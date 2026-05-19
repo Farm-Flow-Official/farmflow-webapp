@@ -1,4 +1,12 @@
-// Subdomain routing middleware
-// dashboard.farmflow.[domain]/* → /admin/*
-// verifier.farmflow.[domain]/* → /verifier/*
-// See: docs/farmflow_webapp_architecture.md
+import { type NextRequest, NextResponse } from 'next/server'
+
+// Subdomain routing will be implemented here:
+// dashboard.farmflow.* → /admin/*
+// verifier.farmflow.*  → /verifier/*
+export function middleware(_request: NextRequest) {
+  return NextResponse.next()
+}
+
+export const config = {
+  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
+}

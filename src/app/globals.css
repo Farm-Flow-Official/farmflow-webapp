@@ -1,0 +1,60 @@
+@import "tailwindcss";
+
+@theme {
+  /* ── Brand ─────────────────────────────── */
+  --color-primary:          #004C22;
+  --color-primary-hover:    #003A1A;
+  --color-primary-subtle:   #F0FFF4;
+  --color-primary-muted:    #D1FAE5;
+  --color-accent:           #C8000E;
+  --color-accent-hover:     #A80009;
+
+  /* ── Surfaces ───────────────────────────── */
+  --color-surface:          #F7F8F9;
+  --color-panel:            #FFFFFF;
+  --color-sunken:           #F0F2F4;
+
+  /* ── Borders ────────────────────────────── */
+  --color-line:             #E4E7EB;
+  --color-line-strong:      #C9CDD3;
+  --color-line-focus:       #004C22;
+
+  /* ── Text ───────────────────────────────── */
+  --color-ink:              #111827;
+  --color-ink-secondary:    #4B5563;
+  --color-ink-muted:        #9CA3AF;
+  --color-ink-disabled:     #D1D5DB;
+
+  /* ── Status ─────────────────────────────── */
+  --color-success:          #166534;
+  --color-success-bg:       #F0FFF4;
+  --color-warning:          #92400E;
+  --color-warning-bg:       #FFFBEB;
+  --color-error:            #991B1B;
+  --color-error-bg:         #FEF2F2;
+  --color-error-border:     #FECACA;
+  --color-info:             #1E40AF;
+  --color-info-bg:          #EFF6FF;
+
+  /* ── GIS Map ────────────────────────────── */
+  --color-gis-verified:     #22C55E;
+  --color-gis-flagged:      #EF4444;
+  --color-gis-pending:      #F59E0B;
+
+  /* ── Typography ─────────────────────────── */
+  --font-sans: var(--font-ibm-plex-sans), system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-ibm-plex-mono), 'Courier New', monospace;
+
+  /* ── Layout ─────────────────────────────── */
+  --sidebar-width:   240px;
+  --topbar-height:    64px;
+}
+
+/* ── Base ─────────────────────────────────── */
+body {
+  background-color: var(--color-surface);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
