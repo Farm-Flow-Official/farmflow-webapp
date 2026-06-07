@@ -1,10 +1,8 @@
 import { redirect } from 'next/navigation'
 import { getAdminSession } from '@/features/auth/services/adminSession'
+import { AdminSidebar } from '@/components/ui/sidebar-nav'
+import { AdminTopbar } from '@/components/ui/topbar'
 
-/**
- * Guards every route under /admin/(protected). Verifies the admin session
- * against the API; unauthenticated visitors are sent to the login page.
- */
 export default async function ProtectedAdminLayout({
   children,
 }: {
@@ -15,5 +13,11 @@ export default async function ProtectedAdminLayout({
     redirect('/admin/login')
   }
 
-  return <>{children}</>
+  return (
+    <div className="min-h-screen bg-surface">
+      <AdminTopbar admin={admin} />
+      <AdminSidebar />
+      <main className="min-h-screen pt-16 ml-60">{children}</main>
+    </div>
+  )
 }
