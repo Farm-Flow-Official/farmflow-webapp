@@ -55,14 +55,25 @@ const NAV: NavSection[] = [
   },
 ]
 
-export function AdminSidebar() {
+type Props = {
+  /** Drawer open state on mobile (ignored at lg+ where the sidebar is fixed). */
+  open?: boolean
+  /** Called when a nav item is chosen — used to close the mobile drawer. */
+  onNavigate?: () => void
+}
+
+export function AdminSidebar({ open = false, onNavigate }: Props) {
   const pathname = usePathname()
 
   const isActive = (href: string) =>
     href === '/admin' ? pathname === '/admin' : pathname.startsWith(href)
 
   return (
-    <aside className="fixed bottom-0 left-0 top-16 z-30 flex w-60 flex-col border-r border-line bg-panel">
+    <aside
+      className={`fixed bottom-0 left-0 top-16 z-40 flex w-60 flex-col border-r border-line bg-panel shadow-xl transition-transform duration-200 lg:translate-x-0 lg:shadow-none ${
+        open ? 'translate-x-0' : '-translate-x-full'
+      }`}
+    >
       <nav className="flex-1 overflow-y-auto px-3 py-4">
         {NAV.map((section) => (
           <div key={section.heading} className="mb-1.5">
@@ -76,6 +87,7 @@ export function AdminSidebar() {
                 <Link
                   key={item.href}
                   href={item.href}
+                  onClick={onNavigate}
                   aria-current={active ? 'page' : undefined}
                   className={`mb-0.5 flex h-10 items-center gap-3 rounded-lg px-3 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 ${
                     active
