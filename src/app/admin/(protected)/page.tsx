@@ -1,103 +1,155 @@
 import type { Metadata } from 'next'
 import { getAdminSession } from '@/features/auth/services/adminSession'
-import { signOutAdmin } from '@/features/auth/actions/signOutAdmin'
+import { KpiCard } from '@/features/dashboard/components/KpiCard'
+import { QuickLinkCard } from '@/features/dashboard/components/QuickLinkCard'
+import {
+  Users,
+  Wallet,
+  Leaf,
+  AlertTriangle,
+  TrendingUp,
+  Map,
+  Megaphone,
+  Settings,
+  Headphones,
+} from 'lucide-react'
 
 export const metadata: Metadata = {
-  title: 'แดชบอร์ด — FarmFlow Admin',
+  title: 'Dashboard — FarmFlow Admin',
 }
 
+// Mock KPI data — wire to GET /admin/dashboard/summary when API is ready
+const KPI = {
+  activeFarmers: 124,
+  pendingPayouts: 5,
+  totalCarbonKgco2e: 42500,
+  overlapFlaggedFarms: 3,
+  marketPriceThb: 48.5,
+}
+
+const KPI_CARDS = [
+  {
+    label: 'Active Farmers',
+    value: KPI.activeFarmers.toLocaleString('en-US'),
+    sublabel: 'registered accounts',
+    alert: false,
+    Icon: Users,
+  },
+  {
+    label: 'Pending Payouts',
+    value: String(KPI.pendingPayouts),
+    sublabel: 'withdrawal requests',
+    alert: KPI.pendingPayouts > 0,
+    Icon: Wallet,
+  },
+  {
+    label: 'Carbon Issued',
+    value: `${KPI.totalCarbonKgco2e.toLocaleString('en-US')} kgCO₂e`,
+    sublabel: 'total credits issued',
+    alert: false,
+    Icon: Leaf,
+  },
+  {
+    label: 'Overlap Flags',
+    value: String(KPI.overlapFlaggedFarms),
+    sublabel: 'farms pending GIS review',
+    alert: KPI.overlapFlaggedFarms > 0,
+    Icon: AlertTriangle,
+  },
+  {
+    label: 'Market Price',
+    value: `฿${KPI.marketPriceThb.toFixed(2)}`,
+    sublabel: 'per kgCO₂e',
+    alert: false,
+    Icon: TrendingUp,
+  },
+]
+
+const QUICK_LINKS = [
+  {
+    href: '/admin/farmers',
+    label: 'Farmer Management',
+    desc: 'View and manage all farmer accounts',
+    Icon: Users,
+  },
+  {
+    href: '/admin/gis',
+    label: 'GIS Map',
+    desc: 'Inspect farm polygons and overlap flags',
+    Icon: Map,
+  },
+  {
+    href: '/admin/payouts',
+    label: 'Payout Queue',
+    desc: 'Process farmer withdrawal requests',
+    Icon: Wallet,
+  },
+  {
+    href: '/admin/announcements',
+    label: 'Announcements',
+    desc: 'Create and publish news banners',
+    Icon: Megaphone,
+  },
+  {
+    href: '/admin/settings',
+    label: 'System Settings',
+    desc: 'Update market price and configuration',
+    Icon: Settings,
+  },
+  {
+    href: '/admin/support',
+    label: 'Support Tickets',
+    desc: 'Handle farmer support requests',
+    Icon: Headphones,
+  },
+]
+
 export default async function AdminDashboardPage() {
-  // The (protected) layout already guarantees a session; this read is memoised.
   const admin = await getAdminSession()
   if (!admin) return null
 
-  return (
-    <main className="min-h-screen bg-[#F7F8F9]">
-      {/* ── Top bar ── */}
-      <header className="flex items-center justify-between border-b border-[#E4E7EB] bg-white px-8 py-4">
-        <div className="flex items-center gap-2.5">
-          <svg width="28" height="28" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-            <path
-              d="M16 3C16 3 5 10 5 19C5 24.5 9.5 29 16 29C22.5 29 27 24.5 27 19C27 10 16 3 16 3Z"
-              fill="#004C22"
-              fillOpacity="0.12"
-              stroke="#004C22"
-              strokeWidth="1.75"
-              strokeLinejoin="round"
-            />
-            <path
-              d="M16 29V15M16 15C16 15 20.5 17.5 23 22"
-              stroke="#004C22"
-              strokeWidth="1.75"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-          <span className="text-lg font-semibold tracking-tight text-[#004C22]">
-            FarmFlow
-          </span>
-          <span className="ml-1 text-xs text-[#9CA3AF]">Admin Dashboard</span>
-        </div>
+  const today = new Date().toLocaleDateString('th-TH', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
 
-        <form action={signOutAdmin}>
-          <button
-            type="submit"
-            className="rounded-md border border-[#E4E7EB] bg-white px-4 py-2 text-sm font-medium text-[#374151] transition-colors hover:bg-[#F3F4F6]"
-          >
-            ออกจากระบบ
-          </button>
-        </form>
+  return (
+    <div className="mx-auto max-w-[1440px] px-8 py-8">
+      {/* Page header */}
+      <header className="mb-8">
+        <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-ink">
+          Dashboard
+        </h1>
+        <p className="mt-1.5 text-sm text-ink-secondary">
+          ยินดีต้อนรับ, <span className="font-medium text-ink">{admin.username}</span> — {today}
+        </p>
       </header>
 
-      {/* ── Body ── */}
-      <section className="mx-auto max-w-[880px] px-8 py-10">
-        <h1 className="text-xl font-semibold text-[#111827]">
-          ยินดีต้อนรับ, {admin.username}
-        </h1>
-        <p className="mt-1 text-sm text-[#6B7280]">
-          เข้าสู่ระบบสำเร็จ — นี่คือหน้าแดชบอร์ดชั่วคราวสำหรับยืนยันการล็อกอิน
-        </p>
-
-        <div className="mt-8 grid gap-4 sm:grid-cols-2">
-          <div className="rounded-xl border border-[#E4E7EB] bg-white p-6">
-            <p className="text-xs font-medium uppercase tracking-wide text-[#9CA3AF]">
-              Admin ID
-            </p>
-            <p className="mt-1.5 break-all font-mono text-sm text-[#111827]">
-              {admin.id}
-            </p>
-          </div>
-
-          <div className="rounded-xl border border-[#E4E7EB] bg-white p-6">
-            <p className="text-xs font-medium uppercase tracking-wide text-[#9CA3AF]">
-              Role ID
-            </p>
-            <p className="mt-1.5 break-all font-mono text-sm text-[#111827]">
-              {admin.roleId}
-            </p>
-          </div>
-        </div>
-
-        <div className="mt-4 rounded-xl border border-[#E4E7EB] bg-white p-6">
-          <p className="text-xs font-medium uppercase tracking-wide text-[#9CA3AF]">
-            Permissions ({admin.permissions.length})
-          </p>
-          {admin.permissions.length > 0 ? (
-            <div className="mt-2.5 flex flex-wrap gap-2">
-              {admin.permissions.map((perm) => (
-                <span
-                  key={perm}
-                  className="rounded-md bg-[#004C22]/8 px-2.5 py-1 font-mono text-xs text-[#004C22]"
-                >
-                  {perm}
-                </span>
-              ))}
-            </div>
-          ) : (
-            <p className="mt-1.5 text-sm text-[#9CA3AF]">— ไม่มีสิทธิ์ที่กำหนด —</p>
-          )}
+      {/* KPI overview */}
+      <section className="mb-10">
+        <h2 className="mb-4 text-xs font-semibold uppercase tracking-wider text-ink-muted">
+          Overview
+        </h2>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+          {KPI_CARDS.map((card) => (
+            <KpiCard key={card.label} {...card} />
+          ))}
         </div>
       </section>
-    </main>
+
+      {/* Quick access */}
+      <section>
+        <h2 className="mb-4 text-xs font-semibold uppercase tracking-wider text-ink-muted">
+          Quick Access
+        </h2>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {QUICK_LINKS.map((link) => (
+            <QuickLinkCard key={link.href} {...link} />
+          ))}
+        </div>
+      </section>
+    </div>
   )
 }

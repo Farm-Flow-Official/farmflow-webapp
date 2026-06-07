@@ -61,12 +61,19 @@ colors:
   chart-neutral:       '#D1D5DB'
 
 typography:
-  # Font: "IBM Plex Sans" — geometric, institutional, highly legible at all sizes
+  # Font roles:
+  #   Montserrat → main headings (display, heading-*)
+  #   Open Sans  → body content (body-*, label, caption)
+  #   Inter      → important numeric data (KPI values, IDs, THB / kgCO₂e)
+  #   Prompt     → Thai-language content (applied via :lang(th) / Thai glyph ranges)
   # Fallback stack: system-ui, -apple-system, sans-serif
-  font-family:         '"IBM Plex Sans", system-ui, -apple-system, sans-serif'
-  font-family-mono:    '"IBM Plex Mono", "Courier New", monospace'
+  font-family-display: '"Montserrat", system-ui, -apple-system, sans-serif'
+  font-family-body:    '"Open Sans", system-ui, -apple-system, sans-serif'
+  font-family-numeric: '"Inter", system-ui, -apple-system, sans-serif'
+  font-family-thai:    '"Prompt", system-ui, -apple-system, sans-serif'
 
   display:
+    fontFamily: '"Montserrat", system-ui, sans-serif'
     fontSize:   28px
     fontWeight: '600'
     lineHeight: '1.25'
@@ -74,17 +81,20 @@ typography:
     color: text-primary
 
   heading-lg:
+    fontFamily: '"Montserrat", system-ui, sans-serif'
     fontSize:   22px
     fontWeight: '600'
     lineHeight: '1.3'
     letterSpacing: '-0.01em'
 
   heading-md:
+    fontFamily: '"Montserrat", system-ui, sans-serif'
     fontSize:   18px
     fontWeight: '600'
     lineHeight: '1.4'
 
   heading-sm:
+    fontFamily: '"Montserrat", system-ui, sans-serif'
     fontSize:   15px
     fontWeight: '600'
     lineHeight: '1.4'
@@ -92,33 +102,42 @@ typography:
     textTransform: 'uppercase'
 
   body-lg:
+    fontFamily: '"Open Sans", system-ui, sans-serif'
     fontSize:   16px
     fontWeight: '400'
     lineHeight: '1.65'
 
   body-md:
+    fontFamily: '"Open Sans", system-ui, sans-serif'
     fontSize:   14px
     fontWeight: '400'
     lineHeight: '1.65'
 
   label:
+    fontFamily: '"Open Sans", system-ui, sans-serif'
     fontSize:   13px
     fontWeight: '500'
     lineHeight: '1.4'
     letterSpacing: '0.01em'
 
   caption:
+    fontFamily: '"Open Sans", system-ui, sans-serif'
     fontSize:   12px
     fontWeight: '400'
     lineHeight: '1.5'
     color: text-secondary
 
   numeric:
-    fontFamily: '"IBM Plex Mono", monospace'
+    fontFamily: '"Inter", system-ui, sans-serif'
+    fontVariantNumeric: 'tabular-nums'
     fontSize:   14px
     fontWeight: '500'
     lineHeight: '1.4'
     letterSpacing: '-0.01em'
+
+  thai:
+    fontFamily: '"Prompt", system-ui, sans-serif'
+    # Use for all Thai-language UI copy; pairs with the sizes/weights above
 
 spacing:
   # 8-point grid system
@@ -173,7 +192,7 @@ True Red (`#C8000E`) is reserved exclusively for: the primary CTA button, critic
 This is a data-heavy B2B system. Components must handle dense information without feeling cramped. Achieve this through generous line-height, disciplined column widths, and clear typographic hierarchy — not through reducing content.
 
 **5. Institutional Legibility**
-Every element is optimized for professional office conditions (high-resolution screens, ambient lighting). Monospace fonts for IDs and numeric data. High-contrast text ratios (minimum WCAG AA, target AAA for critical fields).
+Every element is optimized for professional office conditions (high-resolution screens, ambient lighting). Inter with tabular figures for IDs and numeric data. High-contrast text ratios (minimum WCAG AA, target AAA for critical fields).
 
 ---
 
@@ -194,6 +213,7 @@ Every element is optimized for professional office conditions (high-resolution s
 ```
 
 ### Topbar (64px)
+
 - Background: `#FFFFFF`, bottom border: `1px solid #E4E7EB`
 - Left: FarmFlow logo + wordmark (monochrome, 20px height)
 - Center: Page title (heading-md, text-primary)
@@ -201,6 +221,7 @@ Every element is optimized for professional office conditions (high-resolution s
 - Subdomain indicator: small label below logo — "Admin Dashboard" or "Verifier Portal" in text-tertiary
 
 ### Sidebar (240px)
+
 - Background: `#004C22` (Deep Forest Green)
 - Text: `rgba(255,255,255,0.75)` for inactive items
 - Active item: white text + `rgba(255,255,255,0.12)` fill + 3px left border accent in white
@@ -210,6 +231,7 @@ Every element is optimized for professional office conditions (high-resolution s
 - Bottom: version tag in caption style
 
 ### Page Content
+
 - Background: `#F7F8F9`
 - Padding: 32px on all sides
 - Page header zone: page title (display) + breadcrumb (caption) + primary action button — always top-right aligned
@@ -351,7 +373,7 @@ min-height:    120px
 
 Structure:
   - Label: 12px uppercase, weight 600, letter-spacing 0.06em, text-tertiary
-  - Value: 28px, weight 700, font-family-mono, text-primary
+  - Value: 28px, weight 700, font-family-numeric (Inter, tabular-nums), text-primary
   - Delta/sub-label: 13px, text-secondary
   - Optional: left 3px border in status color (green = positive, red = alert)
 ```
@@ -403,9 +425,10 @@ td:
 ```
 
 **Column Types:**
-- **ID / Code**: `font-family-mono`, 13px, `#6B7280`, background `#F9FAFB` pill
+
+- **ID / Code**: `font-family-numeric` (Inter, tabular-nums), 13px, `#6B7280`, background `#F9FAFB` pill
 - **Name / Primary**: 14px, weight 500, `#111827`
-- **Numeric (THB, kgCO₂e)**: `font-family-mono`, right-aligned
+- **Numeric (THB, kgCO₂e)**: `font-family-numeric` (Inter, tabular-nums), right-aligned
 - **Date / Timestamp**: 13px, `#6B7280`
 - **Status Badge**: see Badge spec below
 - **Actions column**: right-aligned, ghost icon buttons only (no full text buttons in rows)
@@ -420,6 +443,7 @@ body:        body-md, text-tertiary
 ```
 
 **Pagination:**
+
 - Bottom of table, right-aligned
 - "Showing X–Y of Z results" in caption left
 - Prev/Next ghost buttons + page numbers, active page in primary fill
@@ -592,6 +616,7 @@ sidebar-panel (detail / filter):
 ```
 
 **Polygon styling:**
+
 - Verified (no flag): fill `rgba(34, 197, 94, 0.15)`, stroke `#16A34A` 2px
 - Flagged (overlap > 15%): fill `rgba(239, 68, 68, 0.15)`, stroke `#EF4444` 2px, animated pulse on stroke
 - Pending: fill `rgba(245, 158, 11, 0.15)`, stroke `#F59E0B` 2px
@@ -781,6 +806,7 @@ Use for: table rows (show 5–8 skeleton rows), KPI card values, map panel.
 
 ### Empty State
 Center-aligned within the container:
+
 - Outline icon (32px, `#D1D5DB`)
 - Heading: "No [items] found" — heading-sm, text-secondary
 - Description: 1–2 lines of context — body-md, text-tertiary
@@ -817,7 +843,8 @@ Table columns on tablet: hide lower-priority columns (timestamps, secondary IDs)
 
 ## 11. Brand Mark Usage
 
-**Logo composition:** Leaf/carbon icon mark (outline style, 2px stroke) + "FarmFlow" wordmark in Prompt Semi-Bold.
+**Logo composition:** Leaf/carbon icon mark (outline style, 2px stroke) + "FarmFlow" wordmark in Montserrat Semi-Bold.
+
 - On dark backgrounds (sidebar): white full-opacity
 - On light backgrounds (login, topbar): `#004C22` primary
 - Minimum clear space: 16px all sides
@@ -866,8 +893,10 @@ Table columns on tablet: hide lower-priority columns (timestamps, secondary IDs)
   --status-info-text:    #1E40AF;
 
   /* Typography */
-  --font-sans:  'IBM Plex Sans', system-ui, -apple-system, sans-serif;
-  --font-mono:  'IBM Plex Mono', 'Courier New', monospace;
+  --font-display:  'Montserrat', system-ui, -apple-system, sans-serif;  /* main headings */
+  --font-body:     'Open Sans', system-ui, -apple-system, sans-serif;   /* body content */
+  --font-numeric:  'Inter', system-ui, -apple-system, sans-serif;       /* numeric data (tabular-nums) */
+  --font-thai:     'Prompt', system-ui, -apple-system, sans-serif;      /* Thai-language content */
 
   /* Radius */
   --radius-sm:  4px;
