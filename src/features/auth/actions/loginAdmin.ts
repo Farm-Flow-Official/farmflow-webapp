@@ -2,50 +2,55 @@
 
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
+import { relaySetCookies } from '@/features/auth/services/adminSession'
 import type { LoginState } from '@/features/auth/types'
 
 export async function loginAdmin(
   _state: LoginState,
   formData: FormData,
 ): Promise<LoginState> {
-  const email = formData.get('email')?.toString().trim()
+  const username = formData.get('username')?.toString().trim()
   const password = formData.get('password')?.toString()
 
-  if (!email || !password) {
-    return { error: 'กรุณากรอกอีเมลและรหัสผ่าน' }
+  if (!username || !password) {
+    return { error: 'กรุณากรอกชื่อผู้ใช้และรหัสผ่าน' }
   }
 
-  let data: { token: string; role: string; name: string; admin_id: string }
+  const apiBase = process.env.FARMFLOW_API_URL
+  if (!apiBase) {
+    return { error: 'ระบบยังไม่ได้ตั้งค่า API กรุณาติดต่อผู้ดูแลระบบ' }
+  }
+
+  // The API authenticates with username+password and replies with HttpOnly
+  // session cookies (no token in the body). We relay those cookies to the
+  // browser so subsequent requests carry the admin session.
+  let setCookies: string[]
 
   try {
-    const res = await fetch(
-      `${process.env.FARMFLOW_API_URL}/auth/admin/login`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-        cache: 'no-store',
-      },
-    )
+    const res = await fetch(`${apiBase}/admin/auth/sign-in`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password }),
+      cache: 'no-store',
+    })
 
     if (!res.ok) {
-      if (res.status === 401) return { error: 'อีเมลหรือรหัสผ่านไม่ถูกต้อง' }
+      if (res.status === 401) return { error: 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง' }
+      if (res.status === 422) return { error: 'ข้อมูลไม่ถูกต้อง กรุณาตรวจสอบอีกครั้ง' }
       return { error: 'เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง' }
     }
 
-    data = await res.json()
+    setCookies = res.headers.getSetCookie()
   } catch {
     return { error: 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ กรุณาลองใหม่' }
   }
 
+  if (setCookies.length === 0) {
+    return { error: 'เข้าสู่ระบบไม่สำเร็จ (ไม่ได้รับ session) กรุณาลองใหม่' }
+  }
+
   const cookieStore = await cookies()
-  cookieStore.set('admin_token', data.token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    maxAge: 60 * 60 * 8, // 8 hours
-    path: '/',
-  })
+  relaySetCookies(cookieStore, setCookies)
 
   redirect('/admin')
 }
