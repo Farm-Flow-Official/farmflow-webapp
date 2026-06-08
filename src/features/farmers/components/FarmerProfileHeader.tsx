@@ -1,8 +1,10 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { ShieldOff, ShieldCheck, CheckCircle2, AlertTriangle } from 'lucide-react'
+import { useState } from 'react'
+import { ShieldOff, ShieldCheck } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
+import { Toast, useToast } from '@/components/ui/toast'
 import { formatDate } from '@/lib/utils/format'
 import type { FarmerDetail, FarmerAccountStatus } from '@/features/farmers/types'
 
@@ -21,28 +23,11 @@ export function FarmerProfileHeader({ farmer }: { farmer: FarmerDetail }) {
   const [status, setStatus] = useState<FarmerAccountStatus>(farmer.accountStatus)
   const [confirming, setConfirming] = useState(false)
   const [pending, setPending] = useState(false)
-  const [toast, setToast] = useState<string | null>(null)
+  const { message, showToast } = useToast()
 
   const isActive = status === 'Active'
   const initial = farmer.fullName.charAt(0)
   const nextStatus: FarmerAccountStatus = isActive ? 'Suspended' : 'Active'
-
-  // Close the confirm dialog on Escape.
-  useEffect(() => {
-    if (!confirming) return
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setConfirming(false)
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [confirming])
-
-  // Auto-dismiss the success toast.
-  useEffect(() => {
-    if (!toast) return
-    const t = setTimeout(() => setToast(null), 3500)
-    return () => clearTimeout(t)
-  }, [toast])
 
   async function runAction() {
     setPending(true)
@@ -52,7 +37,7 @@ export function FarmerProfileHeader({ farmer }: { farmer: FarmerDetail }) {
     setStatus(nextStatus)
     setPending(false)
     setConfirming(false)
-    setToast(
+    showToast(
       nextStatus === 'Suspended'
         ? 'ระงับบัญชีเรียบร้อย (mock — ยังไม่บันทึกจริง)'
         : 'เปิดใช้งานบัญชีเรียบร้อย (mock — ยังไม่บันทึกจริง)',
@@ -102,78 +87,23 @@ export function FarmerProfileHeader({ farmer }: { farmer: FarmerDetail }) {
         </button>
       </div>
 
-      {/* Confirm dialog */}
       {confirming && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="confirm-title"
-        >
-          <button
-            type="button"
-            aria-label="ปิด"
-            onClick={() => setConfirming(false)}
-            className="absolute inset-0 bg-ink/40"
-          />
-          <div className="relative w-full max-w-sm rounded-2xl border border-line bg-panel p-6 shadow-xl">
-            <div className="mb-3 flex items-center gap-2.5">
-              <span
-                className={`flex h-9 w-9 items-center justify-center rounded-full ${
-                  isActive ? 'bg-error-bg text-error' : 'bg-primary-subtle text-primary'
-                }`}
-              >
-                <AlertTriangle className="h-5 w-5" strokeWidth={1.75} />
-              </span>
-              <h2 id="confirm-title" className="text-base font-semibold text-ink">
-                {isActive ? 'ยืนยันการระงับบัญชี' : 'ยืนยันการเปิดใช้งาน'}
-              </h2>
-            </div>
-            <p className="mb-5 text-sm text-ink-secondary">
-              {isActive
-                ? `ระงับบัญชีของ "${farmer.fullName}"? เกษตรกรจะไม่สามารถเข้าใช้งานได้จนกว่าจะเปิดใช้งานอีกครั้ง`
-                : `เปิดใช้งานบัญชีของ "${farmer.fullName}" ให้กลับมาใช้งานได้ตามปกติ?`}
-            </p>
-            <div className="flex justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => setConfirming(false)}
-                disabled={pending}
-                className="rounded-lg border border-line bg-panel px-4 py-2 text-sm font-medium text-ink-secondary transition-colors hover:bg-surface hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:opacity-60"
-              >
-                ยกเลิก
-              </button>
-              <button
-                type="button"
-                onClick={runAction}
-                disabled={pending}
-                className={`rounded-lg px-4 py-2 text-sm font-semibold text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 ${
-                  isActive
-                    ? 'bg-error hover:bg-error/90 focus-visible:ring-error'
-                    : 'bg-primary hover:bg-primary-hover focus-visible:ring-primary'
-                }`}
-              >
-                {pending
-                  ? 'กำลังดำเนินการ…'
-                  : isActive
-                    ? 'ระงับบัญชี'
-                    : 'เปิดใช้งาน'}
-              </button>
-            </div>
-          </div>
-        </div>
+        <ConfirmDialog
+          title={isActive ? 'ยืนยันการระงับบัญชี' : 'ยืนยันการเปิดใช้งาน'}
+          description={
+            isActive
+              ? `ระงับบัญชีของ "${farmer.fullName}"? เกษตรกรจะไม่สามารถเข้าใช้งานได้จนกว่าจะเปิดใช้งานอีกครั้ง`
+              : `เปิดใช้งานบัญชีของ "${farmer.fullName}" ให้กลับมาใช้งานได้ตามปกติ?`
+          }
+          confirmLabel={isActive ? 'ระงับบัญชี' : 'เปิดใช้งาน'}
+          tone={isActive ? 'danger' : 'primary'}
+          pending={pending}
+          onConfirm={runAction}
+          onClose={() => setConfirming(false)}
+        />
       )}
 
-      {/* Success toast */}
-      {toast && (
-        <div
-          role="status"
-          className="fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 rounded-lg border border-line bg-panel px-4 py-3 text-sm font-medium text-ink shadow-xl"
-        >
-          <CheckCircle2 className="h-4 w-4 shrink-0 text-success" strokeWidth={1.75} />
-          {toast}
-        </div>
-      )}
+      <Toast message={message} />
     </>
   )
 }

@@ -16,7 +16,6 @@ export default async function AnnouncementsPage() {
 
   // The protected layout already guarantees a session; this is a type guard.
   const canDelete = admin ? canDeleteAnnouncement(admin) : false
-  const activeCount = announcements.filter((a) => a.status === 'Active').length
 
   return (
     <div className="mx-auto max-w-[1440px] px-4 py-8 sm:px-8">
@@ -25,9 +24,7 @@ export default async function AnnouncementsPage() {
           Announcements
         </h1>
         <p className="mt-1.5 text-sm text-ink-secondary">
-          จัดการประกาศและข่าวสารถึงเกษตรกร ·{' '}
-          <span className="font-medium text-ink">{announcements.length}</span> รายการ ·{' '}
-          <span className="font-medium text-success">{activeCount}</span> เผยแพร่อยู่
+          จัดการประกาศและข่าวสารถึงเกษตรกร
         </p>
       </header>
 

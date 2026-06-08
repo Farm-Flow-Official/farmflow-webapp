@@ -1,16 +1,12 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import {
-  Plus,
-  Pencil,
-  Trash2,
-  Megaphone,
-  CheckCircle2,
-  AlertTriangle,
-} from 'lucide-react'
+import { useId, useMemo, useState } from 'react'
+import { Plus, Pencil, Trash2, Megaphone } from 'lucide-react'
 import { DataTable, type Column } from '@/components/ui/data-table'
 import { Badge } from '@/components/ui/badge'
+import { Modal } from '@/components/ui/modal'
+import { ConfirmDialog } from '@/components/ui/confirm-dialog'
+import { Toast, useToast } from '@/components/ui/toast'
 import { formatDate } from '@/lib/utils/format'
 import type {
   Announcement,
@@ -31,13 +27,12 @@ export function AnnouncementManager({ initialItems, canDelete }: Props) {
   const [items, setItems] = useState<Announcement[]>(initialItems)
   const [editing, setEditing] = useState<Editing>(null)
   const [deleting, setDeleting] = useState<Announcement | null>(null)
-  const [toast, setToast] = useState<string | null>(null)
+  const { message, showToast } = useToast()
 
-  useEffect(() => {
-    if (!toast) return
-    const t = setTimeout(() => setToast(null), 3500)
-    return () => clearTimeout(t)
-  }, [toast])
+  const activeCount = useMemo(
+    () => items.filter((a) => a.status === 'Active').length,
+    [items],
+  )
 
   // MOCK ONLY — local state, no persistence. Replace with Server Actions / fetch.
   function handleSave(input: AnnouncementInput) {
@@ -51,14 +46,14 @@ export function AnnouncementManager({ initialItems, canDelete }: Props) {
         updatedAt: now,
       }
       setItems((prev) => [created, ...prev])
-      setToast('สร้างประกาศเรียบร้อย (mock — ยังไม่บันทึกจริง)')
+      showToast('สร้างประกาศเรียบร้อย (mock — ยังไม่บันทึกจริง)')
     } else if (editing) {
       // Seam: await updateAnnouncement(editing.id, input)
       const id = editing.id
       setItems((prev) =>
         prev.map((a) => (a.id === id ? { ...a, ...input, updatedAt: now } : a)),
       )
-      setToast('แก้ไขประกาศเรียบร้อย (mock — ยังไม่บันทึกจริง)')
+      showToast('แก้ไขประกาศเรียบร้อย (mock — ยังไม่บันทึกจริง)')
     }
     setEditing(null)
   }
@@ -69,7 +64,7 @@ export function AnnouncementManager({ initialItems, canDelete }: Props) {
     const id = deleting.id
     setItems((prev) => prev.filter((a) => a.id !== id))
     setDeleting(null)
-    setToast('ลบประกาศเรียบร้อย (mock — ยังไม่บันทึกจริง)')
+    showToast('ลบประกาศเรียบร้อย (mock — ยังไม่บันทึกจริง)')
   }
 
   const columns: Column<Announcement>[] = [
@@ -105,29 +100,13 @@ export function AnnouncementManager({ initialItems, canDelete }: Props) {
       align: 'right',
       cell: (a) => (
         <div className="flex items-center justify-end gap-1">
-          <button
-            type="button"
-            aria-label="แก้ไข"
-            onClick={(e) => {
-              e.stopPropagation()
-              setEditing(a)
-            }}
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-ink-secondary transition-colors hover:bg-surface hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-          >
+          <RowAction label="แก้ไข" onClick={() => setEditing(a)}>
             <Pencil className="h-4 w-4" strokeWidth={1.75} />
-          </button>
+          </RowAction>
           {canDelete && (
-            <button
-              type="button"
-              aria-label="ลบ"
-              onClick={(e) => {
-                e.stopPropagation()
-                setDeleting(a)
-              }}
-              className="flex h-8 w-8 items-center justify-center rounded-lg text-ink-secondary transition-colors hover:bg-error-bg hover:text-error focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-error"
-            >
+            <RowAction label="ลบ" tone="danger" onClick={() => setDeleting(a)}>
               <Trash2 className="h-4 w-4" strokeWidth={1.75} />
-            </button>
+            </RowAction>
           )}
         </div>
       ),
@@ -136,7 +115,13 @@ export function AnnouncementManager({ initialItems, canDelete }: Props) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex justify-end">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="text-sm text-ink-secondary">
+          ทั้งหมด <span className="font-medium text-ink">{items.length}</span> ·{' '}
+          เผยแพร่ <span className="font-medium text-success">{activeCount}</span> ·{' '}
+          ฉบับร่าง{' '}
+          <span className="font-medium text-ink">{items.length - activeCount}</span>
+        </p>
         <button
           type="button"
           onClick={() => setEditing('new')}
@@ -168,23 +153,53 @@ export function AnnouncementManager({ initialItems, canDelete }: Props) {
       )}
 
       {deleting && (
-        <ConfirmDelete
-          title={deleting.title}
+        <ConfirmDialog
+          title="ยืนยันการลบประกาศ"
+          description={<>ลบประกาศ “{deleting.title}”? การลบไม่สามารถย้อนกลับได้</>}
+          confirmLabel="ลบประกาศ"
+          tone="danger"
           onConfirm={handleDelete}
           onClose={() => setDeleting(null)}
         />
       )}
 
-      {toast && (
-        <div
-          role="status"
-          className="fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 rounded-lg border border-line bg-panel px-4 py-3 text-sm font-medium text-ink shadow-xl"
-        >
-          <CheckCircle2 className="h-4 w-4 shrink-0 text-success" strokeWidth={1.75} />
-          {toast}
-        </div>
-      )}
+      <Toast message={message} />
     </div>
+  )
+}
+
+/* ── Row action button ──────────────────────────────────────────────────── */
+
+function RowAction({
+  label,
+  tone = 'neutral',
+  onClick,
+  children,
+}: {
+  label: string
+  tone?: 'neutral' | 'danger'
+  onClick: () => void
+  children: React.ReactNode
+}) {
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      // Stop both click AND keydown from bubbling to the clickable DataTable row,
+      // otherwise Enter/Space here would also trigger the row's edit action.
+      onClick={(e) => {
+        e.stopPropagation()
+        onClick()
+      }}
+      onKeyDown={(e) => e.stopPropagation()}
+      className={`flex h-8 w-8 items-center justify-center rounded-lg text-ink-secondary transition-colors focus-visible:outline-none focus-visible:ring-2 ${
+        tone === 'danger'
+          ? 'hover:bg-error-bg hover:text-error focus-visible:ring-error'
+          : 'hover:bg-surface hover:text-ink focus-visible:ring-primary'
+      }`}
+    >
+      {children}
+    </button>
   )
 }
 
@@ -199,18 +214,11 @@ function AnnouncementForm({
   onSave: (input: AnnouncementInput) => void
   onClose: () => void
 }) {
+  const titleId = useId()
   const [title, setTitle] = useState(initial?.title ?? '')
   const [body, setBody] = useState(initial?.body ?? '')
   const [status, setStatus] = useState<AnnouncementStatus>(initial?.status ?? 'Draft')
   const [touched, setTouched] = useState(false)
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [onClose])
 
   const titleError = touched && title.trim() === ''
 
@@ -221,157 +229,97 @@ function AnnouncementForm({
   }
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="ann-form-title"
+    // Forms keep typed input safe: backdrop click won't discard (Esc still works).
+    <Modal
+      onClose={onClose}
+      labelledBy={titleId}
+      closeOnBackdrop={false}
+      panelClassName="flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden"
     >
-      <button type="button" aria-label="ปิด" onClick={onClose} className="absolute inset-0 bg-ink/40" />
-      <div className="relative flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-line bg-panel shadow-xl">
-        <div className="border-b border-line px-6 py-4">
-          <h2 id="ann-form-title" className="text-base font-semibold text-ink">
-            {initial ? 'แก้ไขประกาศ' : 'สร้างประกาศใหม่'}
-          </h2>
-        </div>
+      <div className="border-b border-line px-6 py-4">
+        <h2 id={titleId} className="text-base font-semibold text-ink">
+          {initial ? 'แก้ไขประกาศ' : 'สร้างประกาศใหม่'}
+        </h2>
+      </div>
 
-        <div className="flex flex-col gap-4 overflow-y-auto px-6 py-5">
-          <div>
-            <label htmlFor="ann-title" className="mb-1.5 block text-sm font-medium text-ink">
-              หัวข้อ <span className="text-error">*</span>
-            </label>
-            <input
-              id="ann-title"
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="เช่น อัปเดตราคาคาร์บอนเครดิต"
-              className={`h-10 w-full rounded-lg border bg-panel px-3 text-sm text-ink placeholder:text-ink-muted transition-shadow focus:outline-none focus:ring-2 ${
-                titleError
-                  ? 'border-error-border focus:border-error focus:ring-error/15'
-                  : 'border-line focus:border-primary focus:ring-primary/15'
-              }`}
-            />
-            {titleError && <p className="mt-1 text-xs text-error">กรุณากรอกหัวข้อ</p>}
-          </div>
-
-          <div>
-            <label htmlFor="ann-body" className="mb-1.5 block text-sm font-medium text-ink">
-              เนื้อหา
-            </label>
-            <textarea
-              id="ann-body"
-              value={body}
-              onChange={(e) => setBody(e.target.value)}
-              rows={6}
-              placeholder="รายละเอียดประกาศ…"
-              className="w-full resize-y rounded-lg border border-line bg-panel px-3 py-2 text-sm text-ink placeholder:text-ink-muted transition-shadow focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15"
-            />
-          </div>
-
-          {/* Publish toggle */}
-          <label className="flex cursor-pointer items-center justify-between rounded-lg border border-line bg-surface px-4 py-3">
-            <span className="flex flex-col">
-              <span className="text-sm font-medium text-ink">เผยแพร่ทันที</span>
-              <span className="text-xs text-ink-muted">
-                {status === 'Active' ? 'เกษตรกรจะเห็นประกาศนี้' : 'บันทึกเป็นฉบับร่าง ยังไม่เผยแพร่'}
-              </span>
-            </span>
-            <button
-              type="button"
-              role="switch"
-              aria-checked={status === 'Active'}
-              onClick={() => setStatus((s) => (s === 'Active' ? 'Draft' : 'Active'))}
-              className={`relative h-6 w-11 shrink-0 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
-                status === 'Active' ? 'bg-primary' : 'bg-ink-disabled'
-              }`}
-            >
-              <span
-                className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
-                  status === 'Active' ? 'translate-x-[22px]' : 'translate-x-0.5'
-                }`}
-              />
-            </button>
+      <div className="flex flex-col gap-4 overflow-y-auto px-6 py-5">
+        <div>
+          <label htmlFor="ann-title" className="mb-1.5 block text-sm font-medium text-ink">
+            หัวข้อ <span className="text-error">*</span>
           </label>
+          <input
+            id="ann-title"
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="เช่น อัปเดตราคาคาร์บอนเครดิต"
+            className={`h-10 w-full rounded-lg border bg-panel px-3 text-sm text-ink placeholder:text-ink-muted transition-shadow focus:outline-none focus:ring-2 ${
+              titleError
+                ? 'border-error-border focus:border-error focus:ring-error/15'
+                : 'border-line focus:border-primary focus:ring-primary/15'
+            }`}
+          />
+          {titleError && <p className="mt-1 text-xs text-error">กรุณากรอกหัวข้อ</p>}
         </div>
 
-        <div className="flex justify-end gap-2 border-t border-line px-6 py-4">
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-lg border border-line bg-panel px-4 py-2 text-sm font-medium text-ink-secondary transition-colors hover:bg-surface hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-          >
-            ยกเลิก
-          </button>
-          <button
-            type="button"
-            onClick={submit}
-            className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-          >
-            {initial ? 'บันทึกการแก้ไข' : 'สร้างประกาศ'}
-          </button>
+        <div>
+          <label htmlFor="ann-body" className="mb-1.5 block text-sm font-medium text-ink">
+            เนื้อหา
+          </label>
+          <textarea
+            id="ann-body"
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+            rows={6}
+            placeholder="รายละเอียดประกาศ…"
+            className="w-full resize-y rounded-lg border border-line bg-panel px-3 py-2 text-sm text-ink placeholder:text-ink-muted transition-shadow focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15"
+          />
         </div>
-      </div>
-    </div>
-  )
-}
 
-/* ── Delete confirmation ────────────────────────────────────────────────── */
-
-function ConfirmDelete({
-  title,
-  onConfirm,
-  onClose,
-}: {
-  title: string
-  onConfirm: () => void
-  onClose: () => void
-}) {
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [onClose])
-
-  return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="ann-delete-title"
-    >
-      <button type="button" aria-label="ปิด" onClick={onClose} className="absolute inset-0 bg-ink/40" />
-      <div className="relative w-full max-w-sm rounded-2xl border border-line bg-panel p-6 shadow-xl">
-        <div className="mb-3 flex items-center gap-2.5">
-          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-error-bg text-error">
-            <AlertTriangle className="h-5 w-5" strokeWidth={1.75} />
+        {/* Publish toggle */}
+        <label className="flex cursor-pointer items-center justify-between rounded-lg border border-line bg-surface px-4 py-3">
+          <span className="flex flex-col">
+            <span className="text-sm font-medium text-ink">เผยแพร่ทันที</span>
+            <span className="text-xs text-ink-muted">
+              {status === 'Active'
+                ? 'เกษตรกรจะเห็นประกาศนี้'
+                : 'บันทึกเป็นฉบับร่าง ยังไม่เผยแพร่'}
+            </span>
           </span>
-          <h2 id="ann-delete-title" className="text-base font-semibold text-ink">
-            ยืนยันการลบประกาศ
-          </h2>
-        </div>
-        <p className="mb-5 text-sm text-ink-secondary">
-          ลบประกาศ “{title}”? การลบไม่สามารถย้อนกลับได้
-        </p>
-        <div className="flex justify-end gap-2">
           <button
             type="button"
-            onClick={onClose}
-            className="rounded-lg border border-line bg-panel px-4 py-2 text-sm font-medium text-ink-secondary transition-colors hover:bg-surface hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            role="switch"
+            aria-checked={status === 'Active'}
+            onClick={() => setStatus((s) => (s === 'Active' ? 'Draft' : 'Active'))}
+            className={`inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
+              status === 'Active' ? 'bg-primary' : 'bg-ink-disabled'
+            }`}
           >
-            ยกเลิก
+            <span
+              className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform ${
+                status === 'Active' ? 'translate-x-[22px]' : 'translate-x-0.5'
+              }`}
+            />
           </button>
-          <button
-            type="button"
-            onClick={onConfirm}
-            className="rounded-lg bg-error px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-error/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-error focus-visible:ring-offset-2"
-          >
-            ลบประกาศ
-          </button>
-        </div>
+        </label>
       </div>
-    </div>
+
+      <div className="flex justify-end gap-2 border-t border-line px-6 py-4">
+        <button
+          type="button"
+          onClick={onClose}
+          className="rounded-lg border border-line bg-panel px-4 py-2 text-sm font-medium text-ink-secondary transition-colors hover:bg-surface hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+        >
+          ยกเลิก
+        </button>
+        <button
+          type="button"
+          onClick={submit}
+          className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+        >
+          {initial ? 'บันทึกการแก้ไข' : 'สร้างประกาศ'}
+        </button>
+      </div>
+    </Modal>
   )
 }
