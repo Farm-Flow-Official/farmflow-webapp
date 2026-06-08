@@ -1,4 +1,5 @@
 import type { FarmerDetail, Farm, CropType } from '@/features/farmers/types'
+import { estimateValueThb } from '@/lib/constants/carbon'
 import { mockFarmers } from './mockFarmers'
 
 const PROVINCES = [
@@ -17,14 +18,6 @@ const FARM_NAMES = [
   'ไร่บ้านนา', 'สวนธรรมชาติ', 'นาตากลม', 'แปลงใหม่',
 ]
 
-/**
- * Carbon credit market price in THB per **kg** CO₂e — stands in for the
- * platform-wide `market_price_thb` set by Master Admin. The payout formula is
- * `total_carbon_kgco2e × market_price_thb` (business req §Workflow 6 / A-07).
- * ฿0.45/kg ≈ ฿450/tCO₂e, a realistic voluntary-market figure. When the API is
- * ready, this comes from settings/config, not a constant.
- */
-const MARKET_PRICE_THB_PER_KG = 0.45
 
 /** Deterministic pseudo-random integer in [min, max] seeded by `seed`. */
 function seededInt(seed: number, min: number, max: number): number {
@@ -59,7 +52,7 @@ export const mockFarmerDetails: Record<string, FarmerDetail> = Object.fromEntrie
   mockFarmers.map((farmer) => {
     const farms = buildFarms(farmer.id, farmer.farmsCount, farmer.registeredAt)
     const totalCarbonKgCo2e = farms.reduce((s, f) => s + f.carbonKgCo2e, 0)
-    const estimatedValueThb = Math.round(totalCarbonKgCo2e * MARKET_PRICE_THB_PER_KG)
+    const estimatedValueThb = estimateValueThb(totalCarbonKgCo2e)
 
     return [farmer.id, { ...farmer, farms, totalCarbonKgCo2e, estimatedValueThb }]
   }),
