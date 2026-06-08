@@ -6,7 +6,6 @@ import {
   LayoutDashboard,
   Users,
   Map,
-  Wallet,
   Megaphone,
   Settings,
   ScrollText,
@@ -32,10 +31,6 @@ const NAV: NavSection[] = [
   {
     heading: 'Verification',
     items: [{ href: '/admin/gis', label: 'GIS Map', icon: Map }],
-  },
-  {
-    heading: 'Finance',
-    items: [{ href: '/admin/payouts', label: 'Payout Queue', icon: Wallet }],
   },
   {
     heading: 'Content',
