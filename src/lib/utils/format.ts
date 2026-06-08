@@ -8,6 +8,7 @@ export function formatDate(iso: string): string {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
+    timeZone: 'Asia/Bangkok',
   })
 }
 
@@ -21,6 +22,20 @@ export function formatPhone(phone: string): string {
 /** Number → "1,234" (grouped). */
 export function formatNumber(n: number): string {
   return n.toLocaleString('en-US')
+}
+
+/** ISO date string → "8 มิ.ย. 2568 14:32" (Thai locale, date + 24h time). */
+export function formatDateTime(iso: string): string {
+  const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return '—'
+  return d.toLocaleString('th-TH', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'Asia/Bangkok',
+  })
 }
 
 /**
