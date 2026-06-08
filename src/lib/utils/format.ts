@@ -22,3 +22,22 @@ export function formatPhone(phone: string): string {
 export function formatNumber(n: number): string {
   return n.toLocaleString('en-US')
 }
+
+/**
+ * ISO date string → Thai relative time ("3 ชม.ที่แล้ว"). Falls back to an
+ * absolute date for anything older than a week. Computed against the caller's
+ * clock — use in client components and guard with `suppressHydrationWarning`.
+ */
+export function formatRelativeTime(iso: string): string {
+  const then = new Date(iso)
+  if (Number.isNaN(then.getTime())) return '—'
+  const sec = Math.floor((Date.now() - then.getTime()) / 1000)
+  if (sec < 60) return 'เมื่อสักครู่'
+  const min = Math.floor(sec / 60)
+  if (min < 60) return `${min} นาทีที่แล้ว`
+  const hr = Math.floor(min / 60)
+  if (hr < 24) return `${hr} ชม.ที่แล้ว`
+  const day = Math.floor(hr / 24)
+  if (day < 7) return `${day} วันที่แล้ว`
+  return formatDate(iso)
+}
