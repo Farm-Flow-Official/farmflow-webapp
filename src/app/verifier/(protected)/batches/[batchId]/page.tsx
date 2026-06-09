@@ -17,6 +17,7 @@ import { BatchReviewActions } from '@/features/verifier/components/BatchReviewAc
 import { BatchMiniMap } from '@/features/verifier/components/BatchMiniMap'
 import { TreeSnapshotGrid } from '@/features/verifier/components/TreeSnapshotGrid'
 import { formatDate, formatNumber } from '@/lib/utils/format'
+import { confidenceTextClass } from '@/features/verifier/lib/confidence'
 
 export async function generateMetadata({
   params,
@@ -25,10 +26,6 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { batchId } = await params
   return { title: `${batchId} — FarmFlow Verifier` }
-}
-
-function confColor(c: number): string {
-  return c >= 0.7 ? 'text-success' : c >= 0.5 ? 'text-warning' : 'text-error'
 }
 
 export default async function BatchDetailPage({
@@ -146,7 +143,7 @@ export default async function BatchDetailPage({
               </span>
               <div>
                 <dt className="text-xs text-ink-muted">ความเชื่อมั่น AI เฉลี่ย</dt>
-                <dd className={`font-mono text-lg font-semibold ${confColor(batch.avgConfidence)}`}>
+                <dd className={`font-mono text-lg font-semibold ${confidenceTextClass(batch.avgConfidence)}`}>
                   {Math.round(batch.avgConfidence * 100)}%
                 </dd>
               </div>

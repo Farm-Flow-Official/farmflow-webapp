@@ -2,7 +2,7 @@
 
 import 'leaflet/dist/leaflet.css'
 import { useEffect } from 'react'
-import { MapContainer, TileLayer, Polygon, useMap } from 'react-leaflet'
+import { MapContainer, TileLayer, Polygon, CircleMarker, useMap } from 'react-leaflet'
 import type { LatLngExpression } from 'leaflet'
 
 function Fit({ positions }: { positions: [number, number][] }) {
@@ -22,10 +22,23 @@ function Fit({ positions }: { positions: [number, number][] }) {
   return null
 }
 
-/** Small read-only satellite map showing one farm polygon (V-04). */
-export default function LeafletMiniMap({ polygon }: { polygon: [number, number][] }) {
+/**
+ * Small read-only satellite map showing one farm polygon. Optionally pins a
+ * capture point ([lng, lat]) via a CircleMarker — avoids Leaflet's default
+ * marker-icon asset (which 404s under bundlers). Used by V-04 and V-05.
+ */
+export default function LeafletMiniMap({
+  polygon,
+  pin,
+  pinColor = '#C8000E',
+}: {
+  polygon: [number, number][]
+  pin?: [number, number]
+  pinColor?: string
+}) {
   // GeoJSON [lng, lat] → Leaflet [lat, lng].
   const positions = polygon.map(([lng, lat]) => [lat, lng] as [number, number])
+  const pinLatLng: [number, number] | null = pin ? [pin[1], pin[0]] : null
   const center: LatLngExpression = [15.87, 100.99]
 
   return (
@@ -44,7 +57,14 @@ export default function LeafletMiniMap({ polygon }: { polygon: [number, number][
         positions={positions}
         pathOptions={{ color: '#22C55E', weight: 2, fillColor: '#22C55E', fillOpacity: 0.25 }}
       />
-      <Fit positions={positions} />
+      {pinLatLng && (
+        <CircleMarker
+          center={pinLatLng}
+          radius={7}
+          pathOptions={{ color: '#ffffff', weight: 2, fillColor: pinColor, fillOpacity: 1 }}
+        />
+      )}
+      <Fit positions={pinLatLng ? [...positions, pinLatLng] : positions} />
     </MapContainer>
   )
 }

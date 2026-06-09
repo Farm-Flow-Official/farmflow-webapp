@@ -5,6 +5,7 @@ import type {
 } from '@/features/verifier/types'
 import { mockBatches } from '@/features/verifier/data/mockBatches'
 import { mockFarmGeo } from '@/features/gis/data/mockFarmGeo'
+import { CONFIDENCE_MIN } from '@/features/verifier/lib/confidence'
 
 /**
  * Builds batch details on top of the queue mock. Farm geometry is reused from
@@ -81,7 +82,7 @@ function buildTrees(
       capturedAt: new Date(baseMs - i * 3_600_000).toISOString(),
       weather: WEATHERS[s % 3],
       aiConfidenceScore: conf,
-      anomaly: conf < 0.6,
+      anomaly: conf < CONFIDENCE_MIN,
     }
   })
 }

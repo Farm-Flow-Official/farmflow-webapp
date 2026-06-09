@@ -8,6 +8,7 @@ import { Badge, type BadgeVariant } from '@/components/ui/badge'
 import { FilterPills } from '@/components/ui/filter-pills'
 import { Pagination } from '@/components/ui/pagination'
 import { formatDate } from '@/lib/utils/format'
+import { confidenceTextClass } from '@/features/verifier/lib/confidence'
 import type { VerificationBatch, BatchStatus } from '@/features/verifier/types'
 
 const PAGE_SIZE = 8
@@ -23,11 +24,6 @@ const STATUS_META: Record<BatchStatus, { variant: BadgeVariant; label: string }>
   Pending: { variant: 'pending', label: 'รอตรวจ' },
   Approved: { variant: 'verified', label: 'อนุมัติแล้ว' },
   Rejected: { variant: 'rejected', label: 'ปฏิเสธ' },
-}
-
-/** Confidence text colour: ≥0.70 ok, 0.50–0.69 watch, <0.50 critical. */
-function confColor(c: number): string {
-  return c >= 0.7 ? 'text-success' : c >= 0.5 ? 'text-warning' : 'text-error'
 }
 
 const columns: Column<VerificationBatch>[] = [
@@ -75,7 +71,7 @@ const columns: Column<VerificationBatch>[] = [
             <span className="sr-only">ผิดปกติ</span>
           </>
         )}
-        <span className={`font-mono tabular-nums font-semibold ${confColor(b.avgConfidence)}`}>
+        <span className={`font-mono tabular-nums font-semibold ${confidenceTextClass(b.avgConfidence)}`}>
           {Math.round(b.avgConfidence * 100)}%
         </span>
       </span>

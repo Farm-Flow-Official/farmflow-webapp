@@ -11,6 +11,14 @@ const Map = dynamic(() => import('@/features/verifier/components/LeafletMiniMap'
   ),
 })
 
-export function BatchMiniMap({ polygon }: { polygon: [number, number][] }) {
-  return <Map polygon={polygon} />
+export function BatchMiniMap({
+  polygon,
+  pin,
+  pinColor,
+}: {
+  polygon: [number, number][]
+  pin?: [number, number]
+  pinColor?: string
+}) {
+  return <Map polygon={polygon} pin={pin} pinColor={pinColor} />
 }
