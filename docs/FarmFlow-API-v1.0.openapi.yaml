@@ -1,0 +1,815 @@
+openapi: 3.0.3
+info:
+  title: FarmFlow API — Admin & Verifier
+  version: 1.0.0
+  description: >
+    Machine-readable contract for the FarmFlow Admin Dashboard and Verifier Portal
+    (BETA). Companion to FarmFlow-API-Requirements-v1.0.md (read it for DB mapping,
+    gaps, and the Minimal-PII decision). Source of truth: ERDiagram-v3 (Zero-PII).
+
+    Conventions: all paths are under the `/api/v1` server. Every response uses the
+    envelope { success, data, meta } (errors: { success, error, meta }). DB is
+    snake_case; this API responds in camelCase. Dates are ISO-8601 UTC.
+
+    Fields tagged "Minimal-PII" in the .md (fullName/phone/email/ownerName) are NOT
+    in ERD v3 yet — see requirements §2.8 before implementing.
+servers:
+  - url: /api/v1
+    description: API base path
+
+tags:
+  - name: Admin Auth
+    description: Exists today.
+  - name: Admin
+    description: Admin dashboard data — TO BUILD.
+  - name: Verifier Auth
+    description: TO BUILD (seed Verifier role first).
+  - name: Verifier
+    description: Verifier portal — TO BUILD.
+  - name: Public
+    description: No authentication.
+
+security:
+  - cookieAuth: []
+
+paths:
+  # ─────────────────────────── Admin Auth (exists) ───────────────────────────
+  /admin/auth/sign-in:
+    post:
+      tags: [Admin Auth]
+      summary: Admin sign-in (sets HttpOnly session cookies)
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Credentials' }
+      responses:
+        '200':
+          description: Signed in; Set-Cookie issued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Envelope_AdminProfile'
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /admin/auth/me:
+    get:
+      tags: [Admin Auth]
+      summary: Current admin profile
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope_AdminProfile' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /admin/auth/refresh:
+    post:
+      tags: [Admin Auth]
+      summary: Rotate admin session from refresh cookie
+      security: []
+      responses:
+        '200': { description: Rotated; Set-Cookie issued }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /admin/auth/sign-out:
+    post:
+      tags: [Admin Auth]
+      summary: Revoke admin session
+      responses:
+        '200': { description: Signed out }
+
+  # ─────────────────────────── Admin · Farmers ───────────────────────────
+  /admin/farmers:
+    get:
+      tags: [Admin]
+      summary: List farmers
+      description: 'Roles: MASTER, VERIFY, FINANCE, GENERAL. Returns full list (client paginates).'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope_FarmerList' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /admin/farmers/{id}:
+    get:
+      tags: [Admin]
+      summary: Farmer detail (with farms + carbon)
+      parameters: [{ $ref: '#/components/parameters/PathId' }]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope_FarmerDetail' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /admin/farmers/{id}/status:
+    patch:
+      tags: [Admin]
+      summary: Suspend / activate a farmer (role MASTER; beyond ERD prototype)
+      parameters: [{ $ref: '#/components/parameters/PathId' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status: { type: string, enum: [Active, Suspended] }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope_Farmer' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  # ─────────────────────────── Admin · Announcements ───────────────────────────
+  /admin/announcements:
+    get:
+      tags: [Admin]
+      summary: List announcements (MASTER, GENERAL)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope_AnnouncementList' }
+    post:
+      tags: [Admin]
+      summary: Create announcement (MASTER, GENERAL)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AnnouncementInput' }
+      responses:
+        '200':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope_Announcement' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+  /admin/announcements/{id}:
+    patch:
+      tags: [Admin]
+      summary: Update announcement (MASTER, GENERAL)
+      parameters: [{ $ref: '#/components/parameters/PathId' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AnnouncementInput' }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope_Announcement' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    delete:
+      tags: [Admin]
+      summary: Delete announcement (MASTER only)
+      parameters: [{ $ref: '#/components/parameters/PathId' }]
+      responses:
+        '200': { description: Deleted }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  # ─────────────────────────── Admin · System Settings ───────────────────────────
+  /admin/system/settings:
+    get:
+      tags: [Admin]
+      summary: Get system config / carbon market price (MASTER only)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope_SystemConfig' }
+    patch:
+      tags: [Admin]
+      summary: Update carbon market price (MASTER only); appends a config row
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [marketPriceThb]
+              properties:
+                marketPriceThb:
+                  type: number
+                  description: THB per tCO2e (per tonne). UI guards 1–10000.
+                  example: 220
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope_SystemConfig' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+
+  # ─────────────────────────── Admin · Audit Log ───────────────────────────
+  /admin/audit-logs:
+    get:
+      tags: [Admin]
+      summary: List audit log entries (MASTER only; append-only)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope_AuditLogList' }
+
+  # ─────────────────────────── Admin · Admin Users ───────────────────────────
+  /admin/admins:
+    get:
+      tags: [Admin]
+      summary: List admin users excluding self (MASTER only)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope_AdminUserList' }
+    post:
+      tags: [Admin]
+      summary: Invite an admin (MASTER only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AdminInvite' }
+      responses:
+        '200':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope_AdminUser' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+  /admin/admins/{id}/role:
+    patch:
+      tags: [Admin]
+      summary: Change an admin's role (MASTER only)
+      parameters: [{ $ref: '#/components/parameters/PathId' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [role]
+              properties:
+                role: { $ref: '#/components/schemas/AdminRole' }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope_AdminUser' }
+  /admin/admins/{id}/status:
+    patch:
+      tags: [Admin]
+      summary: Suspend / activate an admin (MASTER only; not self)
+      parameters: [{ $ref: '#/components/parameters/PathId' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status: { type: string, enum: [Active, Inactive] }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope_AdminUser' }
+  /admin/admins/{id}:
+    delete:
+      tags: [Admin]
+      summary: Delete an admin (MASTER only; not self; soft delete)
+      parameters: [{ $ref: '#/components/parameters/PathId' }]
+      responses:
+        '200': { description: Deleted }
+
+  # ─────────────────────────── Admin · GIS ───────────────────────────
+  /admin/gis/farms:
+    get:
+      tags: [Admin]
+      summary: All farm polygons + validation flags (VERIFY, MASTER)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope_FarmGeoList' }
+
+  # ─────────────────────────── Verifier Auth (build) ───────────────────────────
+  /verifier/auth/sign-in:
+    post:
+      tags: [Verifier Auth]
+      summary: Verifier sign-in (role=Verifier only)
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Credentials' }
+      responses:
+        '200':
+          description: Signed in; Set-Cookie issued
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope_VerifierProfile' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /verifier/auth/me:
+    get:
+      tags: [Verifier Auth]
+      summary: Current verifier profile
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope_VerifierProfile' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /verifier/auth/sign-out:
+    post:
+      tags: [Verifier Auth]
+      summary: Revoke verifier session
+      responses:
+        '200': { description: Signed out }
+
+  # ─────────────────────────── Verifier · data ───────────────────────────
+  /verifier/overview:
+    get:
+      tags: [Verifier]
+      summary: Dashboard summary + anomaly alerts (VERIFIER)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope_VerifierOverview' }
+  /verifier/batches:
+    get:
+      tags: [Verifier]
+      summary: Batch queue (VERIFIER)
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope_BatchList' }
+  /verifier/batches/{id}:
+    get:
+      tags: [Verifier]
+      summary: Batch detail with tree snapshots (VERIFIER)
+      parameters: [{ $ref: '#/components/parameters/PathId' }]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope_BatchDetail' }
+        '404': { $ref: '#/components/responses/NotFound' }
+  /verifier/batches/{id}/approve:
+    post:
+      tags: [Verifier]
+      summary: Approve a batch → issues result/credit + document (VERIFIER)
+      parameters: [{ $ref: '#/components/parameters/PathId' }]
+      responses:
+        '200':
+          description: Approved
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope_Batch' }
+  /verifier/batches/{id}/reject:
+    post:
+      tags: [Verifier]
+      summary: Reject a batch (reason required) (VERIFIER)
+      parameters: [{ $ref: '#/components/parameters/PathId' }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reason]
+              properties:
+                reason: { type: string, minLength: 1, example: 'ภาพต้นไม้ไม่ชัด' }
+      responses:
+        '200':
+          description: Rejected
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope_Batch' }
+        '422': { $ref: '#/components/responses/ValidationError' }
+
+  # ─────────────────────────── Public ───────────────────────────
+  /verify/qr-check:
+    get:
+      tags: [Public]
+      summary: Public document verification (no PII — validity + issue date only)
+      security: []
+      parameters:
+        - name: session_id
+          in: query
+          required: true
+          schema: { type: string }
+          example: SES-2026-0034
+      responses:
+        '200':
+          description: OK (valid=false when not found/revoked)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Envelope_SessionVerification' }
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: session
+      description: HttpOnly session cookie issued by sign-in (admin or verifier).
+
+  parameters:
+    PathId:
+      name: id
+      in: path
+      required: true
+      schema: { type: string }
+
+  responses:
+    Unauthorized:
+      description: Not authenticated
+      content:
+        application/json: { schema: { $ref: '#/components/schemas/ErrorEnvelope' } }
+    Forbidden:
+      description: Authenticated but lacks the role
+      content:
+        application/json: { schema: { $ref: '#/components/schemas/ErrorEnvelope' } }
+    NotFound:
+      description: Resource not found
+      content:
+        application/json: { schema: { $ref: '#/components/schemas/ErrorEnvelope' } }
+    ValidationError:
+      description: Invalid request body
+      content:
+        application/json: { schema: { $ref: '#/components/schemas/ErrorEnvelope' } }
+
+  schemas:
+    # ── envelope ──
+    Meta:
+      type: object
+      properties:
+        requestId: { type: string, format: uuid }
+        timestamp: { type: string, format: date-time }
+    ErrorEnvelope:
+      type: object
+      properties:
+        success: { type: boolean, example: false }
+        error:
+          type: object
+          properties:
+            code: { type: string, example: VALIDATION_ERROR }
+            message: { type: string }
+            details: { nullable: true }
+        meta: { $ref: '#/components/schemas/Meta' }
+    Credentials:
+      type: object
+      required: [username, password]
+      properties:
+        username: { type: string }
+        password: { type: string, format: password }
+
+    # ── auth profiles ──
+    AdminProfile:
+      type: object
+      properties:
+        id: { type: string }
+        username: { type: string }
+        roleId: { type: string }
+        permissions: { type: array, items: { type: string } }
+    VerifierProfile:
+      type: object
+      properties:
+        id: { type: string }
+        username: { type: string }
+        org: { type: string, example: VGREEN }
+        role: { type: string, enum: [Verifier] }
+
+    # ── enums ──
+    AccountStatus: { type: string, enum: [Active, Suspended] }
+    CropType:
+      type: string
+      enum: [ข้าว, อ้อย, มันสำปะหลัง, ยางพารา, กาแฟ, ผัก, ผลไม้]
+    AnnouncementStatus: { type: string, enum: [Active, Draft] }
+    PriceSource: { type: string, enum: [manual, api_t-ver, api_verra] }
+    AuditAction: { type: string, enum: [CREATE, UPDATE, DELETE, APPROVE] }
+    AuditActorType: { type: string, enum: [USER, ADMIN, SYSTEM] }
+    AdminRole: { type: string, enum: [SuperAdmin, Auditor, Verifier] }
+    AdminStatus: { type: string, enum: [Active, Inactive] }
+    FarmStatus: { type: string, enum: [Draft, Pending, Active, Rejected, Suspended] }
+    GeeStatus: { type: string, enum: [verified, review, failed] }
+    AnomalyKind: { type: string, enum: [low_confidence, metadata_mismatch] }
+    BatchStatus: { type: string, enum: [Pending, Approved, Rejected] }
+    Weather: { type: string, enum: [sunny, cloudy, rainy] }
+
+    # ── farmers ──
+    Farmer:
+      type: object
+      properties:
+        id: { type: string, example: FRM-1001 }
+        fullName: { type: string, description: 'Minimal-PII ← users.full_name' }
+        phone: { type: string, description: 'Minimal-PII ← users.phone' }
+        email: { type: string, nullable: true, description: 'Minimal-PII ← users.email' }
+        accountStatus: { $ref: '#/components/schemas/AccountStatus' }
+        farmsCount: { type: integer }
+        registeredAt: { type: string, format: date-time }
+    Farm:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        province: { type: string }
+        areaRai: { type: number }
+        cropType: { $ref: '#/components/schemas/CropType' }
+        carbonKgCo2e: { type: number, description: kg CO2e }
+        registeredAt: { type: string, format: date-time }
+    FarmerDetail:
+      allOf:
+        - $ref: '#/components/schemas/Farmer'
+        - type: object
+          properties:
+            farms: { type: array, items: { $ref: '#/components/schemas/Farm' } }
+            totalCarbonKgCo2e: { type: number }
+            estimatedValueThb: { type: number }
+
+    # ── announcements ──
+    Announcement:
+      type: object
+      properties:
+        id: { type: string }
+        title: { type: string }
+        body: { type: string }
+        status: { $ref: '#/components/schemas/AnnouncementStatus' }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    AnnouncementInput:
+      type: object
+      required: [title, body, status]
+      properties:
+        title: { type: string, minLength: 1 }
+        body: { type: string }
+        status: { $ref: '#/components/schemas/AnnouncementStatus' }
+
+    # ── settings ──
+    SystemConfig:
+      type: object
+      properties:
+        configId: { type: string }
+        marketPriceThb: { type: number, description: THB per tCO2e }
+        priceSource: { $ref: '#/components/schemas/PriceSource' }
+        effectiveFrom: { type: string, format: date-time }
+        updatedByAdminId: { type: string }
+        updatedByLabel: { type: string, nullable: true }
+        updatedAt: { type: string, format: date-time }
+
+    # ── audit ──
+    AuditLog:
+      type: object
+      properties:
+        id: { type: string }
+        actorId: { type: string }
+        actorLabel: { type: string, nullable: true }
+        actorType: { $ref: '#/components/schemas/AuditActorType' }
+        action: { $ref: '#/components/schemas/AuditAction' }
+        tableName: { type: string }
+        recordId: { type: string }
+        oldData: { type: object, additionalProperties: true, nullable: true }
+        newData: { type: object, additionalProperties: true, nullable: true }
+        createdAt: { type: string, format: date-time }
+
+    # ── admin users ──
+    AdminUser:
+      type: object
+      properties:
+        id: { type: string }
+        username: { type: string }
+        role: { $ref: '#/components/schemas/AdminRole' }
+        status: { $ref: '#/components/schemas/AdminStatus' }
+        lastLoginAt: { type: string, format: date-time, nullable: true }
+        createdAt: { type: string, format: date-time }
+    AdminInvite:
+      type: object
+      required: [username, role]
+      properties:
+        username: { type: string, minLength: 3 }
+        role: { $ref: '#/components/schemas/AdminRole' }
+
+    # ── gis ──
+    Gee:
+      type: object
+      properties:
+        status: { $ref: '#/components/schemas/GeeStatus' }
+        ndvi: { type: number, description: -1..1 }
+    LngLat:
+      type: array
+      description: '[lng, lat] (GeoJSON order)'
+      minItems: 2
+      maxItems: 2
+      items: { type: number }
+    FarmGeo:
+      type: object
+      properties:
+        id: { type: string }
+        farmName: { type: string }
+        ownerUserId: { type: string }
+        ownerName: { type: string, nullable: true, description: 'Minimal-PII' }
+        province: { type: string }
+        checkinLat: { type: number }
+        checkinLng: { type: number }
+        calculatedAreaRai: { type: number }
+        declaredAreaRai: { type: number }
+        areaDiscrepancyFlag: { type: boolean }
+        overlapFlag: { type: boolean }
+        overlapPercent: { type: number, nullable: true }
+        farmStatus: { $ref: '#/components/schemas/FarmStatus' }
+        gee: { $ref: '#/components/schemas/Gee' }
+        polygon: { type: array, items: { $ref: '#/components/schemas/LngLat' } }
+
+    # ── verifier ──
+    VerifierOverview:
+      type: object
+      properties:
+        pendingReview: { type: integer }
+        anomalyAlerts: { type: integer }
+        approvedThisMonth: { type: integer }
+        rejectedThisMonth: { type: integer }
+    AnomalyAlert:
+      type: object
+      properties:
+        id: { type: string }
+        batchId: { type: string }
+        farmName: { type: string, description: 'Minimal-PII' }
+        ownerName: { type: string, description: 'Minimal-PII' }
+        treeCount: { type: integer }
+        aiConfidenceScore: { type: number, description: 0..1 }
+        kind: { $ref: '#/components/schemas/AnomalyKind' }
+        detail: { type: string }
+        submittedAt: { type: string, format: date-time }
+    VerifierOverviewData:
+      type: object
+      properties:
+        summary: { $ref: '#/components/schemas/VerifierOverview' }
+        alerts: { type: array, items: { $ref: '#/components/schemas/AnomalyAlert' } }
+    VerificationBatch:
+      type: object
+      properties:
+        id: { type: string }
+        farmId: { type: string }
+        farmName: { type: string, description: 'Minimal-PII' }
+        ownerName: { type: string, description: 'Minimal-PII' }
+        submittedAt: { type: string, format: date-time }
+        treeCount: { type: integer }
+        avgConfidence: { type: number, description: 0..1 }
+        anomalyFlag: { type: boolean }
+        status: { $ref: '#/components/schemas/BatchStatus' }
+        totalCarbonKgCo2e: { type: number }
+    TreeSnapshot:
+      type: object
+      properties:
+        id: { type: string }
+        captureLat: { type: number }
+        captureLng: { type: number }
+        capturedAt: { type: string, format: date-time }
+        weather: { $ref: '#/components/schemas/Weather' }
+        aiConfidenceScore: { type: number, description: 0..1 }
+        anomaly: { type: boolean }
+    BatchDetail:
+      allOf:
+        - $ref: '#/components/schemas/VerificationBatch'
+        - type: object
+          properties:
+            phone: { type: string, description: 'Minimal-PII' }
+            farmAddress: { type: string }
+            checkinLat: { type: number }
+            checkinLng: { type: number }
+            polygon: { type: array, items: { $ref: '#/components/schemas/LngLat' } }
+            trees: { type: array, items: { $ref: '#/components/schemas/TreeSnapshot' } }
+    SessionVerification:
+      type: object
+      properties:
+        sessionId: { type: string }
+        valid: { type: boolean }
+        issuedAt: { type: string, format: date-time, nullable: true }
+
+    # ── success envelopes (success + data + meta) ──
+    Envelope_AdminProfile:
+      type: object
+      properties:
+        success: { type: boolean, example: true }
+        data: { $ref: '#/components/schemas/AdminProfile' }
+        meta: { $ref: '#/components/schemas/Meta' }
+    Envelope_VerifierProfile:
+      type: object
+      properties:
+        success: { type: boolean, example: true }
+        data: { $ref: '#/components/schemas/VerifierProfile' }
+        meta: { $ref: '#/components/schemas/Meta' }
+    Envelope_Farmer:
+      type: object
+      properties:
+        success: { type: boolean }
+        data: { $ref: '#/components/schemas/Farmer' }
+        meta: { $ref: '#/components/schemas/Meta' }
+    Envelope_FarmerList:
+      type: object
+      properties:
+        success: { type: boolean }
+        data: { type: array, items: { $ref: '#/components/schemas/Farmer' } }
+        meta: { $ref: '#/components/schemas/Meta' }
+    Envelope_FarmerDetail:
+      type: object
+      properties:
+        success: { type: boolean }
+        data: { $ref: '#/components/schemas/FarmerDetail' }
+        meta: { $ref: '#/components/schemas/Meta' }
+    Envelope_Announcement:
+      type: object
+      properties:
+        success: { type: boolean }
+        data: { $ref: '#/components/schemas/Announcement' }
+        meta: { $ref: '#/components/schemas/Meta' }
+    Envelope_AnnouncementList:
+      type: object
+      properties:
+        success: { type: boolean }
+        data: { type: array, items: { $ref: '#/components/schemas/Announcement' } }
+        meta: { $ref: '#/components/schemas/Meta' }
+    Envelope_SystemConfig:
+      type: object
+      properties:
+        success: { type: boolean }
+        data: { $ref: '#/components/schemas/SystemConfig' }
+        meta: { $ref: '#/components/schemas/Meta' }
+    Envelope_AuditLogList:
+      type: object
+      properties:
+        success: { type: boolean }
+        data: { type: array, items: { $ref: '#/components/schemas/AuditLog' } }
+        meta: { $ref: '#/components/schemas/Meta' }
+    Envelope_AdminUser:
+      type: object
+      properties:
+        success: { type: boolean }
+        data: { $ref: '#/components/schemas/AdminUser' }
+        meta: { $ref: '#/components/schemas/Meta' }
+    Envelope_AdminUserList:
+      type: object
+      properties:
+        success: { type: boolean }
+        data: { type: array, items: { $ref: '#/components/schemas/AdminUser' } }
+        meta: { $ref: '#/components/schemas/Meta' }
+    Envelope_FarmGeoList:
+      type: object
+      properties:
+        success: { type: boolean }
+        data: { type: array, items: { $ref: '#/components/schemas/FarmGeo' } }
+        meta: { $ref: '#/components/schemas/Meta' }
+    Envelope_VerifierOverview:
+      type: object
+      properties:
+        success: { type: boolean }
+        data: { $ref: '#/components/schemas/VerifierOverviewData' }
+        meta: { $ref: '#/components/schemas/Meta' }
+    Envelope_BatchList:
+      type: object
+      properties:
+        success: { type: boolean }
+        data: { type: array, items: { $ref: '#/components/schemas/VerificationBatch' } }
+        meta: { $ref: '#/components/schemas/Meta' }
+    Envelope_Batch:
+      type: object
+      properties:
+        success: { type: boolean }
+        data: { $ref: '#/components/schemas/VerificationBatch' }
+        meta: { $ref: '#/components/schemas/Meta' }
+    Envelope_BatchDetail:
+      type: object
+      properties:
+        success: { type: boolean }
+        data: { $ref: '#/components/schemas/BatchDetail' }
+        meta: { $ref: '#/components/schemas/Meta' }
+    Envelope_SessionVerification:
+      type: object
+      properties:
+        success: { type: boolean }
+        data: { $ref: '#/components/schemas/SessionVerification' }
+        meta: { $ref: '#/components/schemas/Meta' }
