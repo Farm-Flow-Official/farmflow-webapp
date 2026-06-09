@@ -14,8 +14,8 @@ const ENTRIES: AuditLog[] = [
     action: 'UPDATE',
     tableName: 'CARBON_MARKET_CONFIG',
     recordId: 'CFG-PRICE',
-    oldData: { market_price_thb: 0.42 },
-    newData: { market_price_thb: 0.45 },
+    oldData: { market_price_thb: 250 },
+    newData: { market_price_thb: 200 },
     createdAt: '2026-06-09T01:20:00Z',
   },
   {
