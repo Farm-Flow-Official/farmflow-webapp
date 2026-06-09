@@ -2,11 +2,11 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Boxes, QrCode } from 'lucide-react'
+import { LayoutDashboard, Boxes, QrCode, ExternalLink } from 'lucide-react'
 import type { ComponentType, SVGProps } from 'react'
 
 type IconType = ComponentType<SVGProps<SVGSVGElement>>
-type NavItem = { href: string; label: string; icon: IconType }
+type NavItem = { href: string; label: string; icon: IconType; newTab?: boolean }
 type NavSection = { heading: string; items: NavItem[] }
 
 const NAV: NavSection[] = [
@@ -20,7 +20,10 @@ const NAV: NavSection[] = [
   },
   {
     heading: 'Tools',
-    items: [{ href: '/verifier/qr-check', label: 'QR Verify', icon: QrCode }],
+    // Public, shell-less page → open in a new tab so the portal stays put.
+    items: [
+      { href: '/verifier/verify/qr-check', label: 'QR Verify', icon: QrCode, newTab: true },
+    ],
   },
 ]
 
@@ -55,6 +58,8 @@ export function VerifierSidebar({ open = false, onNavigate }: Props) {
                   key={item.href}
                   href={item.href}
                   onClick={onNavigate}
+                  target={item.newTab ? '_blank' : undefined}
+                  rel={item.newTab ? 'noopener noreferrer' : undefined}
                   aria-current={active ? 'page' : undefined}
                   className={`mb-0.5 flex h-10 items-center gap-3 rounded-lg px-3 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 ${
                     active
@@ -67,6 +72,9 @@ export function VerifierSidebar({ open = false, onNavigate }: Props) {
                     strokeWidth={1.75}
                   />
                   {item.label}
+                  {item.newTab && (
+                    <ExternalLink className="ml-auto h-3.5 w-3.5 text-ink-muted" strokeWidth={1.75} />
+                  )}
                 </Link>
               )
             })}
