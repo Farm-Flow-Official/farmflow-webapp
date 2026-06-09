@@ -396,4 +396,28 @@ Source: `ASSESSMENT_SESSIONS` / issued-document registry. Constraint: never expo
 
 ---
 
+## 9. Future / Production scope (NOT in BETA — design hints only)
+
+These are agreed product directions captured so the schema can be designed ahead of time. **Do not build for BETA.**
+
+### 9.1 Tree-level verifier override (human-in-the-loop)
+Today approve/reject is **batch-level** (§5.4). Production should let a verifier approve/reject **individual tree snapshots** at their discretion — to clear AI false-positives (a flagged tree that is actually fine) and to reject a suspicious tree even when AI confidence was high. Value is greatest for **mixed batches** (some good, some bad): keep the good trees, drop only the bad ones, instead of rejecting the whole batch.
+
+**Schema (extend `TREE_SNAPSHOTS`):**
+- `verification_status` — `Pending | Approved | Rejected` (default `Pending`)
+- `verified_by` — `admin_id` of the verifier (nullable)
+- `verified_at` — timestamp (nullable)
+- `verified_reason` — text; **REQUIRED when the verifier overrides the AI flag** (approving an AI-flagged tree, or rejecting a high-confidence one) — this is the anti-greenwashing guard.
+
+**Endpoint:** `PATCH /verifier/batches/:batchId/trees/:treeId` — body `{ "status": "Approved"|"Rejected", "reason"?: string }`. `422` if reason missing on an override. Writes `AUDIT_LOGS`.
+
+**Batch effects:** batch may become "partially approved"; `total_carbon_kgco2e` for the issued credit is **recomputed from approved trees only**. The batch-level approve then finalises whatever per-tree decisions stand.
+
+**Governance:** every override records who + reason + timestamp and surfaces in the audit log — a click alone is not acceptable for overriding AI on carbon credits.
+
+### 9.2 Document content-integrity for QR verification
+V-06 (§5.6) currently verifies only that a `session_id` **exists**. A tampered PDF carrying a valid `session_id` would still read "valid". Production should bind the QR to the document's **content hash / signature** so the public check confirms the *content* is authentic, not just that the id exists.
+
+---
+
 *Generated from the web app's data seams (`features/*/services/*` + mock write-actions). Every shape above is exactly what the frontend already consumes — match it and the app works unchanged.*
