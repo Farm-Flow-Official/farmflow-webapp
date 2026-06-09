@@ -82,8 +82,10 @@ export function Modal({
   }, [onClose])
 
   return (
+    // z-index sits above Leaflet's internal panes/controls (~700–1000) so map
+    // tiles never cover a dialog (e.g. the V-04 mini-map vs the approve dialog).
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-[1100] flex items-center justify-center p-4"
       role="dialog"
       aria-modal="true"
       aria-labelledby={labelledBy}

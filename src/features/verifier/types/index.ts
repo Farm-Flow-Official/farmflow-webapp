@@ -60,3 +60,36 @@ export type VerificationBatch = {
   /** Carbon backing the batch, in kg CO₂e (context for V-04). */
   totalCarbonKgCo2e: number
 }
+
+/* ── V-04 Batch Detail / V-05 Tree Inspect ──────────────────────────────── */
+
+export type WeatherCondition = 'sunny' | 'cloudy' | 'rainy'
+
+/** One tree photo + metadata (ERD: TREE_SNAPSHOTS). Feeds V-04 grid & V-05. */
+export type TreeSnapshot = {
+  /** snapshot_id — route param for V-05 deep inspect. */
+  id: string
+  /** capture_lat / capture_lng — GPS of the photo. */
+  captureLat: number
+  captureLng: number
+  capturedAt: string
+  weather: WeatherCondition
+  /** ai_confidence_score (0…1). */
+  aiConfidenceScore: number
+  /** Flagged by anomaly detection (low confidence / metadata mismatch). */
+  anomaly: boolean
+}
+
+/** Full batch for the detail/review page (V-04). */
+export type BatchDetail = VerificationBatch & {
+  /** Enriched ordinary PII (mock — see [[A-04]]). */
+  phone: string
+  farmAddress: string
+  /** Farm GPS + polygon (ERD: checkin_lat/lng, farm_polygon_geojson). */
+  checkinLat: number
+  checkinLng: number
+  /** GeoJSON polygon outer ring ([lng, lat]). */
+  polygon: [number, number][]
+  trees: TreeSnapshot[]
+}
+

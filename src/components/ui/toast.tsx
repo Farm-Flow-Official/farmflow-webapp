@@ -30,7 +30,7 @@ export function Toast({ message }: { message: string | null }) {
     <div
       role="status"
       aria-live="polite"
-      className="fixed bottom-6 left-1/2 z-[60] flex -translate-x-1/2 items-center gap-2 rounded-lg border border-line bg-panel px-4 py-3 text-sm font-medium text-ink shadow-xl"
+      className="fixed bottom-6 left-1/2 z-[1100] flex -translate-x-1/2 items-center gap-2 rounded-lg border border-line bg-panel px-4 py-3 text-sm font-medium text-ink shadow-xl"
     >
       <CheckCircle2 className="h-4 w-4 shrink-0 text-success" strokeWidth={1.75} />
       {message}
