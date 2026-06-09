@@ -1,6 +1,7 @@
 'use client'
 
-import { LogOut, Menu, X, ShieldCheck } from 'lucide-react'
+import { LogOut, Menu, X } from 'lucide-react'
+import { Logo } from '@/components/ui/logo'
 import type { VerifierProfile } from '@/features/verifier/auth/types'
 import { signOutVerifier } from '@/features/verifier/auth/actions'
 
@@ -27,9 +28,7 @@ export function VerifierTopbar({ verifier, menuOpen = false, onMenuClick }: Prop
         </button>
 
         <div className="flex items-center gap-2.5">
-          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary-subtle text-primary">
-            <ShieldCheck className="h-[18px] w-[18px]" strokeWidth={1.9} />
-          </span>
+          <Logo size={26} />
           <div className="leading-none">
             <p className="text-base font-semibold tracking-tight text-primary">FarmFlow</p>
             <p className="mt-1 text-[10px] text-ink-muted">Verifier Portal</p>

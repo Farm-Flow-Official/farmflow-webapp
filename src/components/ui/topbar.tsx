@@ -1,6 +1,7 @@
 'use client'
 
 import { LogOut, Menu, X } from 'lucide-react'
+import { Logo } from '@/components/ui/logo'
 import type { AdminProfile } from '@/features/auth/types'
 import { signOutAdmin } from '@/features/auth/actions/signOutAdmin'
 
@@ -32,22 +33,7 @@ export function AdminTopbar({ admin, menuOpen = false, onMenuClick }: Props) {
         </button>
 
         <div className="flex items-center gap-2.5">
-          <svg width="26" height="26" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-            <path
-              d="M16 3C16 3 5 10 5 19C5 24.5 9.5 29 16 29C22.5 29 27 24.5 27 19C27 10 16 3 16 3Z"
-              fill="rgba(0,76,34,0.10)"
-              stroke="#004C22"
-              strokeWidth="1.75"
-              strokeLinejoin="round"
-            />
-            <path
-              d="M16 29V15M16 15C16 15 20.5 17.5 23 22"
-              stroke="#004C22"
-              strokeWidth="1.75"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
+          <Logo size={26} />
           <div className="leading-none">
             <p className="text-base font-semibold tracking-tight text-primary">FarmFlow</p>
             <p className="mt-1 text-[10px] text-ink-muted">Admin Dashboard</p>

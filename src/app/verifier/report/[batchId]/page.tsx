@@ -3,7 +3,8 @@ import Link from 'next/link'
 import { headers } from 'next/headers'
 import type { Metadata } from 'next'
 import QRCode from 'qrcode'
-import { ArrowLeft, ShieldCheck } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
+import { Logo } from '@/components/ui/logo'
 import { getVerifierSession } from '@/features/verifier/auth/session'
 import { fetchBatchById } from '@/features/verifier/services/fetchBatchById'
 import { batchSessionId, centroidTileUrl } from '@/features/verifier/lib/report'
@@ -56,9 +57,7 @@ export default async function BatchReportPage({
         {/* Header */}
         <header className="flex items-start justify-between border-b-2 border-primary pb-5">
           <div className="flex items-center gap-2.5">
-            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-white">
-              <ShieldCheck className="h-5 w-5" strokeWidth={1.9} />
-            </span>
+            <Logo size={38} />
             <div>
               <p className="text-lg font-bold tracking-tight text-primary">FarmFlow</p>
               <p className="text-[11px] text-ink-muted">Carbon Verification Report</p>
