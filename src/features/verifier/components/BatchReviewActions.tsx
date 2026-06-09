@@ -44,8 +44,9 @@ export function BatchReviewActions({ batchId, initialStatus, verifierName }: Pro
   }
 
   function handlePdf() {
-    // Seam: GET /verifier/batches/:id/report.pdf
-    showToast('กำลังสร้างรายงาน PDF (mock — ยังไม่ทำงานจริง)')
+    // Opens the print-styled report (with QR → V-06). User saves as PDF from the
+    // browser print dialog. Real export could stream a server-rendered PDF later.
+    window.open(`/verifier/report/${batchId}`, '_blank', 'noopener,noreferrer')
   }
 
   const meta = STATUS_META[status]
