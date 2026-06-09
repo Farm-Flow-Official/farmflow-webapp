@@ -35,3 +35,28 @@ export type VerifierOverviewData = {
   summary: VerifierOverview
   alerts: AnomalyAlert[]
 }
+
+/* ── V-03 Farm Batch Queue ──────────────────────────────────────────────── */
+
+/** Verifier review status of a batch (distinct from the credit-lifecycle status). */
+export type BatchStatus = 'Pending' | 'Approved' | 'Rejected'
+
+export type VerificationBatch = {
+  /** batch_id — route param for V-04 Batch Detail. */
+  id: string
+  farmId: string
+  /** Enriched farm/farmer names (ordinary PII, mock — see [[A-04]]). */
+  farmName: string
+  ownerName: string
+  /** When the farmer submitted the batch for verification. */
+  submittedAt: string
+  /** Number of tree snapshots in the batch. */
+  treeCount: number
+  /** Average ai_confidence_score across the batch (0…1). */
+  avgConfidence: number
+  /** True when anomaly detection flags the batch (low confidence / metadata mismatch). */
+  anomalyFlag: boolean
+  status: BatchStatus
+  /** Carbon backing the batch, in kg CO₂e (context for V-04). */
+  totalCarbonKgCo2e: number
+}
