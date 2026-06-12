@@ -82,11 +82,14 @@ export function SubscriptionTable({
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
+    const qDigits = q.replace(/\D/g, '')
     return rows.filter((s) => {
       const matchesQuery =
         q === '' ||
         s.customerName.toLowerCase().includes(q) ||
-        s.phone.replace(/\D/g, '').includes(q.replace(/\D/g, ''))
+        // Only match on phone when the query actually has digits — otherwise
+        // `''.includes('')` is true and every row leaks through.
+        (qDigits !== '' && s.phone.replace(/\D/g, '').includes(qDigits))
       const matchesTier = tier === 'all' || s.packageCode === tier
       const matchesStatus = status === 'all' || s.status === status
       const matchesExpiring = !expiringOnly || isExpiringSoon(s)

@@ -4,7 +4,7 @@ import { useId, useState } from 'react'
 import { AlertTriangle, ArrowUpRight, ArrowDownRight } from 'lucide-react'
 import { Modal } from '@/components/ui/modal'
 import { Badge } from '@/components/ui/badge'
-import { formatDate, formatPhone } from '@/lib/utils/format'
+import { formatDate, formatNumber, formatPhone } from '@/lib/utils/format'
 import type {
   CustomerSubscription,
   Package,
@@ -104,7 +104,7 @@ export function SubscriptionDetailModal({ sub, packages, onClose, onApply }: Pro
             {packages.map((p) => (
               <option key={p.code} value={p.code}>
                 {p.name}
-                {p.priceThb > 0 ? ` · ฿${p.priceThb.toLocaleString()}` : ' · ฟรี'}
+                {p.priceThb > 0 ? ` · ฿${formatNumber(p.priceThb)}` : ' · ฟรี'}
               </option>
             ))}
           </select>

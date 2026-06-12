@@ -26,8 +26,10 @@ export type Package = {
   iotFreeUnits: number
   /** FEATURE 1 — max simultaneous data-collection devices (2 / 5 / 10 / 25). */
   deviceLimit: number
-  /** Display feature bullets. */
+  /** Live, tier-specific perks shown as bullets. */
   features: string[]
+  /** Planned perks shown with a "เร็ว ๆ นี้" tag — roadmap, not live yet. */
+  upcomingFeatures: string[]
   isActive: boolean
   sortOrder: number
 }

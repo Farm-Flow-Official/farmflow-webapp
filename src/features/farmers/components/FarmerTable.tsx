@@ -89,12 +89,15 @@ export function FarmerTable({ farmers }: { farmers: Farmer[] }) {
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
+    const qDigits = q.replace(/\D/g, '')
     return farmers.filter((f) => {
       const matchesStatus = status === 'all' || f.accountStatus === status
       const matchesQuery =
         q === '' ||
         f.fullName.toLowerCase().includes(q) ||
-        f.phone.replace(/\D/g, '').includes(q.replace(/\D/g, '')) ||
+        // Only match on phone when the query has digits — otherwise
+        // `''.includes('')` is true and every row leaks through.
+        (qDigits !== '' && f.phone.replace(/\D/g, '').includes(qDigits)) ||
         f.id.toLowerCase().includes(q)
       return matchesStatus && matchesQuery
     })
