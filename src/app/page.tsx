@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { LayoutDashboard, ShieldCheck, ArrowRight, QrCode } from 'lucide-react'
+import { LayoutDashboard, ShieldCheck, Briefcase, ArrowRight, QrCode } from 'lucide-react'
 import { Logo } from '@/components/ui/logo'
 import { getVerifierSession } from '@/features/verifier/auth/session'
 import { getAdminSession } from '@/features/auth/services/adminSession'
@@ -17,6 +17,7 @@ const PORTALS = [
     title: 'Admin Dashboard',
     sub: 'สำหรับทีมภายใน',
     desc: 'จัดการเกษตรกร แปลงเพาะปลูก GIS ประกาศ และตั้งค่าระบบ',
+    cta: 'เข้าสู่ระบบ',
   },
   {
     href: '/verifier/login',
@@ -24,6 +25,15 @@ const PORTALS = [
     title: 'Verifier Portal',
     sub: 'สำหรับผู้ตรวจรับรองภายนอก',
     desc: 'ตรวจรับรองข้อมูลคาร์บอน (MRV) อนุมัติ/ปฏิเสธชุดข้อมูล',
+    cta: 'เข้าสู่ระบบ',
+  },
+  {
+    href: '/business',
+    icon: Briefcase,
+    title: 'Business Dashboard',
+    sub: 'สำหรับทีมธุรกิจ / การเงิน',
+    desc: 'จัดการแพ็กเกจ ตรวจสลิป จ่ายเงินเกษตรกร และภาพรวมรายได้',
+    cta: 'เปิดดู (พรีวิว)',
   },
 ] as const
 
@@ -35,7 +45,7 @@ export default async function PortalLandingPage() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-surface p-6">
-      <div className="w-full max-w-2xl">
+      <div className="w-full max-w-3xl">
         {/* Brand */}
         <div className="mb-10 flex flex-col items-center gap-3 text-center">
           <Logo size={48} />
@@ -48,7 +58,7 @@ export default async function PortalLandingPage() {
         </div>
 
         {/* Portal cards */}
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-3">
           {PORTALS.map((p) => {
             const Icon = p.icon
             return (
@@ -66,7 +76,7 @@ export default async function PortalLandingPage() {
                 </p>
                 <p className="mt-2 flex-1 text-[13px] text-ink-secondary">{p.desc}</p>
                 <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
-                  เข้าสู่ระบบ
+                  {p.cta}
                   <ArrowRight
                     className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
                     strokeWidth={2}

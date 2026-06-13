@@ -35,14 +35,14 @@ const NAV: NavSection[] = [
   {
     heading: 'Overview',
     items: [
-      { href: '/business/overview', label: 'Overview', icon: LayoutDashboard, disabled: true },
+      { href: '/business/overview', label: 'Overview', icon: LayoutDashboard },
     ],
   },
   {
     heading: 'Commerce',
     items: [
       { href: '/business/packages', label: 'Packages', icon: Package },
-      { href: '/business/payments', label: 'Payments', icon: Receipt, disabled: true },
+      { href: '/business/payments', label: 'Payments', icon: Receipt },
       { href: '/business/payouts', label: 'Payouts', icon: Banknote, disabled: true },
     ],
   },
