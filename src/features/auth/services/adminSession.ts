@@ -36,9 +36,22 @@ async function forwardCookieHeader(): Promise<string> {
  * `/admin/auth/me` with the forwarded session cookies. Returns `null` when the
  * session is missing or invalid. Memoised per-request via React `cache`.
  */
+const DEMO_COOKIE = 'ff_demo_admin'
+const DEMO_ADMIN: AdminProfile = {
+  id: 'demo-admin-001',
+  username: 'admin',
+  roleId: 'super_admin',
+  permissions: ['*'],
+}
+
 export const getAdminSession = cache(async (): Promise<AdminProfile | null> => {
   const apiBase = process.env.FARMFLOW_API_URL
-  if (!apiBase) return null
+
+  // Demo mode: no API configured → honour the mock session cookie
+  if (!apiBase) {
+    const store = await cookies()
+    return store.get(DEMO_COOKIE)?.value === '1' ? DEMO_ADMIN : null
+  }
 
   const cookieHeader = await forwardCookieHeader()
   if (!cookieHeader) return null
@@ -65,12 +78,18 @@ export const getAdminSession = cache(async (): Promise<AdminProfile | null> => {
 export async function signOutAdminSession(): Promise<void> {
   const apiBase = process.env.FARMFLOW_API_URL
   const store = await cookies()
+
+  if (!apiBase) {
+    store.delete(DEMO_COOKIE)
+    return
+  }
+
   const cookieHeader = store
     .getAll()
     .map((c) => `${c.name}=${c.value}`)
     .join('; ')
 
-  if (apiBase && cookieHeader) {
+  if (cookieHeader) {
     try {
       await fetch(`${apiBase}/admin/auth/sign-out`, {
         method: 'POST',

@@ -3,7 +3,12 @@
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { relaySetCookies } from '@/features/auth/services/adminSession'
+import { sessionCookieOptions } from '@/features/auth/services/sessionCookies'
 import type { LoginState } from '@/features/auth/types'
+
+const DEMO_COOKIE = 'ff_demo_admin'
+const DEMO_USERNAME = 'admin'
+const DEMO_PASSWORD = 'demo1234'
 
 export async function loginAdmin(
   _state: LoginState,
@@ -17,8 +22,15 @@ export async function loginAdmin(
   }
 
   const apiBase = process.env.FARMFLOW_API_URL
+
+  // Demo mode: no API configured → accept hardcoded credentials
   if (!apiBase) {
-    return { error: 'ระบบยังไม่ได้ตั้งค่า API กรุณาติดต่อผู้ดูแลระบบ' }
+    if (username !== DEMO_USERNAME || password !== DEMO_PASSWORD) {
+      return { error: 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง' }
+    }
+    const store = await cookies()
+    store.set(DEMO_COOKIE, '1', sessionCookieOptions(60 * 60 * 8))
+    redirect('/admin')
   }
 
   // The API authenticates with username+password and replies with HttpOnly
