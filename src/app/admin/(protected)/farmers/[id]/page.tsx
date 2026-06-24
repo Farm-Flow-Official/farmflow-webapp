@@ -6,6 +6,7 @@ import { fetchFarmerById } from '@/features/farmers/services/fetchFarmerById'
 import { DataTable, type Column } from '@/components/ui/data-table'
 import { formatDate, formatPhone, formatNumber } from '@/lib/utils/format'
 import { FarmerProfileHeader } from '@/features/farmers/components/FarmerProfileHeader'
+import { MockTag } from '@/components/ui/mock-tag'
 import type { Farm } from '@/features/farmers/types'
 
 export async function generateMetadata({
@@ -16,7 +17,7 @@ export async function generateMetadata({
   const { id } = await params
   const farmer = await fetchFarmerById(id)
   return {
-    title: farmer ? `${farmer.fullName} — FarmFlow Admin` : 'ไม่พบเกษตรกร',
+    title: farmer ? `${farmer.fullName ?? farmer.username} — FarmFlow Admin` : 'ไม่พบเกษตรกร',
   }
 }
 
@@ -38,20 +39,32 @@ const farmColumns: Column<Farm>[] = [
   {
     key: 'province',
     header: 'จังหวัด',
-    cell: (f) => <span className="text-[13px] text-ink-secondary">{f.province}</span>,
+    cell: (f) => (
+      <span className="text-[13px] text-ink-secondary">
+        {f.province ?? <span className="text-ink-disabled">—</span>}
+        {(!f._live || f.province == null) && <MockTag />}
+      </span>
+    ),
   },
   {
     key: 'area',
     header: 'พื้นที่ (ไร่)',
     align: 'right',
     cell: (f) => (
-      <span className="font-mono tabular-nums text-ink-secondary">{f.areaRai}</span>
+      <span className="font-mono tabular-nums text-ink-secondary">
+        {f.areaRai != null ? f.areaRai : <span className="text-ink-disabled">—</span>}
+      </span>
     ),
   },
   {
     key: 'crop',
     header: 'ชนิดพืช',
-    cell: (f) => <span className="text-[13px] text-ink-secondary">{f.cropType}</span>,
+    cell: (f) => (
+      <span className="text-[13px] text-ink-secondary">
+        {f.cropType ?? <span className="text-ink-disabled">—</span>}
+        {(!f._live || f.cropType == null) && <MockTag />}
+      </span>
+    ),
   },
   {
     key: 'carbon',
@@ -59,7 +72,8 @@ const farmColumns: Column<Farm>[] = [
     align: 'right',
     cell: (f) => (
       <span className="font-mono tabular-nums font-semibold text-success">
-        {formatNumber(f.carbonKgCo2e)}
+        {f.carbonKgCo2e != null ? formatNumber(f.carbonKgCo2e) : <span className="font-normal text-ink-disabled">—</span>}
+        {(!f._live || f.carbonKgCo2e == null) && <MockTag />}
       </span>
     ),
   },
@@ -105,7 +119,8 @@ export default async function FarmerDetailPage({
             </p>
           </div>
           <p className="font-mono text-sm font-medium text-ink">
-            {formatPhone(farmer.phone)}
+            {farmer.phone ? formatPhone(farmer.phone) : <span className="text-ink-disabled">—</span>}
+            {(!farmer._live || !farmer.phone) && <MockTag />}
           </p>
         </div>
 
@@ -118,6 +133,7 @@ export default async function FarmerDetailPage({
           </div>
           <p className="truncate text-sm font-medium text-ink">
             {farmer.email ?? <span className="text-ink-disabled">—</span>}
+            <MockTag />
           </p>
         </div>
 
@@ -129,8 +145,10 @@ export default async function FarmerDetailPage({
             </p>
           </div>
           <p className="font-mono text-sm font-semibold text-success">
-            {formatNumber(farmer.totalCarbonKgCo2e)}{' '}
-            <span className="text-xs font-normal text-ink-muted">kgCO₂e</span>
+            {farmer.totalCarbonKgCo2e != null
+              ? <>{formatNumber(farmer.totalCarbonKgCo2e)} <span className="text-xs font-normal text-ink-muted">kgCO₂e</span></>
+              : <><span className="text-ink-disabled">—</span></>}
+            {(!farmer._live || farmer.totalCarbonKgCo2e == null) && <MockTag />}
           </p>
         </div>
 
@@ -142,7 +160,10 @@ export default async function FarmerDetailPage({
             </p>
           </div>
           <p className="font-mono text-sm font-semibold text-ink">
-            ฿{formatNumber(farmer.estimatedValueThb)}
+            {farmer.estimatedValueThb != null
+              ? `฿${formatNumber(farmer.estimatedValueThb)}`
+              : <span className="text-ink-disabled">—</span>}
+            {(!farmer._live || farmer.estimatedValueThb == null) && <MockTag />}
           </p>
         </div>
       </div>

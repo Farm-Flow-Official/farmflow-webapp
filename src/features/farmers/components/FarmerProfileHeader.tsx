@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { ShieldOff, ShieldCheck } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
+import { MockTag } from '@/components/ui/mock-tag'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { Toast, useToast } from '@/components/ui/toast'
 import { formatDate } from '@/lib/utils/format'
@@ -26,7 +27,8 @@ export function FarmerProfileHeader({ farmer }: { farmer: FarmerDetail }) {
   const { message, showToast } = useToast()
 
   const isActive = status === 'Active'
-  const initial = farmer.fullName.charAt(0)
+  const displayName = farmer.fullName ?? farmer.username
+  const initial = displayName.charAt(0).toUpperCase()
   const nextStatus: FarmerAccountStatus = isActive ? 'Suspended' : 'Active'
 
   async function runAction() {
@@ -57,7 +59,8 @@ export function FarmerProfileHeader({ farmer }: { farmer: FarmerDetail }) {
           </span>
           <div>
             <div className="flex flex-wrap items-center gap-2">
-              <h1 className="text-xl font-semibold text-ink">{farmer.fullName}</h1>
+              <h1 className="text-xl font-semibold text-ink">{displayName}</h1>
+              {(!farmer._live || !farmer.fullName) && <MockTag />}
               <Badge variant={isActive ? 'verified' : 'neutral'} dot>
                 {status}
               </Badge>

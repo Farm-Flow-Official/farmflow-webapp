@@ -1,21 +1,26 @@
 /**
- * API contract types for the Farmer domain. When the admin endpoints land,
- * only the service layer (`fetchFarmers`, `fetchFarmerById`) needs to change —
- * every UI component consumes these shapes unchanged.
+ * API contract types for the Farmer domain.
+ *
+ * Fields marked "not in DB yet" are placeholder values shown with a mock
+ * indicator in the UI — they require a future schema migration to become real.
  */
 export type FarmerAccountStatus = 'Active' | 'Suspended'
 
 export type Farmer = {
-  /** farmer_id — stable identifier, also the route param for the detail page. */
   id: string
-  fullName: string
-  phone: string
+  /** Always present — the real DB username. */
+  username: string
+  /** Thai full name — not in DB yet. null when from live API. */
+  fullName: string | null
+  /** Phone number — not in DB yet. null when from live API. */
+  phone: string | null
+  /** Email — not in DB yet. null when from live API. */
   email: string | null
   accountStatus: FarmerAccountStatus
-  /** Number of farms registered to this account. */
   farmsCount: number
-  /** ISO 8601 registration timestamp. */
   registeredAt: string
+  /** true = data from live API; false = demo/mock */
+  _live: boolean
 }
 
 export type CropType =
@@ -30,27 +35,25 @@ export type CropType =
 export type Farm = {
   id: string
   name: string
-  province: string
-  /** Area in rai (1 rai ≈ 1,600 m²). */
-  areaRai: number
-  cropType: CropType
-  /**
-   * Carbon sequestration in **kilograms** CO₂e — mirrors the canonical DB
-   * field `total_carbon_kgco2e`. Stored in kg (not tonnes) to keep the API
-   * contract honest; convert at the display layer only if needed.
-   */
-  carbonKgCo2e: number
+  /** Full address string from DB. */
+  farmAddress: string | null
+  areaRai: number | null
+  farmStatus: string
   registeredAt: string
+  /** Province — not a separate DB field yet. null when from live API. */
+  province: string | null
+  /** Crop type — in subplot data, not directly on farm. null when from live API. */
+  cropType: CropType | null
+  /** Carbon estimate — requires batch join. null when from live API. */
+  carbonKgCo2e: number | null
+  /** true = data from live API; false = demo/mock */
+  _live: boolean
 }
 
 export type FarmerDetail = Farmer & {
   farms: Farm[]
-  /** Sum of `carbonKgCo2e` across all farms, in kg CO₂e. */
-  totalCarbonKgCo2e: number
-  /**
-   * Estimated value in THB = `totalCarbonKgCo2e × market_price_thb`
-   * (see business req §Workflow 6 / A-07). This is an *estimate* of credit
-   * value, not a confirmed/owed payout.
-   */
-  estimatedValueThb: number
+  /** null when from live API (requires batch data join). */
+  totalCarbonKgCo2e: number | null
+  /** null when from live API. */
+  estimatedValueThb: number | null
 }

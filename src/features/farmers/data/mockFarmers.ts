@@ -1,10 +1,9 @@
-import type { Farmer } from '@/features/farmers/types'
-
 /**
  * Temporary stand-in data until the admin farmers API lands. Delete this file
  * once `fetchFarmers()` calls the real endpoint.
+ * username and _live are added by fetchFarmers() at runtime.
  */
-export const mockFarmers: Farmer[] = [
+export const mockFarmers = [
   { id: 'FRM-1001', fullName: 'สมชาย ใจดี', phone: '0812345678', email: 'somchai@example.com', accountStatus: 'Active', farmsCount: 3, registeredAt: '2025-01-12T08:30:00Z' },
   { id: 'FRM-1002', fullName: 'สมหญิง รักไร่', phone: '0823456789', email: 'somying@example.com', accountStatus: 'Active', farmsCount: 1, registeredAt: '2025-01-20T03:15:00Z' },
   { id: 'FRM-1003', fullName: 'ประสิทธิ์ นาทอง', phone: '0834567890', email: null, accountStatus: 'Active', farmsCount: 2, registeredAt: '2025-02-03T09:45:00Z' },

@@ -1,4 +1,4 @@
-{
+  {
   "openapi": "3.0.3",
   "info": {
     "title": "FarmFlow",
@@ -160,6 +160,7 @@
                       "required": [
                         "accessToken",
                         "refreshToken",
+                        "deviceId",
                         "user"
                       ],
                       "properties": {
@@ -179,12 +180,24 @@
                             }
                           ]
                         },
+                        "deviceId": {
+                          "nullable": true,
+                          "anyOf": [
+                            {
+                              "description": "Id of the device registered for this session, if any",
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
                         "user": {
                           "type": "object",
                           "required": [
                             "id",
                             "username",
-                            "ssoProvider",
+                            "ssoProviders",
                             "profileAvatarFileId",
                             "accountStatus",
                             "lastLogin",
@@ -199,24 +212,16 @@
                               "maxLength": 256,
                               "type": "string"
                             },
-                            "ssoProvider": {
-                              "anyOf": [
-                                {
-                                  "anyOf": [
-                                    {
-                                      "const": "google",
-                                      "type": "string"
-                                    },
-                                    {
-                                      "const": "line",
-                                      "type": "string"
-                                    }
-                                  ]
-                                },
-                                {
-                                  "type": "null"
-                                }
-                              ]
+                            "ssoProviders": {
+                              "description": "Linked SSO providers (google / line)",
+                              "type": "array",
+                              "items": {
+                                "type": "string",
+                                "enum": [
+                                  "google",
+                                  "line"
+                                ]
+                              }
                             },
                             "profileAvatarFileId": {
                               "anyOf": [
@@ -769,6 +774,7 @@
                       "required": [
                         "accessToken",
                         "refreshToken",
+                        "deviceId",
                         "user"
                       ],
                       "properties": {
@@ -788,12 +794,24 @@
                             }
                           ]
                         },
+                        "deviceId": {
+                          "nullable": true,
+                          "anyOf": [
+                            {
+                              "description": "Id of the device registered for this session, if any",
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
                         "user": {
                           "type": "object",
                           "required": [
                             "id",
                             "username",
-                            "ssoProvider",
+                            "ssoProviders",
                             "profileAvatarFileId",
                             "accountStatus",
                             "lastLogin",
@@ -808,24 +826,16 @@
                               "maxLength": 256,
                               "type": "string"
                             },
-                            "ssoProvider": {
-                              "anyOf": [
-                                {
-                                  "anyOf": [
-                                    {
-                                      "const": "google",
-                                      "type": "string"
-                                    },
-                                    {
-                                      "const": "line",
-                                      "type": "string"
-                                    }
-                                  ]
-                                },
-                                {
-                                  "type": "null"
-                                }
-                              ]
+                            "ssoProviders": {
+                              "description": "Linked SSO providers (google / line)",
+                              "type": "array",
+                              "items": {
+                                "type": "string",
+                                "enum": [
+                                  "google",
+                                  "line"
+                                ]
+                              }
                             },
                             "profileAvatarFileId": {
                               "anyOf": [
@@ -1264,6 +1274,7 @@
                       "required": [
                         "accessToken",
                         "refreshToken",
+                        "deviceId",
                         "user"
                       ],
                       "properties": {
@@ -1283,12 +1294,24 @@
                             }
                           ]
                         },
+                        "deviceId": {
+                          "nullable": true,
+                          "anyOf": [
+                            {
+                              "description": "Id of the device registered for this session, if any",
+                              "type": "string"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        },
                         "user": {
                           "type": "object",
                           "required": [
                             "id",
                             "username",
-                            "ssoProvider",
+                            "ssoProviders",
                             "profileAvatarFileId",
                             "accountStatus",
                             "lastLogin",
@@ -1303,24 +1326,16 @@
                               "maxLength": 256,
                               "type": "string"
                             },
-                            "ssoProvider": {
-                              "anyOf": [
-                                {
-                                  "anyOf": [
-                                    {
-                                      "const": "google",
-                                      "type": "string"
-                                    },
-                                    {
-                                      "const": "line",
-                                      "type": "string"
-                                    }
-                                  ]
-                                },
-                                {
-                                  "type": "null"
-                                }
-                              ]
+                            "ssoProviders": {
+                              "description": "Linked SSO providers (google / line)",
+                              "type": "array",
+                              "items": {
+                                "type": "string",
+                                "enum": [
+                                  "google",
+                                  "line"
+                                ]
+                              }
                             },
                             "profileAvatarFileId": {
                               "anyOf": [
@@ -1389,6 +1404,72 @@
               "application/json": {
                 "schema": {
                   "description": "Unauthorized - missing or invalid access token.",
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "error",
+                    "meta"
+                  ],
+                  "properties": {
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    },
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message",
+                        "details"
+                      ],
+                      "properties": {
+                        "code": {
+                          "description": "Machine-readable error code",
+                          "type": "string"
+                        },
+                        "message": {
+                          "description": "Human-readable error message",
+                          "type": "string"
+                        },
+                        "details": {
+                          "nullable": true,
+                          "anyOf": [
+                            {
+                              "description": "Additional error details, if any"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "required": [
+                        "requestId",
+                        "timestamp"
+                      ],
+                      "properties": {
+                        "requestId": {
+                          "type": "string"
+                        },
+                        "timestamp": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - you do not have permission to perform this action.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Forbidden - you do not have permission to perform this action.",
                   "type": "object",
                   "required": [
                     "success",
@@ -1638,6 +1719,72 @@
               "application/json": {
                 "schema": {
                   "description": "Unauthorized - missing or invalid access token.",
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "error",
+                    "meta"
+                  ],
+                  "properties": {
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    },
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message",
+                        "details"
+                      ],
+                      "properties": {
+                        "code": {
+                          "description": "Machine-readable error code",
+                          "type": "string"
+                        },
+                        "message": {
+                          "description": "Human-readable error message",
+                          "type": "string"
+                        },
+                        "details": {
+                          "nullable": true,
+                          "anyOf": [
+                            {
+                              "description": "Additional error details, if any"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "required": [
+                        "requestId",
+                        "timestamp"
+                      ],
+                      "properties": {
+                        "requestId": {
+                          "type": "string"
+                        },
+                        "timestamp": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - you do not have permission to perform this action.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Forbidden - you do not have permission to perform this action.",
                   "type": "object",
                   "required": [
                     "success",
@@ -2121,7 +2268,7 @@
                       "required": [
                         "id",
                         "username",
-                        "ssoProvider",
+                        "ssoProviders",
                         "profileAvatarFileId",
                         "accountStatus",
                         "lastLogin",
@@ -2136,24 +2283,16 @@
                           "maxLength": 256,
                           "type": "string"
                         },
-                        "ssoProvider": {
-                          "anyOf": [
-                            {
-                              "anyOf": [
-                                {
-                                  "const": "google",
-                                  "type": "string"
-                                },
-                                {
-                                  "const": "line",
-                                  "type": "string"
-                                }
-                              ]
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
+                        "ssoProviders": {
+                          "description": "Linked SSO providers (google / line)",
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "enum": [
+                              "google",
+                              "line"
+                            ]
+                          }
                         },
                         "profileAvatarFileId": {
                           "anyOf": [
@@ -2280,12 +2419,12 @@
               }
             }
           },
-          "404": {
-            "description": "Not found - the requested resource does not exist.",
+          "403": {
+            "description": "Forbidden - you do not have permission to perform this action.",
             "content": {
               "application/json": {
                 "schema": {
-                  "description": "Not found - the requested resource does not exist.",
+                  "description": "Forbidden - you do not have permission to perform this action.",
                   "type": "object",
                   "required": [
                     "success",
@@ -2428,7 +2567,7 @@
                       "required": [
                         "id",
                         "username",
-                        "ssoProvider",
+                        "ssoProviders",
                         "profileAvatarFileId",
                         "accountStatus",
                         "lastLogin",
@@ -2443,24 +2582,16 @@
                           "maxLength": 256,
                           "type": "string"
                         },
-                        "ssoProvider": {
-                          "anyOf": [
-                            {
-                              "anyOf": [
-                                {
-                                  "const": "google",
-                                  "type": "string"
-                                },
-                                {
-                                  "const": "line",
-                                  "type": "string"
-                                }
-                              ]
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
+                        "ssoProviders": {
+                          "description": "Linked SSO providers (google / line)",
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "enum": [
+                              "google",
+                              "line"
+                            ]
+                          }
                         },
                         "profileAvatarFileId": {
                           "anyOf": [
@@ -2902,7 +3033,7 @@
                       "required": [
                         "id",
                         "username",
-                        "ssoProvider",
+                        "ssoProviders",
                         "profileAvatarFileId",
                         "accountStatus",
                         "lastLogin",
@@ -2917,24 +3048,16 @@
                           "maxLength": 256,
                           "type": "string"
                         },
-                        "ssoProvider": {
-                          "anyOf": [
-                            {
-                              "anyOf": [
-                                {
-                                  "const": "google",
-                                  "type": "string"
-                                },
-                                {
-                                  "const": "line",
-                                  "type": "string"
-                                }
-                              ]
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
+                        "ssoProviders": {
+                          "description": "Linked SSO providers (google / line)",
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "enum": [
+                              "google",
+                              "line"
+                            ]
+                          }
                         },
                         "profileAvatarFileId": {
                           "anyOf": [
@@ -4167,7 +4290,7 @@
           "Farms"
         ],
         "summary": "Create a farm",
-        "description": "Creates a draft farm from the details form. Boundary and photo are added later.",
+        "description": "Creates a **draft** farm from the registration form — step 1 of farm setup. The boundary, check-in point, cover photo, and agricultural data are added afterwards via the other endpoints.\n\n**Required:** farmName. **Optional:** farmAddress, declaredAreaRai (the area the farmer claims, in Rai; later compared against the PostGIS-computed area).\n\n**Side effects:** inserts one farm owned by the caller, with farmStatus = \"draft\" and no geometry. The response's agriculturalData is always null at this stage.\n\n**Business rules:** the farm is owned by the authenticated user; ownership is enforced on every later read and write.\n\n**Errors:** **401 UNAUTHORIZED** (missing/invalid token) · **422 VALIDATION_ERROR** (empty farmName, negative declaredAreaRai).",
         "security": [
           {
             "bearerAuth": []
@@ -4350,7 +4473,15 @@
                           ]
                         },
                         "areaDiscrepancyFlag": {
-                          "type": "boolean"
+                          "nullable": true,
+                          "anyOf": [
+                            {
+                              "type": "boolean"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
                         },
                         "overlapValidationFlag": {
                           "type": "boolean"
@@ -4614,7 +4745,7 @@
           "Farms"
         ],
         "summary": "List farms",
-        "description": "Returns the authenticated user's farms, newest first (without boundary geometry).",
+        "description": "Returns the authenticated user's farms, newest first, **without** geometry or agricultural data — a lightweight list view. Use **GET /farms/:id** for the full record.\n\n**Visibility:** soft-deleted farms are excluded.\n\n**Errors:** **401 UNAUTHORIZED** (missing/invalid token).",
         "security": [
           {
             "bearerAuth": []
@@ -4826,7 +4957,7 @@
           "Farms"
         ],
         "summary": "Get a farm",
-        "description": "Returns one owned farm with its boundary, check-in point (GeoJSON), and agricultural data.",
+        "description": "Returns one owned farm in full: scalar fields, the boundary and check-in point as GeoJSON, and the agricultural data (species / planting year / density) read from the farm's default subplot.\n\n**Response fields of note:** calculatedAreaRai (PostGIS area of the boundary in Rai — null until a boundary is saved) · areaDiscrepancyFlag (DB-derived: true when declared vs calculated area diverge by >15%) · overlapValidationFlag (reserved; always false in this release) · farmBoundary / checkinLocation (GeoJSON, null until set) · agriculturalData (null until recorded).\n\n**Business rules:** only the owner can read the farm; a soft-deleted farm returns 404.\n\n**Errors:** **401 UNAUTHORIZED** · **404 NOT_FOUND** (does not exist, not owned, or soft-deleted).",
         "security": [
           {
             "bearerAuth": []
@@ -4946,7 +5077,15 @@
                           ]
                         },
                         "areaDiscrepancyFlag": {
-                          "type": "boolean"
+                          "nullable": true,
+                          "anyOf": [
+                            {
+                              "type": "boolean"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
                         },
                         "overlapValidationFlag": {
                           "type": "boolean"
@@ -5210,7 +5349,7 @@
           "Farms"
         ],
         "summary": "Update a farm",
-        "description": "Updates editable fields. Sending farmBoundary (GeoJSON Polygon/MultiPolygon) recomputes the calculated area in Rai.",
+        "description": "Updates any subset of the editable farm fields — send only what you want to change.\n\n**Editable:** farmName, farmAddress, declaredAreaRai, farmBoundary (GeoJSON Polygon/MultiPolygon), checkinLocation (GeoJSON Point).\n\n**Side effects:** saving farmBoundary normalizes it to a MultiPolygon and recomputes calculatedAreaRai from the geometry (geom::geography ÷ 1600); areaDiscrepancyFlag is then re-derived by the DB. There is **no clear-to-null** here — sending a value replaces it; omit a field to leave it unchanged.\n\n**Business rules:** owner-scoped; soft-deleted farms 404. An empty body (no recognized fields) is rejected, not silently accepted.\n\n**Errors:** **400 BAD_REQUEST** (empty patch — \"No fields to update\") · **401 UNAUTHORIZED** · **404 NOT_FOUND** · **422 VALIDATION_ERROR** (malformed GeoJSON or bad types).",
         "security": [
           {
             "bearerAuth": []
@@ -5774,7 +5913,15 @@
                           ]
                         },
                         "areaDiscrepancyFlag": {
-                          "type": "boolean"
+                          "nullable": true,
+                          "anyOf": [
+                            {
+                              "type": "boolean"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
                         },
                         "overlapValidationFlag": {
                           "type": "boolean"
@@ -6164,6 +6311,217 @@
           }
         },
         "operationId": "patchApiV1FarmsById"
+      },
+      "delete": {
+        "tags": [
+          "Farms"
+        ],
+        "summary": "Delete a farm",
+        "description": "**Soft-deletes** an owned farm and cascades the soft-delete to its subplots, in one transaction (deletedAt stamped on both). The farm immediately disappears from **GET /farms**, **GET /farms/:id**, and — via the cascade — from the assessment-session reads for that farm.\n\n**Deliberately retained:** the farm's assessment sessions, tree snapshots, and cover-photo file are **not** touched. T-VER compliance requires assessment data to survive farm deletion; it is hidden from the farmer, not destroyed.\n\n**Idempotency:** deleting a farm that is already deleted (or not owned) returns **404** — a second delete is not a success.\n\n**Errors:** **401 UNAUTHORIZED** · **404 NOT_FOUND** (missing, not owned, or already deleted).",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "description": "Farm id (cuid2)",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Soft-delete confirmation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Soft-delete confirmation",
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "message",
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "success": {
+                      "const": true,
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "id"
+                      ],
+                      "properties": {
+                        "id": {
+                          "description": "Id of the soft-deleted farm",
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "required": [
+                        "requestId",
+                        "timestamp"
+                      ],
+                      "properties": {
+                        "requestId": {
+                          "type": "string"
+                        },
+                        "timestamp": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - missing or invalid access token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Unauthorized - missing or invalid access token.",
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "error",
+                    "meta"
+                  ],
+                  "properties": {
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    },
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message",
+                        "details"
+                      ],
+                      "properties": {
+                        "code": {
+                          "description": "Machine-readable error code",
+                          "type": "string"
+                        },
+                        "message": {
+                          "description": "Human-readable error message",
+                          "type": "string"
+                        },
+                        "details": {
+                          "nullable": true,
+                          "anyOf": [
+                            {
+                              "description": "Additional error details, if any"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "required": [
+                        "requestId",
+                        "timestamp"
+                      ],
+                      "properties": {
+                        "requestId": {
+                          "type": "string"
+                        },
+                        "timestamp": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found - the farm does not exist or is not owned by the requester.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Not found - the farm does not exist or is not owned by the requester.",
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "error",
+                    "meta"
+                  ],
+                  "properties": {
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    },
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message",
+                        "details"
+                      ],
+                      "properties": {
+                        "code": {
+                          "description": "Machine-readable error code",
+                          "type": "string"
+                        },
+                        "message": {
+                          "description": "Human-readable error message",
+                          "type": "string"
+                        },
+                        "details": {
+                          "nullable": true,
+                          "anyOf": [
+                            {
+                              "description": "Additional error details, if any"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "required": [
+                        "requestId",
+                        "timestamp"
+                      ],
+                      "properties": {
+                        "requestId": {
+                          "type": "string"
+                        },
+                        "timestamp": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "deleteApiV1FarmsById"
       }
     },
     "/api/v1/farms/{id}/cover-photo": {
@@ -6172,7 +6530,7 @@
           "Farms"
         ],
         "summary": "Set the farm cover photo",
-        "description": "Uploads a cover photo (multipart) and links it to the farm, replacing any previous one.",
+        "description": "Uploads a farm cover photo (multipart **file**) and links it to the farm, replacing any previous cover photo.\n\n**Accepted:** JPEG / PNG / WebP / HEIC, max 10 MB.\n\n**Side effects (one transaction, ADR 0002):** the new file is stored and the farm's coverPhotoFileId is repointed **before** the previous cover photo is purged — so the farm always references a real, existing file. Cover photos are **public**. The response is the new file's metadata.\n\n**Business rules:** owner-scoped; soft-deleted farms 404.\n\n**Errors:** **401 UNAUTHORIZED** · **404 NOT_FOUND** · **422 VALIDATION_ERROR** (missing file, wrong type, too large).",
         "security": [
           {
             "bearerAuth": []
@@ -6569,7 +6927,7 @@
           "Farms"
         ],
         "summary": "Set agricultural data",
-        "description": "Upserts the farm's single agricultural-data record (species, planting year, density).",
+        "description": "Upserts the farm's cultivation data (speciesId, plantingYear, treeDensityPerRai) with **PUT-replace** semantics — the whole record is replaced on each call.\n\n**Where it's stored (ADR 0007):** the farm's single **default** (whole-farm) subplot — created on first save, updated thereafter. This is the cultivation unit an assessment session attaches to, so agricultural data must exist **before** a session can be started on the farm.\n\n**Required:** speciesId (from **GET /species**). **Optional:** plantingYear, treeDensityPerRai.\n\n**Concurrency:** a single atomic upsert — concurrent first-saves converge instead of racing into a duplicate-key error.\n\n**Business rules:** owner-scoped; soft-deleted farms 404. An unknown speciesId is a **400** (not 404), with details.field = \"speciesId\" so the client can highlight the input.\n\n**Errors:** **400 BAD_REQUEST** (unknown species) · **401 UNAUTHORIZED** · **404 NOT_FOUND** (farm) · **422 VALIDATION_ERROR**.",
         "security": [
           {
             "bearerAuth": []
@@ -7206,7 +7564,7 @@
           "Assessments"
         ],
         "summary": "Start an assessment session",
-        "description": "Opens a session on an owned farm for capturing tree snapshots.",
+        "description": "Opens an assessment session on an owned farm for capturing tree snapshots. The session attaches to the farm's **default subplot** (ADR 0007), so the farm's agricultural data must be recorded first.\n\nThe session is created online, so it is **born synced** (syncStatus = \"synced\") with aiBatchStatus = \"waiting\" and totalSnaps = 0. Its tree snapshots, by contrast, are captured offline and drained from the client's outbox — each upload is idempotent (ADR 0010).\n\n**One open session per farm:** a farm may have only one open session (neither completed nor cancelled) at a time. If one is already open, this returns **409** with details.openSessionId pointing at it — the client should resume that session, or complete/cancel it to free the slot, rather than starting a new one. (The Flutter app resumes automatically, so the 409 is a backstop for races, stale clients, and direct API calls; it is also enforced by a DB unique index.)\n\n**Errors:** **400 BAD_REQUEST** (no agricultural data recorded yet) · **401 UNAUTHORIZED** · **404 NOT_FOUND** (farm missing, not owned, or deleted) · **409 CONFLICT** (an open session already exists — see details.openSessionId) · **422 VALIDATION_ERROR**.",
         "security": [
           {
             "bearerAuth": []
@@ -7290,9 +7648,6 @@
                         "syncStatus",
                         "aiBatchStatus",
                         "totalSnaps",
-                        "passedSnaps",
-                        "sessionPassRate",
-                        "totalCarbonKgco2e",
                         "firstSnapAt",
                         "syncedAt",
                         "completedAt",
@@ -7306,14 +7661,7 @@
                           "type": "string"
                         },
                         "subplotId": {
-                          "anyOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
+                          "type": "string"
                         },
                         "syncStatus": {
                           "type": "string",
@@ -7337,35 +7685,6 @@
                           "minimum": -2147483648,
                           "maximum": 2147483647,
                           "type": "integer"
-                        },
-                        "passedSnaps": {
-                          "minimum": -2147483648,
-                          "maximum": 2147483647,
-                          "type": "integer"
-                        },
-                        "sessionPassRate": {
-                          "anyOf": [
-                            {
-                              "minimum": -140737488355328,
-                              "maximum": 140737488355327,
-                              "type": "number"
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
-                        },
-                        "totalCarbonKgco2e": {
-                          "anyOf": [
-                            {
-                              "minimum": -140737488355328,
-                              "maximum": 140737488355327,
-                              "type": "number"
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
                         },
                         "firstSnapAt": {
                           "nullable": true,
@@ -7406,6 +7725,72 @@
                         "createdAt": {
                           "format": "date-time",
                           "type": "string"
+                        }
+                      }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "required": [
+                        "requestId",
+                        "timestamp"
+                      ],
+                      "properties": {
+                        "requestId": {
+                          "type": "string"
+                        },
+                        "timestamp": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - e.g. no agricultural data recorded, a missing Idempotency-Key, a deviceless session, an out-of-range capturedAt, completing a session with no snapshots, or adding to a completed session.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Bad request - e.g. no agricultural data recorded, a missing Idempotency-Key, a deviceless session, an out-of-range capturedAt, completing a session with no snapshots, or adding to a completed session.",
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "error",
+                    "meta"
+                  ],
+                  "properties": {
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    },
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message",
+                        "details"
+                      ],
+                      "properties": {
+                        "code": {
+                          "description": "Machine-readable error code",
+                          "type": "string"
+                        },
+                        "message": {
+                          "description": "Human-readable error message",
+                          "type": "string"
+                        },
+                        "details": {
+                          "nullable": true,
+                          "anyOf": [
+                            {
+                              "description": "Additional error details, if any"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
                         }
                       }
                     },
@@ -7496,11 +7881,77 @@
             }
           },
           "404": {
-            "description": "Not found - the session/farm does not exist or is not owned by the requester.",
+            "description": "Not found - the session/farm does not exist, is not owned by the requester, or its farm was deleted (or the session was cancelled).",
             "content": {
               "application/json": {
                 "schema": {
-                  "description": "Not found - the session/farm does not exist or is not owned by the requester.",
+                  "description": "Not found - the session/farm does not exist, is not owned by the requester, or its farm was deleted (or the session was cancelled).",
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "error",
+                    "meta"
+                  ],
+                  "properties": {
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    },
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message",
+                        "details"
+                      ],
+                      "properties": {
+                        "code": {
+                          "description": "Machine-readable error code",
+                          "type": "string"
+                        },
+                        "message": {
+                          "description": "Human-readable error message",
+                          "type": "string"
+                        },
+                        "details": {
+                          "nullable": true,
+                          "anyOf": [
+                            {
+                              "description": "Additional error details, if any"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "required": [
+                        "requestId",
+                        "timestamp"
+                      ],
+                      "properties": {
+                        "requestId": {
+                          "type": "string"
+                        },
+                        "timestamp": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict - the farm already has an open session (on start), or the session is already completed and cannot be cancelled.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Conflict - the farm already has an open session (on start), or the session is already completed and cannot be cancelled.",
                   "type": "object",
                   "required": [
                     "success",
@@ -7635,7 +8086,7 @@
           "Assessments"
         ],
         "summary": "List assessment sessions",
-        "description": "Returns the requester's sessions, newest first; filter to one farm with ?farmId.",
+        "description": "Returns the requester's assessment sessions, newest first. Filter to one farm with **?farmId**.\n\n**Visibility:** sessions belonging to a soft-deleted farm (or subplot) are excluded — deleting a farm hides its sessions from the farmer, though the rows are retained for compliance.\n\n**Errors:** **401 UNAUTHORIZED**.",
         "security": [
           {
             "bearerAuth": []
@@ -7685,9 +8136,6 @@
                           "syncStatus",
                           "aiBatchStatus",
                           "totalSnaps",
-                          "passedSnaps",
-                          "sessionPassRate",
-                          "totalCarbonKgco2e",
                           "firstSnapAt",
                           "syncedAt",
                           "completedAt",
@@ -7701,14 +8149,7 @@
                             "type": "string"
                           },
                           "subplotId": {
-                            "anyOf": [
-                              {
-                                "type": "string"
-                              },
-                              {
-                                "type": "null"
-                              }
-                            ]
+                            "type": "string"
                           },
                           "syncStatus": {
                             "type": "string",
@@ -7732,35 +8173,6 @@
                             "minimum": -2147483648,
                             "maximum": 2147483647,
                             "type": "integer"
-                          },
-                          "passedSnaps": {
-                            "minimum": -2147483648,
-                            "maximum": 2147483647,
-                            "type": "integer"
-                          },
-                          "sessionPassRate": {
-                            "anyOf": [
-                              {
-                                "minimum": -140737488355328,
-                                "maximum": 140737488355327,
-                                "type": "number"
-                              },
-                              {
-                                "type": "null"
-                              }
-                            ]
-                          },
-                          "totalCarbonKgco2e": {
-                            "anyOf": [
-                              {
-                                "minimum": -140737488355328,
-                                "maximum": 140737488355327,
-                                "type": "number"
-                              },
-                              {
-                                "type": "null"
-                              }
-                            ]
                           },
                           "firstSnapAt": {
                             "nullable": true,
@@ -7901,6 +8313,7 @@
           "Assessments"
         ],
         "summary": "Get an assessment session",
+        "description": "Returns one owned session, with farmId derived from its subplot (ADR 0007).\n\n**Business rules:** owner-scoped; a session whose farm has been soft-deleted returns **404** (hidden from the farmer, retained in the DB).\n\n**Errors:** **401 UNAUTHORIZED** · **404 NOT_FOUND**.",
         "security": [
           {
             "bearerAuth": []
@@ -7948,9 +8361,6 @@
                         "syncStatus",
                         "aiBatchStatus",
                         "totalSnaps",
-                        "passedSnaps",
-                        "sessionPassRate",
-                        "totalCarbonKgco2e",
                         "firstSnapAt",
                         "syncedAt",
                         "completedAt",
@@ -7964,14 +8374,7 @@
                           "type": "string"
                         },
                         "subplotId": {
-                          "anyOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
+                          "type": "string"
                         },
                         "syncStatus": {
                           "type": "string",
@@ -7995,35 +8398,6 @@
                           "minimum": -2147483648,
                           "maximum": 2147483647,
                           "type": "integer"
-                        },
-                        "passedSnaps": {
-                          "minimum": -2147483648,
-                          "maximum": 2147483647,
-                          "type": "integer"
-                        },
-                        "sessionPassRate": {
-                          "anyOf": [
-                            {
-                              "minimum": -140737488355328,
-                              "maximum": 140737488355327,
-                              "type": "number"
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
-                        },
-                        "totalCarbonKgco2e": {
-                          "anyOf": [
-                            {
-                              "minimum": -140737488355328,
-                              "maximum": 140737488355327,
-                              "type": "number"
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
                         },
                         "firstSnapAt": {
                           "nullable": true,
@@ -8154,11 +8528,11 @@
             }
           },
           "404": {
-            "description": "Not found - the session/farm does not exist or is not owned by the requester.",
+            "description": "Not found - the session/farm does not exist, is not owned by the requester, or its farm was deleted (or the session was cancelled).",
             "content": {
               "application/json": {
                 "schema": {
-                  "description": "Not found - the session/farm does not exist or is not owned by the requester.",
+                  "description": "Not found - the session/farm does not exist, is not owned by the requester, or its farm was deleted (or the session was cancelled).",
                   "type": "object",
                   "required": [
                     "success",
@@ -8229,7 +8603,7 @@
           "Assessments"
         ],
         "summary": "Complete an assessment session",
-        "description": "Sets the session's completion time. Idempotent.",
+        "description": "Marks the session complete (stamps **completedAt**). **Idempotent** — re-completing returns the original completion time.\n\n**Gate:** a session with **zero snapshots** cannot be completed (**400**) — capture at least one tree, or **cancel** the session instead. This mirrors the client's drain-gate (Complete is enabled only once the outbox is empty and at least one snapshot exists).\n\n**Errors:** **400 BAD_REQUEST** (no snapshots) · **401 UNAUTHORIZED** · **404 NOT_FOUND** (missing, not owned, deleted farm, or cancelled).",
         "security": [
           {
             "bearerAuth": []
@@ -8277,9 +8651,6 @@
                         "syncStatus",
                         "aiBatchStatus",
                         "totalSnaps",
-                        "passedSnaps",
-                        "sessionPassRate",
-                        "totalCarbonKgco2e",
                         "firstSnapAt",
                         "syncedAt",
                         "completedAt",
@@ -8293,14 +8664,7 @@
                           "type": "string"
                         },
                         "subplotId": {
-                          "anyOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
+                          "type": "string"
                         },
                         "syncStatus": {
                           "type": "string",
@@ -8324,35 +8688,6 @@
                           "minimum": -2147483648,
                           "maximum": 2147483647,
                           "type": "integer"
-                        },
-                        "passedSnaps": {
-                          "minimum": -2147483648,
-                          "maximum": 2147483647,
-                          "type": "integer"
-                        },
-                        "sessionPassRate": {
-                          "anyOf": [
-                            {
-                              "minimum": -140737488355328,
-                              "maximum": 140737488355327,
-                              "type": "number"
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
-                        },
-                        "totalCarbonKgco2e": {
-                          "anyOf": [
-                            {
-                              "minimum": -140737488355328,
-                              "maximum": 140737488355327,
-                              "type": "number"
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
                         },
                         "firstSnapAt": {
                           "nullable": true,
@@ -8393,6 +8728,72 @@
                         "createdAt": {
                           "format": "date-time",
                           "type": "string"
+                        }
+                      }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "required": [
+                        "requestId",
+                        "timestamp"
+                      ],
+                      "properties": {
+                        "requestId": {
+                          "type": "string"
+                        },
+                        "timestamp": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - e.g. no agricultural data recorded, a missing Idempotency-Key, a deviceless session, an out-of-range capturedAt, completing a session with no snapshots, or adding to a completed session.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Bad request - e.g. no agricultural data recorded, a missing Idempotency-Key, a deviceless session, an out-of-range capturedAt, completing a session with no snapshots, or adding to a completed session.",
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "error",
+                    "meta"
+                  ],
+                  "properties": {
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    },
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message",
+                        "details"
+                      ],
+                      "properties": {
+                        "code": {
+                          "description": "Machine-readable error code",
+                          "type": "string"
+                        },
+                        "message": {
+                          "description": "Human-readable error message",
+                          "type": "string"
+                        },
+                        "details": {
+                          "nullable": true,
+                          "anyOf": [
+                            {
+                              "description": "Additional error details, if any"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
                         }
                       }
                     },
@@ -8483,11 +8884,11 @@
             }
           },
           "404": {
-            "description": "Not found - the session/farm does not exist or is not owned by the requester.",
+            "description": "Not found - the session/farm does not exist, is not owned by the requester, or its farm was deleted (or the session was cancelled).",
             "content": {
               "application/json": {
                 "schema": {
-                  "description": "Not found - the session/farm does not exist or is not owned by the requester.",
+                  "description": "Not found - the session/farm does not exist, is not owned by the requester, or its farm was deleted (or the session was cancelled).",
                   "type": "object",
                   "required": [
                     "success",
@@ -8558,7 +8959,7 @@
           "Assessments"
         ],
         "summary": "Capture a tree snapshot",
-        "description": "Uploads a geo-tagged tree photo (multipart) with measurements; the server derives DBH and links the photo to the snapshot.",
+        "description": "Uploads a geo-tagged tree photo (multipart) with measurements; the server derives **dbhCm** (= circumference ÷ π) and links the photo to the snapshot.\n\n**Idempotency (required):** send an **Idempotency-Key** header — a stable UUID per captured tree, unchanged across retries. The offline client resends a capture after any transient/5xx error, so a response lost *after* the server already committed would otherwise create a duplicate tree. A repeated key returns the original snapshot unchanged — no duplicate row, no re-count — with an **Idempotent-Replay: true** response header. A missing key is **400**.\n\n**Provenance (ADR 0010):** the capturing device is read from the session's access token (a deviceless session — e.g. SSO — cannot capture: **400**). Send **capturedAt** (ISO-8601) to record the true field-measurement time of an offline capture; it is stored as the snapshot's secure timestamp while **createdAt** stays the server receive time. capturedAt must not be in the future, nor precede the session start (**400**).\n\n**Other rules:** the session must be open — adding to a **completed** session is **400**. Owner-scoped; a session whose farm was soft-deleted returns **404**.\n\n**Errors:** **400 BAD_REQUEST** (missing Idempotency-Key · deviceless session · invalid/out-of-range capturedAt · completed session) · **401 UNAUTHORIZED** · **404 NOT_FOUND** (session missing, not owned, or deleted farm) · **422 VALIDATION_ERROR** (bad multipart field or capture location).",
         "security": [
           {
             "bearerAuth": []
@@ -8672,6 +9073,11 @@
                         "maxItems": 2
                       }
                     }
+                  },
+                  "capturedAt": {
+                    "format": "date-time",
+                    "description": "On-device capture time (ISO-8601); preserved for offline captures",
+                    "type": "string"
                   }
                 }
               }
@@ -8770,6 +9176,11 @@
                         "maxItems": 2
                       }
                     }
+                  },
+                  "capturedAt": {
+                    "format": "date-time",
+                    "description": "On-device capture time (ISO-8601); preserved for offline captures",
+                    "type": "string"
                   }
                 }
               }
@@ -8868,6 +9279,11 @@
                         "maxItems": 2
                       }
                     }
+                  },
+                  "capturedAt": {
+                    "format": "date-time",
+                    "description": "On-device capture time (ISO-8601); preserved for offline captures",
+                    "type": "string"
                   }
                 }
               }
@@ -8909,9 +9325,6 @@
                         "captureLocation",
                         "withinFarmBoundary",
                         "weatherCondition",
-                        "aiAssessmentStatus",
-                        "aiConfidenceScore",
-                        "estimatedCarbonKgco2e",
                         "createdAt"
                       ],
                       "properties": {
@@ -8955,10 +9368,9 @@
                           ]
                         },
                         "dbhCm": {
+                          "nullable": true,
                           "anyOf": [
                             {
-                              "minimum": -140737488355328,
-                              "maximum": 140737488355327,
                               "type": "number"
                             },
                             {
@@ -9021,38 +9433,6 @@
                             }
                           ]
                         },
-                        "aiAssessmentStatus": {
-                          "type": "string",
-                          "enum": [
-                            "waiting",
-                            "completed",
-                            "rejected"
-                          ]
-                        },
-                        "aiConfidenceScore": {
-                          "anyOf": [
-                            {
-                              "minimum": -140737488355328,
-                              "maximum": 140737488355327,
-                              "type": "number"
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
-                        },
-                        "estimatedCarbonKgco2e": {
-                          "anyOf": [
-                            {
-                              "minimum": -140737488355328,
-                              "maximum": 140737488355327,
-                              "type": "number"
-                            },
-                            {
-                              "type": "null"
-                            }
-                          ]
-                        },
                         "createdAt": {
                           "format": "date-time",
                           "type": "string"
@@ -9080,11 +9460,11 @@
             }
           },
           "400": {
-            "description": "Bad request - e.g. invalid capture location, or session already completed.",
+            "description": "Bad request - e.g. no agricultural data recorded, a missing Idempotency-Key, a deviceless session, an out-of-range capturedAt, completing a session with no snapshots, or adding to a completed session.",
             "content": {
               "application/json": {
                 "schema": {
-                  "description": "Bad request - e.g. invalid capture location, or session already completed.",
+                  "description": "Bad request - e.g. no agricultural data recorded, a missing Idempotency-Key, a deviceless session, an out-of-range capturedAt, completing a session with no snapshots, or adding to a completed session.",
                   "type": "object",
                   "required": [
                     "success",
@@ -9212,11 +9592,11 @@
             }
           },
           "404": {
-            "description": "Not found - the session/farm does not exist or is not owned by the requester.",
+            "description": "Not found - the session/farm does not exist, is not owned by the requester, or its farm was deleted (or the session was cancelled).",
             "content": {
               "application/json": {
                 "schema": {
-                  "description": "Not found - the session/farm does not exist or is not owned by the requester.",
+                  "description": "Not found - the session/farm does not exist, is not owned by the requester, or its farm was deleted (or the session was cancelled).",
                   "type": "object",
                   "required": [
                     "success",
@@ -9405,9 +9785,6 @@
                           "captureLocation",
                           "withinFarmBoundary",
                           "weatherCondition",
-                          "aiAssessmentStatus",
-                          "aiConfidenceScore",
-                          "estimatedCarbonKgco2e",
                           "createdAt"
                         ],
                         "properties": {
@@ -9451,10 +9828,9 @@
                             ]
                           },
                           "dbhCm": {
+                            "nullable": true,
                             "anyOf": [
                               {
-                                "minimum": -140737488355328,
-                                "maximum": 140737488355327,
                                 "type": "number"
                               },
                               {
@@ -9511,38 +9887,6 @@
                               {
                                 "maxLength": 32,
                                 "type": "string"
-                              },
-                              {
-                                "type": "null"
-                              }
-                            ]
-                          },
-                          "aiAssessmentStatus": {
-                            "type": "string",
-                            "enum": [
-                              "waiting",
-                              "completed",
-                              "rejected"
-                            ]
-                          },
-                          "aiConfidenceScore": {
-                            "anyOf": [
-                              {
-                                "minimum": -140737488355328,
-                                "maximum": 140737488355327,
-                                "type": "number"
-                              },
-                              {
-                                "type": "null"
-                              }
-                            ]
-                          },
-                          "estimatedCarbonKgco2e": {
-                            "anyOf": [
-                              {
-                                "minimum": -140737488355328,
-                                "maximum": 140737488355327,
-                                "type": "number"
                               },
                               {
                                 "type": "null"
@@ -9643,11 +9987,11 @@
             }
           },
           "404": {
-            "description": "Not found - the session/farm does not exist or is not owned by the requester.",
+            "description": "Not found - the session/farm does not exist, is not owned by the requester, or its farm was deleted (or the session was cancelled).",
             "content": {
               "application/json": {
                 "schema": {
-                  "description": "Not found - the session/farm does not exist or is not owned by the requester.",
+                  "description": "Not found - the session/farm does not exist, is not owned by the requester, or its farm was deleted (or the session was cancelled).",
                   "type": "object",
                   "required": [
                     "success",
@@ -9710,6 +10054,285 @@
           }
         },
         "operationId": "getApiV1Assessment-sessionsByIdSnapshots"
+      }
+    },
+    "/api/v1/assessment-sessions/{id}/cancel": {
+      "post": {
+        "tags": [
+          "Assessments"
+        ],
+        "summary": "Cancel an assessment session",
+        "description": "Cancels (voids) an open session — the client's \"abandon\". The session is marked cancelled and **excluded** from the active pointer, lists, and dashboard counts, while its snapshots and photos are **retained** (T-VER evidence — hidden from the farmer, not deleted). Cancelling **frees the farm's one-open-session slot**, so a new session can start immediately.\n\n**Business rules:** handles **empty and non-empty** sessions uniformly (supersedes the old empty-only discard). Owner-scoped; a session on a soft-deleted farm returns 404. A session that is already **completed** cannot be cancelled (**409**).\n\n**Errors:** **401 UNAUTHORIZED** · **404 NOT_FOUND** (missing, not owned, deleted farm, or already cancelled) · **409 CONFLICT** (session already completed).",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "description": "Assessment session id (cuid2)",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cancellation confirmation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Cancellation confirmation",
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "message",
+                    "data",
+                    "meta"
+                  ],
+                  "properties": {
+                    "success": {
+                      "const": true,
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "required": [
+                        "id"
+                      ],
+                      "properties": {
+                        "id": {
+                          "description": "Id of the cancelled session",
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "required": [
+                        "requestId",
+                        "timestamp"
+                      ],
+                      "properties": {
+                        "requestId": {
+                          "type": "string"
+                        },
+                        "timestamp": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - missing or invalid access token.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Unauthorized - missing or invalid access token.",
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "error",
+                    "meta"
+                  ],
+                  "properties": {
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    },
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message",
+                        "details"
+                      ],
+                      "properties": {
+                        "code": {
+                          "description": "Machine-readable error code",
+                          "type": "string"
+                        },
+                        "message": {
+                          "description": "Human-readable error message",
+                          "type": "string"
+                        },
+                        "details": {
+                          "nullable": true,
+                          "anyOf": [
+                            {
+                              "description": "Additional error details, if any"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "required": [
+                        "requestId",
+                        "timestamp"
+                      ],
+                      "properties": {
+                        "requestId": {
+                          "type": "string"
+                        },
+                        "timestamp": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found - the session/farm does not exist, is not owned by the requester, or its farm was deleted (or the session was cancelled).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Not found - the session/farm does not exist, is not owned by the requester, or its farm was deleted (or the session was cancelled).",
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "error",
+                    "meta"
+                  ],
+                  "properties": {
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    },
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message",
+                        "details"
+                      ],
+                      "properties": {
+                        "code": {
+                          "description": "Machine-readable error code",
+                          "type": "string"
+                        },
+                        "message": {
+                          "description": "Human-readable error message",
+                          "type": "string"
+                        },
+                        "details": {
+                          "nullable": true,
+                          "anyOf": [
+                            {
+                              "description": "Additional error details, if any"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "required": [
+                        "requestId",
+                        "timestamp"
+                      ],
+                      "properties": {
+                        "requestId": {
+                          "type": "string"
+                        },
+                        "timestamp": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict - the farm already has an open session (on start), or the session is already completed and cannot be cancelled.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Conflict - the farm already has an open session (on start), or the session is already completed and cannot be cancelled.",
+                  "type": "object",
+                  "required": [
+                    "success",
+                    "error",
+                    "meta"
+                  ],
+                  "properties": {
+                    "success": {
+                      "const": false,
+                      "type": "boolean"
+                    },
+                    "error": {
+                      "type": "object",
+                      "required": [
+                        "code",
+                        "message",
+                        "details"
+                      ],
+                      "properties": {
+                        "code": {
+                          "description": "Machine-readable error code",
+                          "type": "string"
+                        },
+                        "message": {
+                          "description": "Human-readable error message",
+                          "type": "string"
+                        },
+                        "details": {
+                          "nullable": true,
+                          "anyOf": [
+                            {
+                              "description": "Additional error details, if any"
+                            },
+                            {
+                              "type": "null"
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "required": [
+                        "requestId",
+                        "timestamp"
+                      ],
+                      "properties": {
+                        "requestId": {
+                          "type": "string"
+                        },
+                        "timestamp": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "postApiV1Assessment-sessionsByIdCancel"
       }
     },
     "/api/v1/dashboard/": {

@@ -8,6 +8,7 @@ import { DataTable, type Column } from '@/components/ui/data-table'
 import { Badge } from '@/components/ui/badge'
 import { Pagination } from '@/components/ui/pagination'
 import { formatDate, formatPhone } from '@/lib/utils/format'
+import { MockTag } from '@/components/ui/mock-tag'
 import type { Farmer, FarmerAccountStatus } from '@/features/farmers/types'
 
 const PAGE_SIZE = 8
@@ -35,13 +36,16 @@ const columns: Column<Farmer>[] = [
     header: 'Name',
     cell: (f) => (
       <div className="flex flex-col">
-        <Link
-          href={`/admin/farmers/${f.id}`}
-          onClick={(e) => e.stopPropagation()}
-          className="font-medium text-ink hover:text-primary hover:underline focus-visible:text-primary focus-visible:underline focus-visible:outline-none"
-        >
-          {f.fullName}
-        </Link>
+        <div className="flex items-center gap-1 flex-wrap">
+          <Link
+            href={`/admin/farmers/${f.id}`}
+            onClick={(e) => e.stopPropagation()}
+            className="font-medium text-ink hover:text-primary hover:underline focus-visible:text-primary focus-visible:underline focus-visible:outline-none"
+          >
+            {f.fullName ?? f.username}
+          </Link>
+          {(!f._live || !f.fullName) && <MockTag />}
+        </div>
         {f.email && <span className="text-xs text-ink-muted">{f.email}</span>}
       </div>
     ),
@@ -51,7 +55,8 @@ const columns: Column<Farmer>[] = [
     header: 'Phone',
     cell: (f) => (
       <span className="font-mono text-[13px] text-ink-secondary">
-        {formatPhone(f.phone)}
+        {f.phone ? formatPhone(f.phone) : <span className="text-ink-disabled">—</span>}
+        {(!f._live || !f.phone) && <MockTag />}
       </span>
     ),
   },
@@ -94,10 +99,10 @@ export function FarmerTable({ farmers }: { farmers: Farmer[] }) {
       const matchesStatus = status === 'all' || f.accountStatus === status
       const matchesQuery =
         q === '' ||
-        f.fullName.toLowerCase().includes(q) ||
+        (f.fullName ?? f.username).toLowerCase().includes(q) ||
         // Only match on phone when the query has digits — otherwise
         // `''.includes('')` is true and every row leaks through.
-        (qDigits !== '' && f.phone.replace(/\D/g, '').includes(qDigits)) ||
+        (qDigits !== '' && f.phone != null && f.phone.replace(/\D/g, '').includes(qDigits)) ||
         f.id.toLowerCase().includes(q)
       return matchesStatus && matchesQuery
     })
