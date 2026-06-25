@@ -36,7 +36,7 @@ export default async function BatchReportPage({
   const verifyUrl = `${proto}://${host}/verifier/verify/qr-check?session_id=${sessionId}`
   const qr = await QRCode.toDataURL(verifyUrl, { width: 240, margin: 1 })
 
-  const tileUrl = centroidTileUrl(batch.checkinLat, batch.checkinLng)
+  const tileUrl = centroidTileUrl(batch.checkinLat ?? 13.7563, batch.checkinLng ?? 100.5018)
 
   return (
     <div className="min-h-screen bg-surface py-8 print:bg-white print:py-0">
@@ -77,11 +77,13 @@ export default async function BatchReportPage({
         <section className="mt-5 grid grid-cols-[1fr_220px] gap-6">
           <dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
             <Field label="เกษตรกร" value={batch.ownerName} />
-            <Field label="เบอร์ติดต่อ" value={batch.phone} mono />
-            <Field label="ที่ตั้งฟาร์ม" value={batch.farmAddress} span2 />
+            <Field label="เบอร์ติดต่อ" value={batch.phone ?? '—'} mono />
+            <Field label="ที่ตั้งฟาร์ม" value={batch.farmAddress ?? '—'} span2 />
             <Field
               label="พิกัด GPS"
-              value={`${batch.checkinLat.toFixed(5)}, ${batch.checkinLng.toFixed(5)}`}
+              value={batch.checkinLat != null && batch.checkinLng != null
+                ? `${batch.checkinLat.toFixed(5)}, ${batch.checkinLng.toFixed(5)}`
+                : '—'}
               mono
               span2
             />

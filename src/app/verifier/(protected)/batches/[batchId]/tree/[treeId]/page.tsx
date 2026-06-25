@@ -22,7 +22,7 @@ import { treePlaceholderStyle } from '@/features/verifier/lib/treePlaceholder'
 import { confidenceTextClass } from '@/features/verifier/lib/confidence'
 import { BatchMiniMap } from '@/features/verifier/components/BatchMiniMap'
 import { formatDateTime } from '@/lib/utils/format'
-import type { WeatherCondition } from '@/features/verifier/types'
+type WeatherCondition = 'sunny' | 'cloudy' | 'rainy'
 
 export async function generateMetadata({
   params,
@@ -57,7 +57,10 @@ export default async function TreeInspectPage({
   const checks = crossCheckTree(tree, batch)
   const failed = checks.filter((c) => c.status === 'fail').length
   const gpsOk = checks.find((c) => c.key === 'gps')?.status === 'pass'
-  const weather = WEATHER[tree.weather]
+  const conf = tree.aiConfidenceScore ?? 0
+  const weather = tree.weather && tree.weather in WEATHER
+    ? WEATHER[tree.weather as WeatherCondition]
+    : null
 
   const navBase = `/verifier/batches/${batch.id}/tree`
 
@@ -94,9 +97,9 @@ export default async function TreeInspectPage({
           >
             <TreePine className="h-16 w-16 text-white/40" strokeWidth={1.25} />
             <span
-              className={`absolute right-3 top-3 rounded-md bg-panel/90 px-2 py-1 font-mono text-sm font-bold backdrop-blur ${confidenceTextClass(tree.aiConfidenceScore)}`}
+              className={`absolute right-3 top-3 rounded-md bg-panel/90 px-2 py-1 font-mono text-sm font-bold backdrop-blur ${confidenceTextClass(conf)}`}
             >
-              {Math.round(tree.aiConfidenceScore * 100)}%
+              {Math.round(conf * 100)}%
             </span>
             <span className="absolute bottom-3 left-3 rounded bg-ink/50 px-2 py-1 text-[11px] text-white/90 backdrop-blur">
               {tree.id}
@@ -164,14 +167,18 @@ export default async function TreeInspectPage({
                   <MapPin className="h-3 w-3" strokeWidth={1.75} /> พิกัดถ่ายภาพ
                 </dt>
                 <dd>
-                  <a
-                    href={`https://www.google.com/maps?q=${tree.captureLat},${tree.captureLng}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-mono text-primary hover:underline"
-                  >
-                    {tree.captureLat.toFixed(5)}, {tree.captureLng.toFixed(5)}
-                  </a>
+                  {tree.captureLat != null && tree.captureLng != null ? (
+                    <a
+                      href={`https://www.google.com/maps?q=${tree.captureLat},${tree.captureLng}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-mono text-primary hover:underline"
+                    >
+                      {tree.captureLat.toFixed(5)}, {tree.captureLng.toFixed(5)}
+                    </a>
+                  ) : (
+                    <span className="text-ink-disabled">—</span>
+                  )}
                 </dd>
               </div>
               <div>
@@ -180,18 +187,20 @@ export default async function TreeInspectPage({
                 </dt>
                 <dd className="text-ink">{formatDateTime(tree.capturedAt)}</dd>
               </div>
-              <div>
-                <dt className="flex items-center gap-1 text-xs text-ink-muted">
-                  <weather.icon className="h-3 w-3" strokeWidth={1.75} /> สภาพอากาศ
-                </dt>
-                <dd className="text-ink">{weather.label}</dd>
-              </div>
+              {weather && (
+                <div>
+                  <dt className="flex items-center gap-1 text-xs text-ink-muted">
+                    <weather.icon className="h-3 w-3" strokeWidth={1.75} /> สภาพอากาศ
+                  </dt>
+                  <dd className="text-ink">{weather.label}</dd>
+                </div>
+              )}
               <div>
                 <dt className="flex items-center gap-1 text-xs text-ink-muted">
                   <Gauge className="h-3 w-3" strokeWidth={1.75} /> ความเชื่อมั่น AI
                 </dt>
-                <dd className={`font-mono font-semibold ${confidenceTextClass(tree.aiConfidenceScore)}`}>
-                  {Math.round(tree.aiConfidenceScore * 100)}%
+                <dd className={`font-mono font-semibold ${confidenceTextClass(conf)}`}>
+                  {Math.round(conf * 100)}%
                 </dd>
               </div>
             </dl>
@@ -202,7 +211,9 @@ export default async function TreeInspectPage({
             <div className="h-56">
               <BatchMiniMap
                 polygon={batch.polygon}
-                pin={[tree.captureLng, tree.captureLat]}
+                pin={tree.captureLng != null && tree.captureLat != null
+                  ? [tree.captureLng, tree.captureLat]
+                  : undefined}
                 pinColor={gpsOk ? '#2563EB' : '#C8000E'}
               />
             </div>

@@ -82,6 +82,8 @@ function buildTrees(
       capturedAt: new Date(baseMs - i * 3_600_000).toISOString(),
       weather: WEATHERS[s % 3],
       aiConfidenceScore: conf,
+      estimatedCarbonKgco2e: null,
+      aiStatus: null,
       anomaly: conf < CONFIDENCE_MIN,
     }
   })
@@ -92,6 +94,8 @@ export const mockBatchDetails: Record<string, BatchDetail> = Object.fromEntries(
     const geo = geoFor(b.farmId)
     const detail: BatchDetail = {
       ...b,
+      _live: false,
+      status: b.status as import('@/features/verifier/types').BatchStatus,
       phone: mockPhone(seedNum(b.id)),
       farmAddress: `อ.เมือง จ.${geo.province}`,
       checkinLat: geo.lat,

@@ -32,8 +32,13 @@ export function pointInPolygon(lng: number, lat: number, ring: [number, number][
  * mocking it would imply a check that isn't actually happening.
  */
 export function crossCheckTree(tree: TreeSnapshot, batch: BatchDetail): CrossCheck[] {
-  const confOk = tree.aiConfidenceScore >= CONFIDENCE_MIN
-  const inBoundary = pointInPolygon(tree.captureLng, tree.captureLat, batch.polygon)
+  const conf = tree.aiConfidenceScore ?? 0
+  const confOk = conf >= CONFIDENCE_MIN
+  const hasGps = tree.captureLat != null && tree.captureLng != null
+  const inBoundary =
+    hasGps && batch.polygon.length > 0
+      ? pointInPolygon(tree.captureLng!, tree.captureLat!, batch.polygon)
+      : false
 
   return [
     {
@@ -41,8 +46,8 @@ export function crossCheckTree(tree: TreeSnapshot, batch: BatchDetail): CrossChe
       label: 'ความเชื่อมั่น AI',
       status: confOk ? 'pass' : 'fail',
       detail: confOk
-        ? `${Math.round(tree.aiConfidenceScore * 100)}% — ผ่านเกณฑ์`
-        : `${Math.round(tree.aiConfidenceScore * 100)}% — ต่ำกว่าเกณฑ์ ${Math.round(CONFIDENCE_MIN * 100)}%`,
+        ? `${Math.round(conf * 100)}% — ผ่านเกณฑ์`
+        : `${Math.round(conf * 100)}% — ต่ำกว่าเกณฑ์ ${Math.round(CONFIDENCE_MIN * 100)}%`,
     },
     {
       key: 'gps',

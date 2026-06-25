@@ -16,6 +16,7 @@ import { fetchBatchById } from '@/features/verifier/services/fetchBatchById'
 import { BatchReviewActions } from '@/features/verifier/components/BatchReviewActions'
 import { BatchMiniMap } from '@/features/verifier/components/BatchMiniMap'
 import { TreeSnapshotGrid } from '@/features/verifier/components/TreeSnapshotGrid'
+import { MockTag } from '@/components/ui/mock-tag'
 import { formatDate, formatNumber } from '@/lib/utils/format'
 import { confidenceTextClass } from '@/features/verifier/lib/confidence'
 
@@ -89,7 +90,10 @@ export default async function BatchDetailPage({
                 <dt className="flex items-center gap-1 text-xs text-ink-muted">
                   <Phone className="h-3 w-3" strokeWidth={1.75} /> เบอร์ติดต่อ
                 </dt>
-                <dd className="font-mono text-ink">{batch.phone}</dd>
+                <dd className="font-mono text-ink">
+                  {batch.phone ?? <span className="text-ink-disabled">—</span>}
+                  {(!batch._live || !batch.phone) && <MockTag />}
+                </dd>
               </div>
               <div>
                 <dt className="flex items-center gap-1 text-xs text-ink-muted">
@@ -100,15 +104,19 @@ export default async function BatchDetailPage({
               <div>
                 <dt className="text-xs text-ink-muted">พิกัด GPS</dt>
                 <dd>
-                  <a
-                    href={`https://www.google.com/maps?q=${batch.checkinLat},${batch.checkinLng}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 font-mono text-primary hover:underline"
-                  >
-                    {batch.checkinLat.toFixed(5)}, {batch.checkinLng.toFixed(5)}
-                    <ExternalLink className="h-3 w-3" strokeWidth={1.75} />
-                  </a>
+                  {batch.checkinLat != null && batch.checkinLng != null ? (
+                    <a
+                      href={`https://www.google.com/maps?q=${batch.checkinLat},${batch.checkinLng}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 font-mono text-primary hover:underline"
+                    >
+                      {batch.checkinLat.toFixed(5)}, {batch.checkinLng.toFixed(5)}
+                      <ExternalLink className="h-3 w-3" strokeWidth={1.75} />
+                    </a>
+                  ) : (
+                    <span className="text-ink-disabled">—</span>
+                  )}
                 </dd>
               </div>
             </dl>

@@ -1,13 +1,8 @@
-import type { VerificationBatch } from '@/features/verifier/types'
-
 /**
- * Temporary stand-in until verifier endpoints exist (carbon_credit_batches /
- * assessment_results are empty in the API). Farm/farmer names mirror the real
- * seeded data; the three anomaly batches match the V-02 alert panel so clicking
- * through from the dashboard stays consistent. Delete once `fetchBatches()`
- * calls the real endpoint.
+ * Temporary stand-in until verifier endpoints exist.
+ * _live and totalCarbonKgCo2e are added by fetchBatches() at runtime.
  */
-export const mockBatches: VerificationBatch[] = [
+export const mockBatches = [
   // ── flagged / pending (match V-02 alerts) ──
   { id: 'BATCH-2026-0042', farmId: 'FARM-GIS-10', farmName: 'ไร่หัวใจ', ownerName: 'วิชัย ไร่กาแฟ', submittedAt: '2026-06-08T07:45:00Z', treeCount: 38, avgConfidence: 0.43, anomalyFlag: true, status: 'Pending', totalCarbonKgCo2e: 15600 },
   { id: 'BATCH-2026-0039', farmId: 'FARM-GIS-05', farmName: 'แปลงริมน้ำ', ownerName: 'ดวงใจ ไร่สับปะรด', submittedAt: '2026-06-07T03:20:00Z', treeCount: 21, avgConfidence: 0.61, anomalyFlag: true, status: 'Pending', totalCarbonKgCo2e: 8400 },

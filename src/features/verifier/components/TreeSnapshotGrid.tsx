@@ -1,7 +1,9 @@
 import Link from 'next/link'
 import { TreePine, TriangleAlert, Sun, Cloud, CloudRain } from 'lucide-react'
 import type { ComponentType, SVGProps } from 'react'
-import type { TreeSnapshot, WeatherCondition } from '@/features/verifier/types'
+import type { TreeSnapshot } from '@/features/verifier/types'
+
+type WeatherCondition = 'sunny' | 'cloudy' | 'rainy'
 import { treePlaceholderStyle } from '@/features/verifier/lib/treePlaceholder'
 import { confidenceBadgeClass } from '@/features/verifier/lib/confidence'
 
@@ -21,8 +23,9 @@ export function TreeSnapshotGrid({
   return (
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5">
       {trees.map((t) => {
-        const Weather = WEATHER_ICON[t.weather]
-        const pct = Math.round(t.aiConfidenceScore * 100)
+        const Weather = t.weather && t.weather in WEATHER_ICON ? WEATHER_ICON[t.weather as WeatherCondition] : null
+        const conf = t.aiConfidenceScore ?? 0
+        const pct = Math.round(conf * 100)
         return (
           <Link
             key={t.id}
@@ -38,7 +41,7 @@ export function TreeSnapshotGrid({
             >
               <TreePine className="h-8 w-8 text-white/40" strokeWidth={1.5} />
               <span
-                className={`absolute right-1.5 top-1.5 rounded px-1.5 py-0.5 font-mono text-[11px] font-bold ${confidenceBadgeClass(t.aiConfidenceScore)}`}
+                className={`absolute right-1.5 top-1.5 rounded px-1.5 py-0.5 font-mono text-[11px] font-bold ${confidenceBadgeClass(conf)}`}
               >
                 {pct}%
               </span>
@@ -51,9 +54,11 @@ export function TreeSnapshotGrid({
             </div>
             <div className="flex items-center justify-between gap-1 px-2 py-1.5">
               <span className="truncate font-mono text-[10px] text-ink-muted">
-                {t.captureLat.toFixed(4)}, {t.captureLng.toFixed(4)}
+                {t.captureLat != null && t.captureLng != null
+                  ? `${t.captureLat.toFixed(4)}, ${t.captureLng.toFixed(4)}`
+                  : '—'}
               </span>
-              <Weather className="h-3.5 w-3.5 shrink-0 text-ink-muted" strokeWidth={1.75} />
+              {Weather && <Weather className="h-3.5 w-3.5 shrink-0 text-ink-muted" strokeWidth={1.75} />}
             </div>
           </Link>
         )
