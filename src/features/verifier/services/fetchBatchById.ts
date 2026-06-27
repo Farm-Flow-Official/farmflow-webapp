@@ -11,6 +11,8 @@ type ApiTree = {
   aiConfidenceScore: number | null
   estimatedCarbonKgco2e: number | null
   aiStatus: string | null
+  dbhCm: number | null
+  treeHeightM: number | null
   anomaly: boolean
 }
 
@@ -57,6 +59,8 @@ function mapApiTree(t: ApiTree): TreeSnapshot {
     aiConfidenceScore: t.aiConfidenceScore,
     estimatedCarbonKgco2e: t.estimatedCarbonKgco2e,
     aiStatus: t.aiStatus,
+    dbhCm: t.dbhCm ?? null,
+    treeHeightM: t.treeHeightM ?? null,
     anomaly: t.anomaly,
   }
 }

@@ -66,6 +66,10 @@ export type TreeSnapshot = {
   estimatedCarbonKgco2e: number | null
   /** AI assessment status: 'waiting' | 'completed' | 'rejected'. null when no assessment yet. */
   aiStatus: string | null
+  /** Diameter at Breast Height (1.3 m) in cm, derived from circumference / π. */
+  dbhCm: number | null
+  /** Tree height in metres. */
+  treeHeightM: number | null
   anomaly: boolean
 }
 

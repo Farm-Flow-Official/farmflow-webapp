@@ -75,6 +75,7 @@ function buildTrees(
   return Array.from({ length: count }, (_, i) => {
     const s = seed + i * 7
     const conf = Math.round(clamp(avg + (frac(s) - 0.5) * 0.4, 0.2, 0.98) * 100) / 100
+    const circumference = Math.round((30 + frac(s + 3) * 90) * 10) / 10  // 30–120 cm
     return {
       id: `${batchId}-T${String(i + 1).padStart(3, '0')}`,
       captureLat: Math.round((baseLat + (frac(s + 1) - 0.5) * 0.003) * 1e6) / 1e6,
@@ -84,6 +85,8 @@ function buildTrees(
       aiConfidenceScore: conf,
       estimatedCarbonKgco2e: null,
       aiStatus: null,
+      dbhCm: Math.round((circumference / Math.PI) * 10) / 10,
+      treeHeightM: Math.round((5 + frac(s + 4) * 15) * 10) / 10,  // 5–20 m
       anomaly: conf < CONFIDENCE_MIN,
     }
   })

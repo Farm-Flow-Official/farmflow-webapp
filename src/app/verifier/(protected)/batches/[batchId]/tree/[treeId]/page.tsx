@@ -9,6 +9,8 @@ import {
   MapPin,
   Clock,
   Gauge,
+  Ruler,
+  ArrowUpFromLine,
   TreePine,
   CircleCheck,
   CircleX,
@@ -195,12 +197,28 @@ export default async function TreeInspectPage({
                   <dd className="text-ink">{weather.label}</dd>
                 </div>
               )}
-              <div>
+              <div className={weather ? 'col-span-2' : ''}>
                 <dt className="flex items-center gap-1 text-xs text-ink-muted">
                   <Gauge className="h-3 w-3" strokeWidth={1.75} /> ความเชื่อมั่น AI
                 </dt>
                 <dd className={`font-mono font-semibold ${confidenceTextClass(conf)}`}>
                   {Math.round(conf * 100)}%
+                </dd>
+              </div>
+              <div>
+                <dt className="flex items-center gap-1 text-xs text-ink-muted">
+                  <Ruler className="h-3 w-3" strokeWidth={1.75} /> DBH
+                </dt>
+                <dd className="font-mono text-ink">
+                  {tree.dbhCm != null ? `${tree.dbhCm.toFixed(1)} cm` : <span className="text-ink-disabled">—</span>}
+                </dd>
+              </div>
+              <div>
+                <dt className="flex items-center gap-1 text-xs text-ink-muted">
+                  <ArrowUpFromLine className="h-3 w-3" strokeWidth={1.75} /> ความสูง
+                </dt>
+                <dd className="font-mono text-ink">
+                  {tree.treeHeightM != null ? `${tree.treeHeightM.toFixed(1)} m` : <span className="text-ink-disabled">—</span>}
                 </dd>
               </div>
             </dl>
