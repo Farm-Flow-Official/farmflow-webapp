@@ -13,8 +13,8 @@ export type SystemConfig = {
   priceSource: PriceSource
   /** When this price takes effect (ERD: effective_from). */
   effectiveFrom: string
-  /** Admin who set it (ERD: updated_by_admin_id). */
-  updatedByAdminId: string
+  /** Admin who set it (ERD: updated_by_admin_id); null when seeded/unknown. */
+  updatedByAdminId: string | null
   /** Enriched admin username via JOIN to ADMINS — null if unknown. */
   updatedByLabel?: string | null
   /** Row creation time (ERD: created_at). */

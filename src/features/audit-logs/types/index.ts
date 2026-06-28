@@ -3,7 +3,7 @@
  * an append-only event table. Read-only: no create/update/delete from the UI.
  */
 export type AuditActorType = 'USER' | 'ADMIN' | 'SYSTEM'
-export type AuditAction = 'CREATE' | 'UPDATE' | 'DELETE' | 'APPROVE'
+export type AuditAction = 'CREATE' | 'UPDATE' | 'DELETE' | 'APPROVE' | 'REJECT'
 
 /** A single before/after snapshot payload (ERD: old_data / new_data json). */
 export type AuditSnapshot = Record<string, string | number | boolean | null>
@@ -11,8 +11,8 @@ export type AuditSnapshot = Record<string, string | number | boolean | null>
 export type AuditLog = {
   /** log_id — append-only. */
   id: string
-  /** user_id or admin_id of the actor. */
-  actorId: string
+  /** user_id or admin_id of the actor; null for some system events. */
+  actorId: string | null
   /**
    * Human-readable actor name (e.g. admin username), enriched by the API via a
    * JOIN to ADMINS. Null when there's no friendly name (USER/SYSTEM). The raw
@@ -33,5 +33,5 @@ export type AuditLog = {
   createdAt: string
 }
 
-export const AUDIT_ACTIONS: AuditAction[] = ['CREATE', 'UPDATE', 'DELETE', 'APPROVE']
+export const AUDIT_ACTIONS: AuditAction[] = ['CREATE', 'UPDATE', 'DELETE', 'APPROVE', 'REJECT']
 export const AUDIT_ACTOR_TYPES: AuditActorType[] = ['ADMIN', 'USER', 'SYSTEM']

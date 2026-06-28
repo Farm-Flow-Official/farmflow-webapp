@@ -6,12 +6,16 @@
     "dev": "next dev -p 3001",
     "build": "next build",
     "start": "next start -p 3001",
-    "lint": "eslint"
+    "lint": "eslint",
+    "api:types": "openapi-typescript docs/api-version-3.0.3.json -o src/lib/api/schema.d.ts",
+    "api:types:live": "openapi-typescript \"${FARMFLOW_API_URL:-http://localhost:3000}/openapi/json\" -o src/lib/api/schema.d.ts",
+    "api:spec:pull": "node scripts/pull-spec.mjs"
   },
   "dependencies": {
     "leaflet": "^1.9.4",
     "lucide-react": "^1.17.0",
     "next": "16.2.6",
+    "openapi-fetch": "^0.17.0",
     "qrcode": "^1.5.4",
     "react": "19.2.4",
     "react-dom": "19.2.4",
@@ -26,6 +30,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
+    "openapi-typescript": "^7.13.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

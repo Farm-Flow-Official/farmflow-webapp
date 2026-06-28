@@ -1,42 +1,7 @@
-import { cookies } from 'next/headers'
-import { mockBatches } from '@/features/verifier/data/mockBatches'
-import type { VerificationBatch, BatchStatus } from '@/features/verifier/types'
+import { api, unwrap } from '@/lib/api'
+import type { VerificationBatch } from '@/features/verifier/types'
 
-type ApiSession = {
-  id: string
-  farmId: string
-  farmName: string
-  ownerUsername: string
-  submittedAt: string
-  treeCount: number
-  avgConfidence: number
-  totalCarbonKgco2e: number
-  anomalyFlag: boolean
-  aiBatchStatus: string
-}
-
-function mapStatus(aiBatchStatus: string): BatchStatus {
-  if (aiBatchStatus === 'completed') return 'Approved'
-  if (aiBatchStatus === 'rejected') return 'Rejected'
-  return 'Pending'
-}
-
-function mapApiSession(s: ApiSession): VerificationBatch {
-  return {
-    id: s.id,
-    farmId: s.farmId,
-    farmName: s.farmName,
-    ownerName: s.ownerUsername,
-    submittedAt: s.submittedAt,
-    treeCount: s.treeCount,
-    avgConfidence: s.avgConfidence,
-    anomalyFlag: s.anomalyFlag,
-    status: mapStatus(s.aiBatchStatus),
-    totalCarbonKgCo2e: s.totalCarbonKgco2e,
-    _live: true,
-  }
-}
-
+/** Pending first, then anomalies, then lowest confidence — the review priority order. */
 function smartSort(batches: VerificationBatch[]): VerificationBatch[] {
   return [...batches].sort((a, b) => {
     const aPending = a.status === 'Pending' ? 0 : 1
@@ -47,32 +12,20 @@ function smartSort(batches: VerificationBatch[]): VerificationBatch[] {
   })
 }
 
-const mockWithFlag: VerificationBatch[] = mockBatches.map((b) => ({
-  ...b,
-  status: b.status as BatchStatus,
-  _live: false as const,
-}))
-
+/** The verifier review queue (assessment sessions awaiting a decision). */
 export async function fetchBatches(): Promise<VerificationBatch[]> {
-  const apiBase = process.env.FARMFLOW_API_URL
-  if (!apiBase) return smartSort(mockWithFlag)
-
-  const store = await cookies()
-  const cookieHeader = store
-    .getAll()
-    .map((c) => `${c.name}=${c.value}`)
-    .join('; ')
-
-  try {
-    const res = await fetch(`${apiBase}/admin/sessions`, {
-      headers: { cookie: cookieHeader },
-      cache: 'no-store',
-    })
-    if (!res.ok) return smartSort(mockWithFlag)
-
-    const json = (await res.json()) as { data?: ApiSession[] }
-    return smartSort((json.data ?? []).map(mapApiSession))
-  } catch {
-    return smartSort(mockWithFlag)
-  }
+  const batches = await unwrap(api.GET('/api/v1/verifier/batches'))
+  return smartSort(
+    batches.map((b) => ({
+      id: b.id,
+      farmName: b.farmName,
+      ownerName: b.farmerName,
+      submittedAt: b.submittedAt,
+      treeCount: b.treeCount,
+      avgConfidence: b.avgConfidence ?? 0,
+      anomalyFlag: b.anomalyFlag,
+      status: b.status,
+      totalCarbonKgCo2e: b.totalCarbonKgCo2e,
+    })),
+  )
 }

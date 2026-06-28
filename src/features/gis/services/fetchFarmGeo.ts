@@ -1,22 +1,35 @@
-import type { FarmGeo } from '@/features/gis/types'
-import { mockFarmGeo } from '@/features/gis/data/mockFarmGeo'
+import { api, unwrap } from '@/lib/api'
+import type {
+  FarmGeo,
+  FarmStatus,
+  GeeStatus,
+  PolygonCoords,
+} from '@/features/gis/types'
 
 /**
- * Single data seam for the farm map. Today it returns mock data; when the admin
- * API is ready, replace ONLY the body below. The endpoint should return each
- * farm's `farm_polygon_geojson` plus the validation flags and a server-computed
- * overlap percentage:
- *
- *   const apiBase = process.env.FARMFLOW_API_URL
- *   const cookieHeader = await forwardCookieHeader()   // export from adminSession.ts
- *   const res = await fetch(`${apiBase}/admin/gis/farms`, {
- *     headers: { cookie: cookieHeader },
- *     cache: 'no-store',
- *   })
- *   if (!res.ok) return []
- *   const json = (await res.json()) as { data?: FarmGeo[] }
- *   return json.data ?? []
+ * All farms for the admin map. Only farms with a check-in point and a GEE result
+ * are returned — a farm with no location can't be plotted, and the map UI assumes
+ * those fields are present.
  */
 export async function fetchFarmGeo(): Promise<FarmGeo[]> {
-  return mockFarmGeo
+  const farms = await unwrap(api.GET('/api/v1/admin/gis/farms'))
+  return farms
+    .filter((f) => f.checkinLat != null && f.checkinLng != null && f.gee != null)
+    .map((f) => ({
+      id: f.id,
+      farmName: f.farmName,
+      ownerUserId: f.ownerUserId,
+      ownerName: f.ownerName,
+      province: f.province ?? '',
+      checkinLat: f.checkinLat as number,
+      checkinLng: f.checkinLng as number,
+      gee: { status: f.gee!.status as GeeStatus, ndvi: f.gee!.ndvi },
+      calculatedAreaRai: f.calculatedAreaRai ?? 0,
+      declaredAreaRai: f.declaredAreaRai ?? 0,
+      areaDiscrepancyFlag: f.areaDiscrepancyFlag,
+      overlapFlag: f.overlapFlag,
+      overlapPercent: f.overlapPercent,
+      farmStatus: f.farmStatus as FarmStatus,
+      polygon: f.polygon as PolygonCoords,
+    }))
 }

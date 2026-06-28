@@ -8,7 +8,6 @@ import { DataTable, type Column } from '@/components/ui/data-table'
 import { Badge } from '@/components/ui/badge'
 import { Pagination } from '@/components/ui/pagination'
 import { formatDate, formatPhone } from '@/lib/utils/format'
-import { MockTag } from '@/components/ui/mock-tag'
 import type { Farmer, FarmerAccountStatus } from '@/features/farmers/types'
 
 const PAGE_SIZE = 8
@@ -42,9 +41,8 @@ const columns: Column<Farmer>[] = [
             onClick={(e) => e.stopPropagation()}
             className="font-medium text-ink hover:text-primary hover:underline focus-visible:text-primary focus-visible:underline focus-visible:outline-none"
           >
-            {f.fullName ?? f.username}
+            {f.fullName}
           </Link>
-          {(!f._live || !f.fullName) && <MockTag />}
         </div>
         {f.email && <span className="text-xs text-ink-muted">{f.email}</span>}
       </div>
@@ -56,7 +54,6 @@ const columns: Column<Farmer>[] = [
     cell: (f) => (
       <span className="font-mono text-[13px] text-ink-secondary">
         {f.phone ? formatPhone(f.phone) : <span className="text-ink-disabled">—</span>}
-        {(!f._live || !f.phone) && <MockTag />}
       </span>
     ),
   },
@@ -99,7 +96,7 @@ export function FarmerTable({ farmers }: { farmers: Farmer[] }) {
       const matchesStatus = status === 'all' || f.accountStatus === status
       const matchesQuery =
         q === '' ||
-        (f.fullName ?? f.username).toLowerCase().includes(q) ||
+        f.fullName.toLowerCase().includes(q) ||
         // Only match on phone when the query has digits — otherwise
         // `''.includes('')` is true and every row leaks through.
         (qDigits !== '' && f.phone != null && f.phone.replace(/\D/g, '').includes(qDigits)) ||

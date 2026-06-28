@@ -13,6 +13,11 @@ import type {
   AnnouncementInput,
   AnnouncementStatus,
 } from '@/features/announcements/types'
+import {
+  createAnnouncement,
+  updateAnnouncement,
+  deleteAnnouncement,
+} from '@/features/announcements/actions/announcementActions'
 
 type Props = {
   initialItems: Announcement[]
@@ -34,37 +39,30 @@ export function AnnouncementManager({ initialItems, canDelete }: Props) {
     [items],
   )
 
-  // MOCK ONLY — local state, no persistence. Replace with Server Actions / fetch.
-  function handleSave(input: AnnouncementInput) {
-    const now = new Date().toISOString()
+  async function handleSave(input: AnnouncementInput) {
     if (editing === 'new') {
-      // Seam: await createAnnouncement(input)
-      const created: Announcement = {
-        id: `ANN-${Date.now()}`,
-        ...input,
-        createdAt: now,
-        updatedAt: now,
-      }
-      setItems((prev) => [created, ...prev])
-      showToast('สร้างประกาศเรียบร้อย (mock — ยังไม่บันทึกจริง)')
+      const res = await createAnnouncement(input)
+      if (!res.ok) return showToast(res.error)
+      setItems((prev) => [res.data, ...prev])
+      showToast('สร้างประกาศเรียบร้อย')
     } else if (editing) {
-      // Seam: await updateAnnouncement(editing.id, input)
-      const id = editing.id
-      setItems((prev) =>
-        prev.map((a) => (a.id === id ? { ...a, ...input, updatedAt: now } : a)),
-      )
-      showToast('แก้ไขประกาศเรียบร้อย (mock — ยังไม่บันทึกจริง)')
+      const res = await updateAnnouncement(editing.id, input)
+      if (!res.ok) return showToast(res.error)
+      const updated = res.data
+      setItems((prev) => prev.map((a) => (a.id === updated.id ? updated : a)))
+      showToast('แก้ไขประกาศเรียบร้อย')
     }
     setEditing(null)
   }
 
-  function handleDelete() {
+  async function handleDelete() {
     if (!deleting) return
-    // Seam: await deleteAnnouncement(deleting.id)
     const id = deleting.id
+    const res = await deleteAnnouncement(id)
+    if (!res.ok) return showToast(res.error ?? 'ลบประกาศไม่สำเร็จ')
     setItems((prev) => prev.filter((a) => a.id !== id))
     setDeleting(null)
-    showToast('ลบประกาศเรียบร้อย (mock — ยังไม่บันทึกจริง)')
+    showToast('ลบประกาศเรียบร้อย')
   }
 
   const columns: Column<Announcement>[] = [

@@ -7,6 +7,7 @@ import { Modal } from '@/components/ui/modal'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { Toast, useToast } from '@/components/ui/toast'
 import type { BatchStatus } from '@/features/verifier/types'
+import { approveBatch, rejectBatch } from '@/features/verifier/actions/reviewActions'
 
 const STATUS_META: Record<BatchStatus, { variant: BadgeVariant; label: string }> = {
   Pending: { variant: 'pending', label: 'รอตรวจ' },
@@ -24,23 +25,33 @@ export function BatchReviewActions({ batchId, initialStatus, verifierName }: Pro
   const [status, setStatus] = useState<BatchStatus>(initialStatus)
   const [approving, setApproving] = useState(false)
   const [rejecting, setRejecting] = useState(false)
+  const [pending, setPending] = useState(false)
   const { message, showToast } = useToast()
 
-  // MOCK ONLY — local state, no persistence. Replace with Server Actions when
-  // the verifier API exposes approve/reject + PDF generation.
-  function handleApprove() {
-    // Seam: await approveBatch(batchId) → status Approved + PDF w/ verifier signature
-    setStatus('Approved')
+  async function handleApprove() {
+    setPending(true)
+    const res = await approveBatch(batchId)
+    setPending(false)
     setApproving(false)
-    showToast('อนุมัติ batch แล้ว · ออกใบรับรอง PDF (mock — ยังไม่บันทึกจริง)')
+    if (res.ok) {
+      setStatus('Approved')
+      showToast('อนุมัติ batch แล้ว · ออกใบรับรองให้เกษตรกร')
+    } else {
+      showToast(res.error ?? 'อนุมัติไม่สำเร็จ')
+    }
   }
 
-  function handleReject(reason: string) {
-    // Seam: await rejectBatch(batchId, reason) → status Rejected + notify farmer
-    void reason
-    setStatus('Rejected')
-    setRejecting(false)
-    showToast('ปฏิเสธ batch แล้ว · แจ้งเหตุผลถึงเกษตรกร (mock — ยังไม่บันทึกจริง)')
+  async function handleReject(reason: string) {
+    setPending(true)
+    const res = await rejectBatch(batchId, reason)
+    setPending(false)
+    if (res.ok) {
+      setStatus('Rejected')
+      setRejecting(false)
+      showToast('ปฏิเสธ batch แล้ว · แจ้งเหตุผลถึงเกษตรกร')
+    } else {
+      showToast(res.error ?? 'ปฏิเสธไม่สำเร็จ')
+    }
   }
 
   function handlePdf() {
@@ -101,6 +112,7 @@ export function BatchReviewActions({ batchId, initialStatus, verifierName }: Pro
           }
           confirmLabel="อนุมัติ"
           tone="primary"
+          pending={pending}
           onConfirm={handleApprove}
           onClose={() => setApproving(false)}
         />

@@ -25,6 +25,12 @@ import {
   type AdminStatus,
   type AdminInvite,
 } from '@/features/admin-users/types'
+import {
+  inviteAdmin,
+  updateAdminRole,
+  setAdminStatus,
+  deleteAdmin,
+} from '@/features/admin-users/actions/adminActions'
 
 type Props = {
   initialAdmins: AdminUser[]
@@ -38,16 +44,15 @@ const PAGE_SIZE = 8
  * "Active" status (green) visually distinct. Light tints preserve the clean look.
  */
 const ROLE_STYLE: Record<AdminRole, { dot: string; avatar: string }> = {
-  SuperAdmin: { dot: 'bg-info', avatar: 'bg-info-bg text-info' },
-  Auditor: { dot: 'bg-ink', avatar: 'bg-ink text-white' },
-  Verifier: { dot: 'bg-pink-600', avatar: 'bg-pink-100 text-pink-700' },
+  MASTER: { dot: 'bg-info', avatar: 'bg-info-bg text-info' },
+  VERIFIER: { dot: 'bg-pink-600', avatar: 'bg-pink-100 text-pink-700' },
+  FINANCE: { dot: 'bg-ink', avatar: 'bg-ink text-white' },
+  GENERAL: { dot: 'bg-ink-muted', avatar: 'bg-surface text-ink-secondary' },
 }
 
 const ROLE_FILTERS: { value: 'all' | AdminRole; label: string }[] = [
   { value: 'all', label: 'ทุกบทบาท' },
-  { value: 'SuperAdmin', label: 'Super Admin' },
-  { value: 'Auditor', label: 'Auditor' },
-  { value: 'Verifier', label: 'Verifier' },
+  ...ADMIN_ROLES.map((r) => ({ value: r, label: ROLE_INFO[r].label })),
 ]
 
 const STATUS_FILTERS: { value: 'all' | AdminStatus; label: string }[] = [
@@ -83,18 +88,13 @@ export function AdminUserManager({ initialAdmins }: Props) {
   const safePage = Math.min(page, totalPages)
   const pageRows = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE)
 
-  // MOCK ONLY — local state, no persistence. Replace with Server Actions / fetch.
-  function handleInvite(invite: AdminInvite) {
-    // Seam: await inviteAdmin(invite)
-    const now = new Date().toISOString()
-    const created: AdminUser = {
-      id: `ADM-${Date.now()}`,
-      username: invite.username,
-      role: invite.role,
-      status: 'Active',
-      lastLoginAt: null,
-      createdAt: now,
+  async function handleInvite(invite: AdminInvite) {
+    const res = await inviteAdmin(invite)
+    if (!res.ok || !res.admin) {
+      showToast(res.error ?? 'เชิญผู้ดูแลไม่สำเร็จ')
+      return
     }
+    const created = res.admin
     setAdmins((prev) => [created, ...prev])
     setInviting(false)
     // Clear filters so the newcomer is always visible.
@@ -102,39 +102,47 @@ export function AdminUserManager({ initialAdmins }: Props) {
     setRoleFilter('all')
     setStatusFilter('all')
     setPage(1)
-    showToast(`เชิญ ${invite.username} เข้าระบบแล้ว (mock — ยังไม่บันทึกจริง)`)
+    showToast(`เชิญ ${invite.username} เข้าระบบแล้ว`)
   }
 
-  function handleEditRole(role: AdminRole) {
+  async function handleEditRole(role: AdminRole) {
     if (!editing) return
-    // Seam: await updateAdminRole(editing.id, role)
     const id = editing.id
+    const res = await updateAdminRole(id, role)
+    if (!res.ok) {
+      showToast(res.error ?? 'อัปเดตบทบาทไม่สำเร็จ')
+      return
+    }
     setAdmins((prev) => prev.map((a) => (a.id === id ? { ...a, role } : a)))
     setEditing(null)
-    showToast('อัปเดตบทบาทเรียบร้อย (mock — ยังไม่บันทึกจริง)')
+    showToast('อัปเดตบทบาทเรียบร้อย')
   }
 
-  function handleToggleStatus() {
+  async function handleToggleStatus() {
     if (!statusTarget) return
-    // Seam: await setAdminStatus(statusTarget.id, next)
     const id = statusTarget.id
-    const next = statusTarget.status === 'Active' ? 'Inactive' : 'Active'
+    const next: AdminStatus = statusTarget.status === 'Active' ? 'Inactive' : 'Active'
+    const res = await setAdminStatus(id, next)
+    if (!res.ok) {
+      showToast(res.error ?? 'อัปเดตสถานะไม่สำเร็จ')
+      return
+    }
     setAdmins((prev) => prev.map((a) => (a.id === id ? { ...a, status: next } : a)))
     setStatusTarget(null)
-    showToast(
-      next === 'Inactive'
-        ? 'ระงับบัญชีผู้ดูแลแล้ว (mock — ยังไม่บันทึกจริง)'
-        : 'เปิดใช้งานบัญชีผู้ดูแลแล้ว (mock — ยังไม่บันทึกจริง)',
-    )
+    showToast(next === 'Inactive' ? 'ระงับบัญชีผู้ดูแลแล้ว' : 'เปิดใช้งานบัญชีผู้ดูแลแล้ว')
   }
 
-  function handleDelete() {
+  async function handleDelete() {
     if (!deleting) return
-    // Seam: await deleteAdmin(deleting.id)
     const id = deleting.id
+    const res = await deleteAdmin(id)
+    if (!res.ok) {
+      showToast(res.error ?? 'ลบบัญชีไม่สำเร็จ')
+      return
+    }
     setAdmins((prev) => prev.filter((a) => a.id !== id))
     setDeleting(null)
-    showToast('ลบบัญชีผู้ดูแลแล้ว (mock — ยังไม่บันทึกจริง)')
+    showToast('ลบบัญชีผู้ดูแลแล้ว')
   }
 
   const columns: Column<AdminUser>[] = [
@@ -474,7 +482,7 @@ function InviteForm({
 }) {
   const titleId = useId()
   const [username, setUsername] = useState('')
-  const [role, setRole] = useState<AdminRole>('Verifier')
+  const [role, setRole] = useState<AdminRole>('VERIFIER')
   const [touched, setTouched] = useState(false)
 
   const trimmed = username.trim()

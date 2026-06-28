@@ -3,22 +3,16 @@
 import { useState } from 'react'
 import { ShieldOff, ShieldCheck } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
-import { MockTag } from '@/components/ui/mock-tag'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { Toast, useToast } from '@/components/ui/toast'
 import { formatDate } from '@/lib/utils/format'
 import type { FarmerDetail, FarmerAccountStatus } from '@/features/farmers/types'
+import { setFarmerStatus } from '@/features/farmers/actions/setFarmerStatus'
 
 /**
- * ⚠️ BEYOND CURRENT REQUIREMENTS — read before extending.
- *
- * The Suspend / Activate account action is NOT in the A-04 spec (all listed
- * sections are view-only) and the business requirements describe the prototype
- * as auto-`Active` with KYC bypassed — there is no documented farmer-suspension
- * flow. This was likely an overlooked-but-sensible capability, so it's kept as
- * a MOCK: the status flips optimistically in local state only — nothing is
- * persisted. When the API lands, replace the body of `runAction()` with a real
- * Server Action / fetch and let the server revalidate the page.
+ * Suspend / reactivate a farmer account via the `setFarmerStatus` Server Action
+ * (PATCH /admin/farmers/:id/status) — persists + audits server-side, then
+ * updates local state for immediate feedback.
  */
 export function FarmerProfileHeader({ farmer }: { farmer: FarmerDetail }) {
   const [status, setStatus] = useState<FarmerAccountStatus>(farmer.accountStatus)
@@ -27,22 +21,22 @@ export function FarmerProfileHeader({ farmer }: { farmer: FarmerDetail }) {
   const { message, showToast } = useToast()
 
   const isActive = status === 'Active'
-  const displayName = farmer.fullName ?? farmer.username
+  const displayName = farmer.fullName
   const initial = displayName.charAt(0).toUpperCase()
   const nextStatus: FarmerAccountStatus = isActive ? 'Suspended' : 'Active'
 
   async function runAction() {
     setPending(true)
-    // MOCK ONLY — no persistence. Replace with a real Server Action when ready:
-    //   await setFarmerStatus(farmer.id, nextStatus)   // revalidates the page
-    await new Promise<void>((r) => setTimeout(r, 700))
-    setStatus(nextStatus)
+    const res = await setFarmerStatus(farmer.id, nextStatus)
     setPending(false)
+    if (!res.ok) {
+      showToast(res.error ?? 'อัปเดตสถานะไม่สำเร็จ')
+      return
+    }
+    setStatus(nextStatus)
     setConfirming(false)
     showToast(
-      nextStatus === 'Suspended'
-        ? 'ระงับบัญชีเรียบร้อย (mock — ยังไม่บันทึกจริง)'
-        : 'เปิดใช้งานบัญชีเรียบร้อย (mock — ยังไม่บันทึกจริง)',
+      nextStatus === 'Suspended' ? 'ระงับบัญชีเรียบร้อย' : 'เปิดใช้งานบัญชีเรียบร้อย',
     )
   }
 
@@ -60,7 +54,6 @@ export function FarmerProfileHeader({ farmer }: { farmer: FarmerDetail }) {
           <div>
             <div className="flex flex-wrap items-center gap-2">
               <h1 className="text-xl font-semibold text-ink">{displayName}</h1>
-              {(!farmer._live || !farmer.fullName) && <MockTag />}
               <Badge variant={isActive ? 'verified' : 'neutral'} dot>
                 {status}
               </Badge>

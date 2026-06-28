@@ -2,16 +2,14 @@
 
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { sessionCookieOptions } from '@/features/auth/services/sessionCookies'
-import { VERIFIER_COOKIE } from '@/features/verifier/auth/session'
+import { api } from '@/lib/api'
+import { relaySetCookies } from '@/features/auth/services/adminSession'
 import type { VerifierLoginState } from '@/features/verifier/auth/types'
 
 /**
- * MOCK verifier sign-in. The API has no verifier auth yet (only an admin/MASTER
- * account + role exist), so this accepts any non-empty credentials and issues a
- * local mock session. When the backend adds the Verifier role + endpoint,
- * replace the body with a real `POST /auth/verifier/login` that relays the API's
- * session cookies (see `loginAdmin`).
+ * Verifier sign-in via `POST /verifier/auth/sign-in` (gates on the VERIFIER
+ * role). The API replies with an HttpOnly `verifier_access` cookie which we relay
+ * to the browser, mirroring `loginAdmin`.
  */
 export async function loginVerifier(
   _state: VerifierLoginState,
@@ -24,18 +22,45 @@ export async function loginVerifier(
     return { error: 'กรุณากรอกชื่อผู้ใช้และรหัสผ่าน' }
   }
 
+  let setCookies: string[]
+  try {
+    const { data, response } = await api.POST('/api/v1/verifier/auth/sign-in', {
+      body: { username, password },
+    })
+
+    if (!data?.success) {
+      if (response.status === 401) return { error: 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง' }
+      if (response.status === 403) return { error: 'บัญชีนี้ไม่มีสิทธิ์ผู้ตรวจสอบ (Verifier)' }
+      if (response.status === 422) return { error: 'ข้อมูลไม่ถูกต้อง กรุณาตรวจสอบอีกครั้ง' }
+      return { error: 'เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง' }
+    }
+
+    setCookies = response.headers.getSetCookie()
+  } catch {
+    return { error: 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ กรุณาลองใหม่' }
+  }
+
+  if (setCookies.length === 0) {
+    return { error: 'เข้าสู่ระบบไม่สำเร็จ (ไม่ได้รับ session) กรุณาลองใหม่' }
+  }
+
   const store = await cookies()
-  store.set(
-    VERIFIER_COOKIE,
-    JSON.stringify({ id: `VRF-${username}`, username, org: 'VGREEN' }),
-    sessionCookieOptions(60 * 60 * 8), // 8h mock session
-  )
+  relaySetCookies(store, setCookies)
 
   redirect('/verifier')
 }
 
 export async function signOutVerifier(): Promise<void> {
+  try {
+    await api.POST('/api/v1/verifier/auth/sign-out')
+  } catch {
+    // Even if the API call fails, still clear local cookies below.
+  }
+
   const store = await cookies()
-  store.delete(VERIFIER_COOKIE)
+  for (const c of store.getAll()) {
+    store.delete(c.name)
+  }
+
   redirect('/verifier/login')
 }

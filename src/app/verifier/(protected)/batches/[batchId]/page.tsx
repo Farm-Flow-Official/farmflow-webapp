@@ -16,7 +16,6 @@ import { fetchBatchById } from '@/features/verifier/services/fetchBatchById'
 import { BatchReviewActions } from '@/features/verifier/components/BatchReviewActions'
 import { BatchMiniMap } from '@/features/verifier/components/BatchMiniMap'
 import { TreeSnapshotGrid } from '@/features/verifier/components/TreeSnapshotGrid'
-import { MockTag } from '@/components/ui/mock-tag'
 import { formatDate, formatNumber } from '@/lib/utils/format'
 import { confidenceTextClass } from '@/features/verifier/lib/confidence'
 
@@ -92,7 +91,6 @@ export default async function BatchDetailPage({
                 </dt>
                 <dd className="font-mono text-ink">
                   {batch.phone ?? <span className="text-ink-disabled">—</span>}
-                  {(!batch._live || !batch.phone) && <MockTag />}
                 </dd>
               </div>
               <div>

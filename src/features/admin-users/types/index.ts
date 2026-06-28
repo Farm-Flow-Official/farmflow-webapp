@@ -1,25 +1,19 @@
 /**
- * API contract for the Admin Users domain, aligned with **ERD v3 (Zero-PII)** —
- * the source of truth for BETA. Admins are identified by `username` only; the
- * schema deliberately carries no name/email PII. When the admin endpoints land,
- * only the service layer changes.
- *
- * Mapped from ERD: ADMINS (admin_id, username, role_id, admin_status,
- * last_login, created_at) joined to ROLES.role_name.
+ * View-model types for the Admin Users domain, aligned with the Elysia
+ * `/admin/admins` responses and the RBAC roles from ADR 0014.
  */
-export type AdminRole = 'SuperAdmin' | 'Auditor' | 'Verifier'
+export type AdminRole = 'MASTER' | 'VERIFIER' | 'FINANCE' | 'GENERAL'
 
-/** ADMINS.admin_status — note ERD uses Active/Inactive (not "Suspended"). */
+/** ADMINS.admin_status, surfaced as Active/Inactive in the UI. */
 export type AdminStatus = 'Active' | 'Inactive'
 
 export type AdminUser = {
-  /** admin_id. */
   id: string
   username: string
-  /** Denormalised from role_id → ROLES.role_name. */
+  /** Role name (ROLES.role_name). */
   role: AdminRole
   status: AdminStatus
-  /** ISO 8601, or null if the admin has never signed in (e.g. freshly invited). */
+  /** ISO 8601, or null if the admin has never signed in. */
   lastLoginAt: string | null
   createdAt: string
 }
@@ -30,20 +24,24 @@ export type AdminInvite = {
   role: AdminRole
 }
 
-export const ADMIN_ROLES: AdminRole[] = ['SuperAdmin', 'Auditor', 'Verifier']
+export const ADMIN_ROLES: AdminRole[] = ['MASTER', 'VERIFIER', 'FINANCE', 'GENERAL']
 
-/** Human-readable role context (from business req §RBAC). Used in selectors. */
+/** Human-readable role context (RBAC, ADR 0014). Used in selectors + the table. */
 export const ROLE_INFO: Record<AdminRole, { label: string; description: string }> = {
-  SuperAdmin: {
-    label: 'Super Admin',
+  MASTER: {
+    label: 'Master',
     description: 'ดูแลระบบทั้งหมด จัดการผู้ดูแล และกำหนดราคาคาร์บอน',
   },
-  Auditor: {
-    label: 'Auditor',
-    description: 'ตรวจสอบบันทึกกิจกรรมและความถูกต้องของข้อมูล',
-  },
-  Verifier: {
+  VERIFIER: {
     label: 'Verifier',
     description: 'ตรวจรับรองข้อมูลการประเมินคาร์บอน (MRV)',
+  },
+  FINANCE: {
+    label: 'Finance',
+    description: 'ดูแลการเงิน การชำระเงิน และแพ็กเกจ',
+  },
+  GENERAL: {
+    label: 'General',
+    description: 'สิทธิ์พื้นฐานสำหรับเจ้าหน้าที่ทั่วไป',
   },
 }

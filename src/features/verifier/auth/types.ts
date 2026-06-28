@@ -1,10 +1,11 @@
-/** Authenticated external verifier (mock for BETA — see auth/actions.ts). */
+/** Authenticated external verifier as returned by `/verifier/auth/me`. */
 export type VerifierProfile = {
   id: string
   username: string
-  /** External verifier organisation, e.g. "VGREEN". */
-  org: string
-  role: 'Verifier'
+  /** Verifier role label from the API. */
+  role: string
+  /** External verifier organisation (e.g. "VGREEN"); null when unset. */
+  org: string | null
 }
 
 export type VerifierLoginState = { error: string } | undefined

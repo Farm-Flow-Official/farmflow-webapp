@@ -14,6 +14,7 @@ import {
   PRICE_SOURCE_LABEL,
   type SystemConfig,
 } from '@/features/settings/types'
+import { updateMarketPrice } from '@/features/settings/actions/updateSystemConfig'
 
 type Props = {
   config: SystemConfig
@@ -51,17 +52,21 @@ export function SettingsForm({ config, currentAdminUsername }: Props) {
   const bigChange = valid && pctChange > MARKET_PRICE_LARGE_CHANGE
   const pctLabel = `${parsed >= price ? '+' : '−'}${Math.round(pctChange * 100)}%`
 
-  // MOCK ONLY — local state, no persistence. Replace with Server Action / fetch.
-  function handleSave() {
-    // Seam: await updateSystemConfig({ marketPriceThb: parsed })
-    setPrice(parsed)
+  async function handleSave() {
+    const res = await updateMarketPrice(parsed)
+    if (!res.ok) {
+      showToast(res.error)
+      return
+    }
+    setPrice(res.data.marketPriceThb)
+    setDraft(String(res.data.marketPriceThb))
     setMeta({
-      effectiveFrom: new Date().toISOString(),
-      updatedByLabel: `${currentAdminUsername} (mock)`,
-      updatedAt: new Date().toISOString(),
+      effectiveFrom: res.data.effectiveFrom,
+      updatedByLabel: res.data.updatedByLabel ?? currentAdminUsername,
+      updatedAt: res.data.updatedAt,
     })
     setConfirming(false)
-    showToast('อัปเดตราคาคาร์บอนเรียบร้อย (mock — ยังไม่บันทึกจริง)')
+    showToast('อัปเดตราคาคาร์บอนเรียบร้อย')
   }
 
   return (

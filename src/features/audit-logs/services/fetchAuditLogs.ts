@@ -1,22 +1,19 @@
-import type { AuditLog } from '@/features/audit-logs/types'
-import { mockAuditLogs } from '@/features/audit-logs/data/mockAuditLogs'
+import { api, unwrap } from '@/lib/api'
+import type {
+  AuditAction,
+  AuditActorType,
+  AuditLog,
+  AuditSnapshot,
+} from '@/features/audit-logs/types'
 
-/**
- * Single data seam for the audit log. Today it returns mock data sorted
- * newest-first; when the admin API is ready, replace ONLY the body below:
- *
- *   const apiBase = process.env.FARMFLOW_API_URL
- *   const cookieHeader = await forwardCookieHeader()   // export from adminSession.ts
- *   const res = await fetch(`${apiBase}/admin/audit-logs`, {
- *     headers: { cookie: cookieHeader },
- *     cache: 'no-store',
- *   })
- *   if (!res.ok) return []
- *   const json = (await res.json()) as { data?: AuditLog[] }
- *   return json.data ?? []
- */
+/** The audit log, newest-first (the API already orders it). */
 export async function fetchAuditLogs(): Promise<AuditLog[]> {
-  return [...mockAuditLogs].sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-  )
+  const logs = await unwrap(api.GET('/api/v1/admin/audit-logs/'))
+  return logs.map((l) => ({
+    ...l,
+    actorType: l.actorType as AuditActorType,
+    action: l.action as AuditAction,
+    oldData: l.oldData as AuditSnapshot | null,
+    newData: l.newData as AuditSnapshot | null,
+  }))
 }

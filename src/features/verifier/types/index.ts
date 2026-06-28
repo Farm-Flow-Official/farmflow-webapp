@@ -1,6 +1,8 @@
 /**
- * API contract for the Verifier Portal, aligned with ERD v3.
- * Fields marked "not in DB yet" are mock-only; shown with MockTag in UI.
+ * View-model types for the Verifier Portal. The services map the Elysia
+ * `/verifier/*` responses onto these shapes; fields the API does not expose
+ * (phone, address, check-in point, per-snapshot weather/time) are filled with
+ * null by the mappers.
  */
 
 export type VerifierOverview = {
@@ -16,7 +18,7 @@ export type AnomalyAlert = {
   id: string
   batchId: string
   farmName: string
-  /** username from DB (no fullName yet) */
+  /** Personal name / non-PII fallback; empty when the API omits it. */
   ownerName: string
   treeCount: number
   aiConfidenceScore: number
@@ -36,9 +38,8 @@ export type BatchStatus = 'Pending' | 'Approved' | 'Rejected'
 
 export type VerificationBatch = {
   id: string
-  farmId: string
   farmName: string
-  /** username from DB — no fullName yet */
+  /** Personal name, or a non-PII fallback (ADR 0013). */
   ownerName: string
   submittedAt: string
   treeCount: number
@@ -46,8 +47,6 @@ export type VerificationBatch = {
   anomalyFlag: boolean
   status: BatchStatus
   totalCarbonKgCo2e: number
-  /** true = data from live API; false = demo/mock */
-  _live: boolean
 }
 
 /* ── V-04 Batch Detail / V-05 Tree Inspect ──────────────────────────────── */
@@ -58,15 +57,16 @@ export type TreeSnapshot = {
   id: string
   captureLat: number | null
   captureLng: number | null
-  capturedAt: string
-  /** weather string from DB (not strongly typed) */
+  /** Capture time; null — not exposed by the review endpoint. */
+  capturedAt: string | null
+  /** Weather; null — not exposed by the review endpoint. */
   weather: string | null
   aiConfidenceScore: number | null
-  /** Estimated carbon sequestration for this tree in kgCO₂e. null when no AI assessment yet. */
+  /** Estimated carbon for this tree in kgCO₂e; null when no AI assessment yet. */
   estimatedCarbonKgco2e: number | null
-  /** AI assessment status: 'waiting' | 'completed' | 'rejected'. null when no assessment yet. */
+  /** AI assessment status: 'waiting' | 'completed' | 'rejected'; null when none. */
   aiStatus: string | null
-  /** Diameter at Breast Height (1.3 m) in cm, derived from circumference / π. */
+  /** Diameter at Breast Height (1.3 m) in cm. */
   dbhCm: number | null
   /** Tree height in metres. */
   treeHeightM: number | null
@@ -74,7 +74,7 @@ export type TreeSnapshot = {
 }
 
 export type BatchDetail = VerificationBatch & {
-  /** Phone — not in DB yet */
+  /** Phone — not exposed by the review endpoint. */
   phone: string | null
   farmAddress: string | null
   checkinLat: number | null

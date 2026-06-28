@@ -1,34 +1,31 @@
-import { cookies } from 'next/headers'
-import { mockVerifierOverview } from '@/features/verifier/data/mockVerifierOverview'
-import type { VerifierOverviewData } from '@/features/verifier/types'
+import { api, unwrap } from '@/lib/api'
+import type { AnomalyAlert, VerifierOverviewData } from '@/features/verifier/types'
 
-const mockFallback: VerifierOverviewData = {
-  ...mockVerifierOverview,
-  alerts: [...mockVerifierOverview.alerts].sort(
-    (a, b) => a.aiConfidenceScore - b.aiConfidenceScore,
-  ),
-}
-
+/** Verifier dashboard summary counts + anomaly alerts. */
 export async function fetchVerifierOverview(): Promise<VerifierOverviewData> {
-  const apiBase = process.env.FARMFLOW_API_URL
-  if (!apiBase) return mockFallback
+  const o = await unwrap(api.GET('/api/v1/verifier/overview'))
 
-  const store = await cookies()
-  const cookieHeader = store
-    .getAll()
-    .map((c) => `${c.name}=${c.value}`)
-    .join('; ')
+  // The overview exposes only sessionId/farmName/reason per alert; richer
+  // per-alert fields aren't available here (they live on the batch detail).
+  const alerts: AnomalyAlert[] = o.anomalyAlerts.map((a) => ({
+    id: a.sessionId,
+    batchId: a.sessionId,
+    farmName: a.farmName,
+    ownerName: '',
+    treeCount: 0,
+    aiConfidenceScore: 0,
+    kind: 'low_confidence',
+    detail: a.reason,
+    submittedAt: '',
+  }))
 
-  try {
-    const res = await fetch(`${apiBase}/admin/verifier/overview`, {
-      headers: { cookie: cookieHeader },
-      cache: 'no-store',
-    })
-    if (!res.ok) return mockFallback
-
-    const json = (await res.json()) as { data?: VerifierOverviewData }
-    return json.data ?? mockFallback
-  } catch {
-    return mockFallback
+  return {
+    summary: {
+      pendingReview: o.pendingCount,
+      anomalyAlerts: o.anomalyCount,
+      approvedThisMonth: o.approvedCount,
+      rejectedThisMonth: o.rejectedCount,
+    },
+    alerts,
   }
 }

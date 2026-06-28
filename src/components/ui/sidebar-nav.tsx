@@ -10,7 +10,6 @@ import {
   Settings,
   ScrollText,
   UserCog,
-  Headphones,
 } from 'lucide-react'
 import type { ComponentType, SVGProps } from 'react'
 
@@ -43,10 +42,6 @@ const NAV: NavSection[] = [
       { href: '/admin/audit-log', label: 'Audit Log', icon: ScrollText },
       { href: '/admin/admin-users', label: 'Admin Users', icon: UserCog },
     ],
-  },
-  {
-    heading: 'Support',
-    items: [{ href: '/admin/support', label: 'Support Tickets', icon: Headphones }],
   },
 ]
 

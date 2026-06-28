@@ -187,7 +187,13 @@ export default async function TreeInspectPage({
                 <dt className="flex items-center gap-1 text-xs text-ink-muted">
                   <Clock className="h-3 w-3" strokeWidth={1.75} /> เวลาถ่าย
                 </dt>
-                <dd className="text-ink">{formatDateTime(tree.capturedAt)}</dd>
+                <dd className="text-ink">
+                  {tree.capturedAt ? (
+                    formatDateTime(tree.capturedAt)
+                  ) : (
+                    <span className="text-ink-disabled">—</span>
+                  )}
+                </dd>
               </div>
               {weather && (
                 <div>

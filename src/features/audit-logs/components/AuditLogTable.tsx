@@ -22,6 +22,7 @@ const ACTION_VARIANT: Record<AuditAction, BadgeVariant> = {
   UPDATE: 'pending',
   DELETE: 'rejected',
   APPROVE: 'verified',
+  REJECT: 'rejected',
 }
 
 const ACTOR_CHIP: Record<AuditActorType, string> = {
@@ -56,7 +57,7 @@ export function AuditLogTable({ logs }: { logs: AuditLog[] }) {
     return logs.filter((l) => {
       const matchesQuery =
         q === '' ||
-        l.actorId.toLowerCase().includes(q) ||
+        (l.actorId?.toLowerCase().includes(q) ?? false) ||
         l.actorType.toLowerCase().includes(q) ||
         (l.actorLabel?.toLowerCase().includes(q) ?? false) ||
         l.recordId.toLowerCase().includes(q) ||

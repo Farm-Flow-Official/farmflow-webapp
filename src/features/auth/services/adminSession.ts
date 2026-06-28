@@ -1,5 +1,6 @@
 import { cache } from 'react'
 import { cookies } from 'next/headers'
+import { api } from '@/lib/api'
 import type { AdminProfile } from '@/features/auth/types'
 import {
   parseSetCookie,
@@ -22,49 +23,15 @@ export function relaySetCookies(store: CookieStore, setCookies: string[]): void 
   }
 }
 
-/** Builds a `Cookie` request header from all cookies the browser sent us. */
-async function forwardCookieHeader(): Promise<string> {
-  const store = await cookies()
-  return store
-    .getAll()
-    .map((c) => `${c.name}=${c.value}`)
-    .join('; ')
-}
-
 /**
- * Resolves the currently authenticated admin by calling the API's
- * `/admin/auth/me` with the forwarded session cookies. Returns `null` when the
- * session is missing or invalid. Memoised per-request via React `cache`.
+ * Resolves the currently authenticated admin via `GET /admin/auth/me` (the typed
+ * client forwards the session cookies). Returns `null` when the session is
+ * missing or invalid. Memoised per-request via React `cache`.
  */
-const DEMO_COOKIE = 'ff_demo_admin'
-const DEMO_ADMIN: AdminProfile = {
-  id: 'demo-admin-001',
-  username: 'admin',
-  roleId: 'super_admin',
-  permissions: ['*'],
-}
-
 export const getAdminSession = cache(async (): Promise<AdminProfile | null> => {
-  const apiBase = process.env.FARMFLOW_API_URL
-
-  // Demo mode: no API configured → honour the mock session cookie
-  if (!apiBase) {
-    const store = await cookies()
-    return store.get(DEMO_COOKIE)?.value === '1' ? DEMO_ADMIN : null
-  }
-
-  const cookieHeader = await forwardCookieHeader()
-  if (!cookieHeader) return null
-
   try {
-    const res = await fetch(`${apiBase}/admin/auth/me`, {
-      headers: { cookie: cookieHeader },
-      cache: 'no-store',
-    })
-    if (!res.ok) return null
-
-    const json = (await res.json()) as { data?: AdminProfile }
-    return json.data ?? null
+    const { data } = await api.GET('/api/v1/admin/auth/me')
+    return data?.success ? data.data : null
   } catch {
     return null
   }
@@ -76,31 +43,13 @@ export const getAdminSession = cache(async (): Promise<AdminProfile | null> => {
  * all — this app stores nothing else).
  */
 export async function signOutAdminSession(): Promise<void> {
-  const apiBase = process.env.FARMFLOW_API_URL
+  try {
+    await api.POST('/api/v1/admin/auth/sign-out')
+  } catch {
+    // Even if the API call fails, still clear local cookies below.
+  }
+
   const store = await cookies()
-
-  if (!apiBase) {
-    store.delete(DEMO_COOKIE)
-    return
-  }
-
-  const cookieHeader = store
-    .getAll()
-    .map((c) => `${c.name}=${c.value}`)
-    .join('; ')
-
-  if (cookieHeader) {
-    try {
-      await fetch(`${apiBase}/admin/auth/sign-out`, {
-        method: 'POST',
-        headers: { cookie: cookieHeader },
-        cache: 'no-store',
-      })
-    } catch {
-      // Even if the API call fails, still clear local cookies below.
-    }
-  }
-
   for (const c of store.getAll()) {
     store.delete(c.name)
   }
