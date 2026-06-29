@@ -1,8 +1,8 @@
 import type { CSSProperties } from 'react'
 
 /**
- * Deterministic earthy gradient standing in for a tree photo (no real images
- * yet — swap for `/api/v1/files/:id/content` when verifier file access opens).
+ * Deterministic earthy gradient behind every snapshot photo — it shows while the
+ * image loads and as the fallback when a tree has no photo (`photoFileId` null).
  * Shared by the V-04 grid and the V-05 deep-inspect view.
  */
 export function treePlaceholderStyle(id: string): CSSProperties {

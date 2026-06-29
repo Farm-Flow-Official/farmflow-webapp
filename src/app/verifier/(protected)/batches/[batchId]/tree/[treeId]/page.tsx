@@ -21,6 +21,7 @@ import {
 import { fetchBatchById } from '@/features/verifier/services/fetchBatchById'
 import { crossCheckTree } from '@/features/verifier/lib/crossCheck'
 import { treePlaceholderStyle } from '@/features/verifier/lib/treePlaceholder'
+import { snapshotPhotoUrl } from '@/features/verifier/lib/files'
 import { confidenceTextClass } from '@/features/verifier/lib/confidence'
 import { BatchMiniMap } from '@/features/verifier/components/BatchMiniMap'
 import { formatDateTime } from '@/lib/utils/format'
@@ -97,7 +98,16 @@ export default async function TreeInspectPage({
             }`}
             style={treePlaceholderStyle(tree.id)}
           >
-            <TreePine className="h-16 w-16 text-white/40" strokeWidth={1.25} />
+            {tree.photoFileId ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={snapshotPhotoUrl(tree.photoFileId)}
+                alt={`ภาพต้นไม้ ${tree.id}`}
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+            ) : (
+              <TreePine className="h-16 w-16 text-white/40" strokeWidth={1.25} />
+            )}
             <span
               className={`absolute right-3 top-3 rounded-md bg-panel/90 px-2 py-1 font-mono text-sm font-bold backdrop-blur ${confidenceTextClass(conf)}`}
             >
@@ -107,9 +117,11 @@ export default async function TreeInspectPage({
               {tree.id}
             </span>
           </div>
-          <p className="mt-2 text-center text-xs text-ink-muted">
-            ภาพตัวอย่าง (placeholder) — รอเชื่อมต่อ API รูปจริง
-          </p>
+          {!tree.photoFileId && (
+            <p className="mt-2 text-center text-xs text-ink-muted">
+              ไม่มีภาพถ่ายสำหรับต้นไม้นี้
+            </p>
+          )}
         </section>
 
         {/* Info */}

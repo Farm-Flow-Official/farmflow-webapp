@@ -23,6 +23,7 @@ export async function fetchBatchById(id: string): Promise<BatchDetail | null> {
   const trees = s.trees.map(
     (t): TreeSnapshot => ({
       id: t.id,
+      photoFileId: t.photoFileId,
       captureLat: t.captureLat,
       captureLng: t.captureLng,
       capturedAt: null,

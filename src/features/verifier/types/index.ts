@@ -55,6 +55,8 @@ export type WeatherCondition = 'sunny' | 'cloudy' | 'rainy'
 
 export type TreeSnapshot = {
   id: string
+  /** Snapshot photo file id; null when no photo was captured. */
+  photoFileId: string | null
   captureLat: number | null
   captureLng: number | null
   /** Capture time; null — not exposed by the review endpoint. */

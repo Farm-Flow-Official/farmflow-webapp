@@ -5,6 +5,7 @@ import type { TreeSnapshot } from '@/features/verifier/types'
 
 type WeatherCondition = 'sunny' | 'cloudy' | 'rainy'
 import { treePlaceholderStyle } from '@/features/verifier/lib/treePlaceholder'
+import { snapshotPhotoUrl } from '@/features/verifier/lib/files'
 import { confidenceBadgeClass } from '@/features/verifier/lib/confidence'
 
 const WEATHER_ICON: Record<WeatherCondition, ComponentType<SVGProps<SVGSVGElement>>> = {
@@ -34,12 +35,23 @@ export function TreeSnapshotGrid({
               t.anomaly ? 'border-error/60 ring-1 ring-error/30' : 'border-line'
             }`}
           >
-            {/* Photo placeholder — swap for /api/v1/files/:id/content when access opens */}
+            {/* Snapshot photo over an earthy gradient that doubles as the
+                loading/fallback backdrop (img is served via the verifier file proxy). */}
             <div
               className="relative flex aspect-square items-center justify-center"
               style={treePlaceholderStyle(t.id)}
             >
-              <TreePine className="h-8 w-8 text-white/40" strokeWidth={1.5} />
+              {t.photoFileId ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={snapshotPhotoUrl(t.photoFileId)}
+                  alt=""
+                  loading="lazy"
+                  className="absolute inset-0 h-full w-full object-cover"
+                />
+              ) : (
+                <TreePine className="h-8 w-8 text-white/40" strokeWidth={1.5} />
+              )}
               <span
                 className={`absolute right-1.5 top-1.5 rounded px-1.5 py-0.5 font-mono text-[11px] font-bold ${confidenceBadgeClass(conf)}`}
               >
