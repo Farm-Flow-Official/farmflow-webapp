@@ -66,7 +66,7 @@ export function VerifierLoginForm() {
       </button>
 
       <p className="mt-4 text-center text-xs text-ink-muted">
-        BETA: ใส่ชื่อผู้ใช้/รหัสผ่านอะไรก็ได้ (mock session)
+        ใช้บัญชีผู้ตรวจสอบที่ได้รับสิทธิ์ (Verifier)
       </p>
     </form>
   )
