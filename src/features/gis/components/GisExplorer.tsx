@@ -122,6 +122,18 @@ export function GisExplorer({ farms }: { farms: FarmGeo[] }) {
             focusNonce={focusNonce}
           />
 
+          {/* Empty DB: no farms to plot yet — float a calm hint over the map. */}
+          {farms.length === 0 && (
+            <div className="pointer-events-none absolute inset-x-0 top-6 z-[500] flex justify-center px-4">
+              <div className="pointer-events-auto flex items-center gap-2.5 rounded-xl border border-line bg-panel/95 px-4 py-3 shadow-md backdrop-blur">
+                <MapIcon className="h-4 w-4 shrink-0 text-ink-disabled" strokeWidth={1.75} />
+                <p className="text-[13px] text-ink-secondary">
+                  ยังไม่มีแปลงเกษตรในระบบ — ขอบเขตแปลงจะปรากฏบนแผนที่เมื่อเกษตรกรลงทะเบียนแปลง
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Legend */}
           <div className="pointer-events-none absolute bottom-4 left-4 z-[500] rounded-lg border border-line bg-panel/95 px-3 py-2 shadow-md backdrop-blur">
             <p className="mb-1 text-[10px] font-bold uppercase tracking-wide text-ink-muted">

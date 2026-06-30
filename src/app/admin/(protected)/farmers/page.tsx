@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
+import { Users } from 'lucide-react'
 import { fetchFarmers } from '@/features/farmers/services/fetchFarmers'
 import { FarmerTable } from '@/features/farmers/components/FarmerTable'
+import { EmptyState } from '@/components/ui/empty-state'
 
 export const metadata: Metadata = {
   title: 'Farmer Management — FarmFlow Admin',
@@ -21,7 +23,15 @@ export default async function FarmersPage() {
         </p>
       </header>
 
-      <FarmerTable farmers={farmers} />
+      {farmers.length === 0 ? (
+        <EmptyState
+          icon={Users}
+          title="ยังไม่มีเกษตรกรในระบบ"
+          description="ข้อมูลเกษตรกรจะปรากฏที่นี่โดยอัตโนมัติเมื่อมีผู้ใช้ลงทะเบียนผ่านแอป FarmFlow"
+        />
+      ) : (
+        <FarmerTable farmers={farmers} />
+      )}
     </div>
   )
 }

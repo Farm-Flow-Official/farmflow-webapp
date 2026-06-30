@@ -49,11 +49,14 @@ export function AuditLogTable({ logs }: { logs: AuditLog[] }) {
   const [range, setRange] = useState<'all' | '1' | '7' | '30'>('all')
   const [page, setPage] = useState(1)
   const [viewing, setViewing] = useState<AuditLog | null>(null)
+  // Capture "now" once at mount (lazy initializer keeps render pure) so the
+  // relative-range filter has a stable reference point across re-renders.
+  const [nowMs] = useState(() => Date.now())
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
     const cutoff =
-      range === 'all' ? 0 : Date.now() - Number(range) * 86_400_000
+      range === 'all' ? 0 : nowMs - Number(range) * 86_400_000
     return logs.filter((l) => {
       const matchesQuery =
         q === '' ||
@@ -66,7 +69,7 @@ export function AuditLogTable({ logs }: { logs: AuditLog[] }) {
       const matchesRange = range === 'all' || new Date(l.createdAt).getTime() >= cutoff
       return matchesQuery && matchesAction && matchesRange
     })
-  }, [logs, query, action, range])
+  }, [logs, query, action, range, nowMs])
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
   const safePage = Math.min(page, totalPages)

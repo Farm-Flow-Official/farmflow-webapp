@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
+import { Boxes } from 'lucide-react'
 import { fetchBatches } from '@/features/verifier/services/fetchBatches'
 import { BatchQueueTable } from '@/features/verifier/components/BatchQueueTable'
+import { EmptyState } from '@/components/ui/empty-state'
 
 export const metadata: Metadata = {
   title: 'Batch Queue — FarmFlow Verifier',
@@ -24,7 +26,15 @@ export default async function BatchQueuePage() {
         </p>
       </header>
 
-      <BatchQueueTable batches={batches} />
+      {batches.length === 0 ? (
+        <EmptyState
+          icon={Boxes}
+          title="ยังไม่มี batch รอตรวจ"
+          description="ชุดข้อมูล (assessment session) จะปรากฏที่นี่เมื่อเกษตรกรส่งข้อมูลคาร์บอนเข้ามาให้ตรวจรับรอง"
+        />
+      ) : (
+        <BatchQueueTable batches={batches} />
+      )}
     </div>
   )
 }

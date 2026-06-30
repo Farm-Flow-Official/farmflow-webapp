@@ -6,17 +6,13 @@ export async function fetchVerifierOverview(): Promise<VerifierOverviewData> {
   const o = await unwrap(api.GET('/api/v1/verifier/overview'))
 
   // The overview exposes only sessionId/farmName/reason per alert; richer
-  // per-alert fields aren't available here (they live on the batch detail).
+  // per-alert fields aren't available here (they live on the batch detail), so
+  // we map exactly those three rather than padding with zeros.
   const alerts: AnomalyAlert[] = o.anomalyAlerts.map((a) => ({
     id: a.sessionId,
     batchId: a.sessionId,
     farmName: a.farmName,
-    ownerName: '',
-    treeCount: 0,
-    aiConfidenceScore: 0,
-    kind: 'low_confidence',
-    detail: a.reason,
-    submittedAt: '',
+    reason: a.reason,
   }))
 
   return {

@@ -33,11 +33,11 @@ export type FarmGeo = {
   ownerName?: string | null
   /** Province — enriched from farm_address / reverse-geocode (not a discrete ERD column). */
   province: string
-  /** GPS check-in point (ERD: checkin_lat / checkin_lng, system-set). */
-  checkinLat: number
-  checkinLng: number
-  /** Google Earth Engine land-validity result. */
-  gee: GeeVerification
+  /** GPS check-in point (ERD: checkin_lat / checkin_lng) — null until captured. */
+  checkinLat: number | null
+  checkinLng: number | null
+  /** Google Earth Engine land-validity result — null until the GEE check runs. */
+  gee: GeeVerification | null
   /** calculated_area_rai — system-derived from the polygon (authoritative). */
   calculatedAreaRai: number
   /** declared_area_rai — what the farmer claimed. */

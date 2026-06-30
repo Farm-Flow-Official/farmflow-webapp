@@ -12,19 +12,19 @@ export type VerifierOverview = {
   rejectedThisMonth: number
 }
 
-export type AnomalyKind = 'low_confidence' | 'metadata_mismatch'
-
+/**
+ * Anomaly alert as exposed by `GET /verifier/overview`. The endpoint only
+ * provides the session id, farm name, and a human-readable reason — richer
+ * per-alert fields (owner, tree count, confidence, timestamp) live on the batch
+ * detail, not here. We model exactly what the API returns rather than padding
+ * missing fields with zeros (which rendered as "0%", "0 ต้น", "Invalid Date").
+ */
 export type AnomalyAlert = {
+  /** Assessment session id — row key and batch link target. */
   id: string
   batchId: string
   farmName: string
-  /** Personal name / non-PII fallback; empty when the API omits it. */
-  ownerName: string
-  treeCount: number
-  aiConfidenceScore: number
-  kind: AnomalyKind
-  detail: string
-  submittedAt: string
+  reason: string
 }
 
 export type VerifierOverviewData = {

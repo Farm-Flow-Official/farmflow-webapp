@@ -1,72 +1,33 @@
 import type { Metadata } from 'next'
-import { Wallet, TrendingUp, Users, Map, Percent } from 'lucide-react'
-import { formatNumber } from '@/lib/utils/format'
-import { fetchBusinessOverview } from '@/features/business/overview/services/fetchBusinessOverview'
-import { KpiCard } from '@/features/business/overview/components/KpiCard'
-import { RevenueTrendChart } from '@/features/business/overview/components/RevenueTrendChart'
-import { TierDonut } from '@/features/business/overview/components/TierDonut'
-import { PipelineCards } from '@/features/business/overview/components/PipelineCards'
-import { ImpactStrip } from '@/features/business/overview/components/ImpactStrip'
+import { LayoutDashboard } from 'lucide-react'
+import { ComingSoon } from '@/components/ui/coming-soon'
 
 export const metadata: Metadata = {
   title: 'Overview — FarmFlow Business',
 }
 
-export default async function OverviewPage() {
-  const { kpis, revenueTrend, tierDistribution, pipeline, impact } =
-    await fetchBusinessOverview()
-
+export default function OverviewPage() {
   return (
     <div className="mx-auto max-w-[1440px] px-4 py-8 sm:px-8">
       <header className="mb-6">
         <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-ink">
           Business Overview
         </h1>
-        <p className="mt-1.5 text-sm text-ink-secondary">ภาพรวมสุขภาพธุรกิจในหน้าจอเดียว</p>
+        <p className="mt-1.5 text-sm text-ink-secondary">
+          ภาพรวมสุขภาพธุรกิจ — รายได้ MRR สัดส่วนแพ็กเกจ และคิวงาน
+        </p>
       </header>
 
-      <div className="flex flex-col gap-5">
-        {/* KPI row — business health (carbon lives in the Impact band below) */}
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-5">
-          <KpiCard
-            label="รายได้เดือนนี้"
-            value={`฿${formatNumber(kpis.revenueMtdThb)}`}
-            icon={Wallet}
-          />
-          <KpiCard label="MRR" value={`฿${formatNumber(kpis.mrrThb)}`} icon={TrendingUp} />
-          <KpiCard
-            label="สมาชิกที่ใช้งาน"
-            value={formatNumber(kpis.activeSubscriptions)}
-            icon={Users}
-          />
-          <KpiCard
-            label="พื้นที่รวม"
-            value={formatNumber(kpis.totalRai)}
-            unit="ไร่"
-            icon={Map}
-          />
-          <KpiCard
-            label="Free → Paid"
-            value={`${kpis.freeToPaidPct}`}
-            unit="%"
-            icon={Percent}
-          />
-        </div>
-
-        {/* Revenue trend + tier donut */}
-        <div className="grid gap-5 lg:grid-cols-3">
-          <div className="lg:col-span-2">
-            <RevenueTrendChart data={revenueTrend} />
-          </div>
-          <TierDonut data={tierDistribution} />
-        </div>
-
-        {/* Action queue */}
-        <PipelineCards pipeline={pipeline} />
-
-        {/* Impact */}
-        <ImpactStrip impact={impact} />
-      </div>
+      <ComingSoon
+        icon={LayoutDashboard}
+        title="Business Overview รอ Backend API"
+        description="หน้านี้สรุปรายได้ MRR สัดส่วนแพ็กเกจ และคิวงาน ซึ่งต้องรวบรวมจากข้อมูลฝั่งธุรกิจ (subscriptions, payment slips, payouts) ที่ API v3.0.3-1 ยังไม่ครอบคลุม — จะแสดงข้อมูลจริงทันทีเมื่อ endpoint พร้อม โดยไม่ใช้ mock"
+        requiredEndpoints={[
+          'GET /api/v1/business/overview',
+          'GET /api/v1/business/subscriptions',
+          'GET /api/v1/business/payment-slips',
+        ]}
+      />
     </div>
   )
 }

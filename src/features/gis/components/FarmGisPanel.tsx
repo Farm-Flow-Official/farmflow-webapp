@@ -79,7 +79,7 @@ export function FarmGisPanel({
         </button>
       </div>
 
-      {farm.gee.status !== 'verified' && (
+      {farm.gee && farm.gee.status !== 'verified' && (
         <div className="mx-5 mt-3 flex items-start gap-2 rounded-lg bg-warning-bg px-3 py-2 text-xs text-warning">
           <TriangleAlert className="mt-0.5 h-3.5 w-3.5 shrink-0" strokeWidth={1.75} />
           <span>
@@ -106,15 +106,19 @@ export function FarmGisPanel({
           </Link>
         </Row>
         <Row label="พิกัด GPS">
-          <a
-            href={`https://www.google.com/maps?q=${farm.checkinLat},${farm.checkinLng}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 font-mono tabular-nums text-primary hover:underline focus-visible:underline focus-visible:outline-none"
-          >
-            {farm.checkinLat.toFixed(5)}, {farm.checkinLng.toFixed(5)}
-            <ExternalLink className="h-3 w-3" strokeWidth={1.75} />
-          </a>
+          {farm.checkinLat != null && farm.checkinLng != null ? (
+            <a
+              href={`https://www.google.com/maps?q=${farm.checkinLat},${farm.checkinLng}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 font-mono tabular-nums text-primary hover:underline focus-visible:underline focus-visible:outline-none"
+            >
+              {farm.checkinLat.toFixed(5)}, {farm.checkinLng.toFixed(5)}
+              <ExternalLink className="h-3 w-3" strokeWidth={1.75} />
+            </a>
+          ) : (
+            <span className="text-ink-disabled">—</span>
+          )}
         </Row>
         <Row label="พื้นที่ (คำนวณ)">
           <span className="font-mono tabular-nums">{farm.calculatedAreaRai} ไร่</span>
@@ -136,13 +140,20 @@ export function FarmGisPanel({
           </Row>
         )}
         <Row label="ตรวจสอบ GEE">
-          <span className={`inline-flex items-center gap-1.5 ${GEE_META[farm.gee.status].text}`}>
-            <Satellite className="h-3.5 w-3.5" strokeWidth={1.75} />
-            {GEE_META[farm.gee.status].label}
-            <span className="font-mono text-xs text-ink-muted">
-              (NDVI {farm.gee.ndvi.toFixed(2)})
+          {farm.gee ? (
+            <span className={`inline-flex items-center gap-1.5 ${GEE_META[farm.gee.status].text}`}>
+              <Satellite className="h-3.5 w-3.5" strokeWidth={1.75} />
+              {GEE_META[farm.gee.status].label}
+              <span className="font-mono text-xs text-ink-muted">
+                (NDVI {farm.gee.ndvi.toFixed(2)})
+              </span>
             </span>
-          </span>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 text-ink-muted">
+              <Satellite className="h-3.5 w-3.5" strokeWidth={1.75} />
+              ยังไม่ได้ตรวจสอบ
+            </span>
+          )}
         </Row>
         <Row label="สถานะแปลง">{FARM_STATUS_LABEL[farm.farmStatus]}</Row>
       </dl>

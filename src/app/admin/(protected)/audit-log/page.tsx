@@ -1,9 +1,10 @@
 import type { Metadata } from 'next'
-import { ShieldAlert } from 'lucide-react'
+import { ShieldAlert, ScrollText } from 'lucide-react'
 import { getAdminSession } from '@/features/auth/services/adminSession'
 import { fetchAuditLogs } from '@/features/audit-logs/services/fetchAuditLogs'
 import { canViewAuditLog } from '@/features/audit-logs/permissions'
 import { AuditLogTable } from '@/features/audit-logs/components/AuditLogTable'
+import { EmptyState } from '@/components/ui/empty-state'
 
 export const metadata: Metadata = {
   title: 'Audit Log — FarmFlow Admin',
@@ -27,7 +28,15 @@ export default async function AuditLogPage() {
       </header>
 
       {canView ? (
-        <AuditLogTable logs={logs} />
+        logs.length === 0 ? (
+          <EmptyState
+            icon={ScrollText}
+            title="ยังไม่มีบันทึกกิจกรรม"
+            description="การกระทำของผู้ดูแลระบบ (สร้าง/แก้ไข/อนุมัติ) จะถูกบันทึกที่นี่โดยอัตโนมัติ"
+          />
+        ) : (
+          <AuditLogTable logs={logs} />
+        )
       ) : (
         <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-line bg-panel py-16 text-center">
           <ShieldAlert className="h-8 w-8 text-ink-disabled" strokeWidth={1.5} />

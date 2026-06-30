@@ -1,18 +1,12 @@
 import type { Metadata } from 'next'
-import { getBusinessSession } from '@/features/business/auth/session'
-import { fetchPaymentSlips } from '@/features/business/payments/services/fetchPaymentSlips'
-import { PaymentsView } from '@/features/business/payments/components/PaymentsView'
+import { Receipt } from 'lucide-react'
+import { ComingSoon } from '@/components/ui/coming-soon'
 
 export const metadata: Metadata = {
   title: 'Payments — FarmFlow Business',
 }
 
-export default async function PaymentsPage() {
-  const [slips, session] = await Promise.all([
-    fetchPaymentSlips(),
-    getBusinessSession(),
-  ])
-
+export default function PaymentsPage() {
   return (
     <div className="mx-auto max-w-[1440px] px-4 py-8 sm:px-8">
       <header className="mb-6">
@@ -24,7 +18,16 @@ export default async function PaymentsPage() {
         </p>
       </header>
 
-      <PaymentsView slips={slips} reviewerName={session?.username ?? 'finance'} />
+      <ComingSoon
+        icon={Receipt}
+        title="Payment Verification รอ Backend API"
+        description="ตรวจสลิปการชำระเงินแพ็กเกจ แล้วอนุมัติ/ปฏิเสธพร้อมลงนาม — ต้องมี endpoint payment-slips ฝั่งธุรกิจก่อนจึงจะแสดงข้อมูลจริงได้ (ไม่ใช้ mock)"
+        requiredEndpoints={[
+          'GET /api/v1/business/payment-slips',
+          'POST /api/v1/business/payment-slips/{id}/approve',
+          'POST /api/v1/business/payment-slips/{id}/reject',
+        ]}
+      />
     </div>
   )
 }

@@ -33,12 +33,6 @@ const QUICK_LINKS = [
     Icon: Map,
   },
   {
-    href: '/admin/payouts',
-    label: 'Payout Queue',
-    desc: 'Process farmer withdrawal requests',
-    Icon: Wallet,
-  },
-  {
     href: '/admin/announcements',
     label: 'Announcements',
     desc: 'Create and publish news banners',

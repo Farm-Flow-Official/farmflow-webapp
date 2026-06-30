@@ -6,16 +6,20 @@ import type { TierSlice } from '@/features/business/overview/types'
 export function TierDonut({ data }: { data: TierSlice[] }) {
   const total = Math.max(1, data.reduce((sum, s) => sum + s.count, 0))
 
-  // Build conic-gradient stops from cumulative percentages.
-  let acc = 0
+  // Build conic-gradient stops from cumulative percentages (thread the running
+  // total through reduce — no post-render reassignment).
   const stops = data
-    .map((s) => {
-      const start = (acc / total) * 100
-      acc += s.count
-      const end = (acc / total) * 100
-      return `${TIER_COLORS[s.code]} ${start}% ${end}%`
-    })
-    .join(', ')
+    .reduce<{ acc: number; out: string[] }>(
+      ({ acc, out }, s) => {
+        const start = (acc / total) * 100
+        const next = acc + s.count
+        const end = (next / total) * 100
+        out.push(`${TIER_COLORS[s.code]} ${start}% ${end}%`)
+        return { acc: next, out }
+      },
+      { acc: 0, out: [] },
+    )
+    .out.join(', ')
 
   return (
     <section className="rounded-2xl border border-line bg-panel p-5 shadow-sm">

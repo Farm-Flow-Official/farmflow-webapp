@@ -102,8 +102,9 @@ export default function GisMap({
               weight: selected ? 4 : 2,
               fillColor: color,
               fillOpacity: selected ? 0.5 : 0.25,
-              // Dashed outline flags a GEE land-check concern (e.g. plot on water).
-              dashArray: f.gee.status !== 'verified' ? '6 6' : undefined,
+              // Dashed outline flags a not-yet-verified GEE land-check (e.g. plot
+              // on water, or GEE hasn't run yet); solid once verified.
+              dashArray: f.gee?.status !== 'verified' ? '6 6' : undefined,
             }}
             eventHandlers={{ click: () => onSelect(f.id) }}
           />
