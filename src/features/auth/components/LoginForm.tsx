@@ -38,18 +38,18 @@ export function LoginForm() {
       <div className="space-y-5">
         <div>
           <label
-            htmlFor="email"
+            htmlFor="username"
             className="mb-1.5 block text-[13px] font-medium text-[#374151]"
           >
-            อีเมล
+            ชื่อผู้ใช้
           </label>
           <input
-            id="email"
-            name="email"
-            type="email"
-            autoComplete="email"
+            id="username"
+            name="username"
+            type="text"
+            autoComplete="username"
             required
-            placeholder="admin@farmflow.com"
+            placeholder="admin"
             className="h-11 w-full rounded-md border border-[#E4E7EB] bg-white px-3.5 text-sm text-[#111827] placeholder:text-[#9CA3AF] outline-none transition-shadow focus:border-[#004C22] focus:ring-[3px] focus:ring-[#004C22]/8 disabled:cursor-not-allowed disabled:opacity-50"
           />
         </div>
