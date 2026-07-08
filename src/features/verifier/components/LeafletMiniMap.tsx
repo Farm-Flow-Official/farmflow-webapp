@@ -46,7 +46,16 @@ export default function LeafletMiniMap({
       className="h-full w-full"
       center={center}
       zoom={6}
+      // Fully locked: a static reference thumbnail. On touch (iPad) a stray
+      // finger must not pan/zoom it. The programmatic `Fit` below still frames
+      // the polygon — these flags only disable *user* interaction.
+      dragging={false}
+      touchZoom={false}
+      doubleClickZoom={false}
       scrollWheelZoom={false}
+      boxZoom={false}
+      keyboard={false}
+      zoomControl={false}
     >
       <TileLayer
         url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
