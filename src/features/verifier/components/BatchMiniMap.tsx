@@ -51,7 +51,7 @@ export function BatchMiniMap({ polygon, pin, pinColor, expandable = false }: Pro
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="absolute right-2 top-2 z-[1000] inline-flex items-center gap-1 rounded-lg border border-line bg-panel/90 px-2 py-1 text-[11px] font-medium text-ink-secondary shadow-sm backdrop-blur transition-colors hover:text-ink"
+        className="absolute right-2 top-2 z-[700] inline-flex items-center gap-1 rounded-lg border border-line bg-panel/90 px-2 py-1 text-[11px] font-medium text-ink-secondary shadow-sm backdrop-blur transition-colors hover:text-ink"
       >
         <Eye className="h-3.5 w-3.5" strokeWidth={1.9} /> ขยาย
       </button>
