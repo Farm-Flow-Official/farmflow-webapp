@@ -62,6 +62,8 @@ export type Trends = {
   revenueByMonth: MonthPoint[]
   farmerGrowthByMonth: MonthPoint[]
   raiGrowthByMonth: MonthPoint[]
+  availableCreditsByMonth: MonthPoint[]
+  soldCreditsByMonth: MonthPoint[]
 }
 
 export type Opportunity = {
