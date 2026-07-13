@@ -31,7 +31,7 @@ export function TreeSnapshotGrid({
           <Link
             key={t.id}
             href={`/verifier/batches/${batchId}/tree/${t.id}`}
-            className={`group flex flex-col overflow-hidden rounded-xl border bg-panel shadow-sm transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+            className={`group flex flex-col overflow-hidden rounded-xl border bg-panel shadow-sm transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md motion-reduce:transform-none motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
               t.anomaly ? 'border-error/60 ring-1 ring-error/30' : 'border-line'
             }`}
           >
@@ -47,7 +47,7 @@ export function TreeSnapshotGrid({
                   src={snapshotPhotoUrl(t.photoFileId)}
                   alt=""
                   loading="lazy"
-                  className="absolute inset-0 h-full w-full object-cover"
+                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-200 ease-out group-hover:scale-[1.02] motion-reduce:transform-none"
                 />
               ) : (
                 <TreePine className="h-8 w-8 text-white/40" strokeWidth={1.5} />

@@ -24,6 +24,7 @@ import { treePlaceholderStyle } from '@/features/verifier/lib/treePlaceholder'
 import { snapshotPhotoUrl } from '@/features/verifier/lib/files'
 import { confidenceTextClass } from '@/features/verifier/lib/confidence'
 import { BatchMiniMap } from '@/features/verifier/components/BatchMiniMap'
+import { PhotoLightbox } from '@/features/verifier/components/PhotoLightbox'
 import { formatDateTime } from '@/lib/utils/format'
 type WeatherCondition = 'sunny' | 'cloudy' | 'rainy'
 
@@ -116,6 +117,12 @@ export default async function TreeInspectPage({
             <span className="absolute bottom-3 left-3 rounded bg-ink/50 px-2 py-1 text-[11px] text-white/90 backdrop-blur">
               {tree.id}
             </span>
+            {tree.photoFileId && (
+              <PhotoLightbox
+                src={snapshotPhotoUrl(tree.photoFileId)}
+                alt={`ภาพต้นไม้ ${tree.id}`}
+              />
+            )}
           </div>
           {!tree.photoFileId && (
             <p className="mt-2 text-center text-xs text-ink-muted">
@@ -251,6 +258,7 @@ export default async function TreeInspectPage({
                   ? [tree.captureLng, tree.captureLat]
                   : undefined}
                 pinColor={gpsOk ? '#2563EB' : '#C8000E'}
+                expandable
               />
             </div>
           </section>
