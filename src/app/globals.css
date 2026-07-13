@@ -42,8 +42,13 @@
   --color-gis-pending:      #F59E0B;
 
   /* ── Typography ─────────────────────────── */
-  --font-sans: var(--font-ibm-plex-sans), system-ui, -apple-system, sans-serif;
-  --font-mono: var(--font-ibm-plex-mono), 'Courier New', monospace;
+  /* Headings → Montserrat (Latin) + Prompt (Thai glyphs). */
+  --font-display: var(--font-montserrat), var(--font-prompt), system-ui, sans-serif;
+  /* Body → Open Sans (Latin) + Prompt (Thai). */
+  --font-sans: var(--font-open-sans), var(--font-prompt), system-ui, -apple-system, sans-serif;
+  /* IDs & numeric data → Inter (use with tabular-nums). The `font-mono` utility
+     is intentionally mapped to Inter per the design system (not a monospace). */
+  --font-mono: var(--font-inter), var(--font-prompt), system-ui, sans-serif;
 
   /* ── Layout ─────────────────────────────── */
   --sidebar-width:   240px;
@@ -57,4 +62,11 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Headings use the display font (Montserrat) app-wide; Thai falls back to Prompt. */
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
 }

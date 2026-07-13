@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { getAdminSession } from '@/features/auth/services/adminSession'
+import { fetchAdminSummary } from '@/features/dashboard/services/fetchAdminSummary'
 import { KpiCard } from '@/features/dashboard/components/KpiCard'
 import { QuickLinkCard } from '@/features/dashboard/components/QuickLinkCard'
 import {
@@ -18,53 +19,6 @@ export const metadata: Metadata = {
   title: 'Dashboard — FarmFlow Admin',
 }
 
-// Mock KPI data — wire to GET /admin/dashboard/summary when API is ready
-const KPI = {
-  activeFarmers: 124,
-  pendingPayouts: 5,
-  totalCarbonKgco2e: 42500,
-  overlapFlaggedFarms: 3,
-  marketPriceThb: 48.5,
-}
-
-const KPI_CARDS = [
-  {
-    label: 'Active Farmers',
-    value: KPI.activeFarmers.toLocaleString('en-US'),
-    sublabel: 'registered accounts',
-    alert: false,
-    Icon: Users,
-  },
-  {
-    label: 'Pending Payouts',
-    value: String(KPI.pendingPayouts),
-    sublabel: 'withdrawal requests',
-    alert: KPI.pendingPayouts > 0,
-    Icon: Wallet,
-  },
-  {
-    label: 'Carbon Issued',
-    value: `${KPI.totalCarbonKgco2e.toLocaleString('en-US')} kgCO₂e`,
-    sublabel: 'total credits issued',
-    alert: false,
-    Icon: Leaf,
-  },
-  {
-    label: 'Overlap Flags',
-    value: String(KPI.overlapFlaggedFarms),
-    sublabel: 'farms pending GIS review',
-    alert: KPI.overlapFlaggedFarms > 0,
-    Icon: AlertTriangle,
-  },
-  {
-    label: 'Market Price',
-    value: `฿${KPI.marketPriceThb.toFixed(2)}`,
-    sublabel: 'per kgCO₂e',
-    alert: false,
-    Icon: TrendingUp,
-  },
-]
-
 const QUICK_LINKS = [
   {
     href: '/admin/farmers',
@@ -77,12 +31,6 @@ const QUICK_LINKS = [
     label: 'GIS Map',
     desc: 'Inspect farm polygons and overlap flags',
     Icon: Map,
-  },
-  {
-    href: '/admin/payouts',
-    label: 'Payout Queue',
-    desc: 'Process farmer withdrawal requests',
-    Icon: Wallet,
   },
   {
     href: '/admin/announcements',
@@ -105,7 +53,10 @@ const QUICK_LINKS = [
 ]
 
 export default async function AdminDashboardPage() {
-  const admin = await getAdminSession()
+  const [admin, summary] = await Promise.all([
+    getAdminSession(),
+    fetchAdminSummary(),
+  ])
   if (!admin) return null
 
   const today = new Date().toLocaleDateString('th-TH', {
@@ -114,6 +65,44 @@ export default async function AdminDashboardPage() {
     month: 'long',
     day: 'numeric',
   })
+
+  const kpiCards = [
+    {
+      label: 'Active Farmers',
+      value: summary.activeFarmers.toLocaleString('en-US'),
+      sublabel: 'registered accounts',
+      alert: false,
+      Icon: Users,
+    },
+    {
+      label: 'Pending Batches',
+      value: String(summary.pendingBatchCount),
+      sublabel: 'sessions awaiting processing',
+      alert: summary.pendingBatchCount > 0,
+      Icon: Wallet,
+    },
+    {
+      label: 'Carbon Issued',
+      value: `${summary.totalCarbonKgco2e.toLocaleString('en-US')} kgCO₂e`,
+      sublabel: 'total credits issued',
+      alert: false,
+      Icon: Leaf,
+    },
+    {
+      label: 'Overlap Flags',
+      value: String(summary.overlapFlaggedFarms),
+      sublabel: 'farms pending GIS review',
+      alert: summary.overlapFlaggedFarms > 0,
+      Icon: AlertTriangle,
+    },
+    {
+      label: 'Market Price',
+      value: summary.marketPriceThb != null ? `฿${summary.marketPriceThb.toFixed(2)}` : '—',
+      sublabel: 'per kgCO₂e',
+      alert: false,
+      Icon: TrendingUp,
+    },
+  ]
 
   return (
     <div className="mx-auto max-w-[1440px] px-8 py-8">
@@ -133,7 +122,7 @@ export default async function AdminDashboardPage() {
           Overview
         </h2>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-          {KPI_CARDS.map((card) => (
+          {kpiCards.map((card) => (
             <KpiCard key={card.label} {...card} />
           ))}
         </div>

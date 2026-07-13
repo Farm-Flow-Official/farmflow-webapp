@@ -53,7 +53,7 @@ async function refreshAdminSession(
 
   let setCookies: string[]
   try {
-    const res = await fetch(`${apiBase}/admin/auth/refresh`, {
+    const res = await fetch(`${apiBase}/api/v1/admin/auth/refresh`, {
       method: 'POST',
       headers: { cookie: cookieHeader },
       cache: 'no-store',
