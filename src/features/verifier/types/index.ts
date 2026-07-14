@@ -59,9 +59,9 @@ export type TreeSnapshot = {
   photoFileId: string | null
   captureLat: number | null
   captureLng: number | null
-  /** Capture time; null — not exposed by the review endpoint. */
+  /** Field capture time (ISO 8601); null when unset or encrypted at rest. */
   capturedAt: string | null
-  /** Weather; null — not exposed by the review endpoint. */
+  /** Field-recorded weather ('sunny' | 'cloudy' | 'rainy'); null when not recorded. */
   weather: string | null
   aiConfidenceScore: number | null
   /** Estimated carbon for this tree in kgCO₂e; null when no AI assessment yet. */
@@ -78,9 +78,18 @@ export type TreeSnapshot = {
 export type BatchDetail = VerificationBatch & {
   /** Phone — not exposed by the review endpoint. */
   phone: string | null
+  /** Free-text farm address; falls back to the province name when absent. */
   farmAddress: string | null
+  /** Province name (structured), shown as a secondary line under the address. */
+  province: string | null
   checkinLat: number | null
   checkinLng: number | null
+  /** Farmer-declared area in rai; null when not provided. */
+  declaredAreaRai: number | null
+  /** PostGIS-calculated area in rai; null when the boundary is unset. */
+  calculatedAreaRai: number | null
+  /** Declared vs calculated area diverge >15% (ADR 0008). */
+  areaDiscrepancyFlag: boolean
   polygon: [number, number][]
   trees: TreeSnapshot[]
 }

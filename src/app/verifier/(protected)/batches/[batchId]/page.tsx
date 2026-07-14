@@ -10,6 +10,7 @@ import {
   Gauge,
   TreePine,
   TriangleAlert,
+  LandPlot,
 } from 'lucide-react'
 import { getVerifierSession } from '@/features/verifier/auth/session'
 import { fetchBatchById } from '@/features/verifier/services/fetchBatchById'
@@ -41,6 +42,14 @@ export default async function BatchDetailPage({
   if (!batch) notFound()
 
   const anomalyTrees = batch.trees.filter((t) => t.anomaly).length
+  const areaDiscrepancyPct =
+    batch.declaredAreaRai != null &&
+    batch.declaredAreaRai > 0 &&
+    batch.calculatedAreaRai != null
+      ? Math.round(
+          (Math.abs(batch.declaredAreaRai - batch.calculatedAreaRai) / batch.declaredAreaRai) * 100,
+        )
+      : null
 
   return (
     <div className="mx-auto max-w-[1440px] px-4 py-8 sm:px-8">
@@ -97,10 +106,52 @@ export default async function BatchDetailPage({
                 <dt className="flex items-center gap-1 text-xs text-ink-muted">
                   <MapPin className="h-3 w-3" strokeWidth={1.75} /> ที่ตั้ง
                 </dt>
-                <dd className="text-ink">{batch.farmAddress}</dd>
+                <dd className="text-ink">
+                  {batch.farmAddress ?? <span className="text-ink-disabled">—</span>}
+                  {batch.province && batch.province !== batch.farmAddress && (
+                    <span className="mt-0.5 block text-xs text-ink-muted">
+                      จ.{batch.province}
+                    </span>
+                  )}
+                </dd>
               </div>
               <div>
-                <dt className="text-xs text-ink-muted">พิกัด GPS</dt>
+                <dt className="flex items-center gap-1 text-xs text-ink-muted">
+                  <LandPlot className="h-3 w-3" strokeWidth={1.75} /> พื้นที่แปลง
+                </dt>
+                <dd className="text-ink">
+                  {batch.declaredAreaRai != null || batch.calculatedAreaRai != null ? (
+                    <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
+                      <span className="font-mono">
+                        แจ้ง{' '}
+                        {batch.declaredAreaRai != null
+                          ? batch.declaredAreaRai.toFixed(1)
+                          : '—'}{' '}
+                        ไร่
+                        <span className="mx-1.5 text-ink-disabled">·</span>
+                        คำนวณ{' '}
+                        {batch.calculatedAreaRai != null
+                          ? batch.calculatedAreaRai.toFixed(1)
+                          : '—'}{' '}
+                        ไร่
+                      </span>
+                      {batch.areaDiscrepancyFlag && (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-error-bg px-2 py-0.5 text-[11px] font-semibold text-error">
+                          <TriangleAlert className="h-3 w-3" strokeWidth={1.9} />
+                          ต่าง{areaDiscrepancyPct != null ? ` ${areaDiscrepancyPct}%` : 'เกินเกณฑ์'}
+                        </span>
+                      )}
+                    </div>
+                  ) : (
+                    <span className="text-ink-disabled">—</span>
+                  )}
+                </dd>
+              </div>
+              <div>
+                <dt className="flex items-center gap-1 text-xs text-ink-muted">
+                  <MapPin className="h-3 w-3" strokeWidth={1.75} /> พิกัด GPS
+                  <span className="font-normal text-ink-disabled">(จุดเช็คอิน)</span>
+                </dt>
                 <dd>
                   {batch.checkinLat != null && batch.checkinLng != null ? (
                     <a

@@ -4882,7 +4882,14 @@ export interface operations {
                             farm: {
                                 id: string;
                                 name: string;
+                                address: (string | null) | null;
                                 province: (string | null) | null;
+                                checkinLat: (number | null) | null;
+                                checkinLng: (number | null) | null;
+                                declaredAreaRai: (number | null) | null;
+                                calculatedAreaRai: (number | null) | null;
+                                /** @description Declared vs calculated area diverge >15% (ADR 0008) */
+                                areaDiscrepancyFlag: boolean;
                                 /** @description Boundary outer ring as [lng, lat] pairs */
                                 polygon: number[][];
                             };
@@ -4907,6 +4914,8 @@ export interface operations {
                                 photoFileId: (string | null) | null;
                                 captureLat: (number | null) | null;
                                 captureLng: (number | null) | null;
+                                capturedAt: (string | null) | null;
+                                weatherCondition: (string | null) | null;
                             }[];
                         };
                         meta: {
