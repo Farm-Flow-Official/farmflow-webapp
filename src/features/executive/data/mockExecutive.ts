@@ -1,72 +1,118 @@
 import type { ExecutiveOverview } from '@/features/executive/types'
 
 /**
- * Temporary stand-in for the aggregated executive overview until
+ * DEMO stand-in for the executive overview until
  * `GET /api/v1/admin/executive/overview` lands. Delete this file once
  * `fetchExecutiveOverview()` calls the real endpoint.
  *
- * Numbers are deterministic (refresh → no change) and internally consistent, so
- * the demo reads honestly:
- *   - funnel decreases monotonically (estimated ≥ … ≥ sold)
- *   - available = certified − sold
- *   - headline.soldCreditsTco2e = funnel.sold; availableCredits = funnel.available
- *   - projectedRevenueThb = 20% × sold × price ; opportunity = 20% × available × price
- *   - each trend's last point = its headline value
+ * Numbers are DETERMINISTIC (a refresh never re-rolls them) and INTERNALLY
+ * CONSISTENT so the demo reads honestly:
+ *   • funnel decreases left → right (estimated ≥ verified ≥ … ≥ sold)
+ *   • available = certified − sold                       (3,200 = 4,500 − 1,300)
+ *   • soldCreditsTco2e = funnel.sold                     (1,300)
+ *   • availableCreditsTco2e = funnel.available           (3,200)
+ *   • projectedRevenueThb = round(0.20 × sold × price)   (0.20 × 1,300 × 300 = 78,000)
+ *   • opportunity.sellableValueThb = available × price   (3,200 × 300 = 960,000)
+ *   • opportunity.projectedCommissionThb = 0.20 × sellable (192,000)
+ *   • each trend's last point = the current snapshot; 2nd-to-last = the KPI prevValue
  */
-
-const COMMISSION_RATE_PCT = 20
-const PRICE_THB_PER_TON = 280
-
-const SOLD = 1_450
-const AVAILABLE = 2_150
-const CERTIFIED = AVAILABLE + SOLD // 3,600 — enforces available = certified − sold
-
-const round = (n: number) => Math.round(n)
-const commission = (tonnes: number) =>
-  round((COMMISSION_RATE_PCT / 100) * tonnes * PRICE_THB_PER_TON)
-
-// 12 months ending ก.ค. (current). Cumulative growth curves; last = snapshot.
-const MONTHS = ['ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.', 'ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.'] as const
-
-const REVENUE_CUM = [8_000, 13_000, 19_000, 25_000, 32_000, 40_000, 47_000, 54_000, 61_000, 68_000, 74_500, commission(SOLD)]
-const FARMERS_CUM = [420, 510, 590, 665, 740, 820, 910, 995, 1_080, 1_150, 1_218, 1_284]
-const RAI_CUM = [7_200, 8_400, 9_500, 10_600, 11_800, 12_900, 14_000, 15_100, 16_200, 17_200, 17_900, 18_540]
-
-const series = (values: readonly number[]) =>
-  MONTHS.map((label, i) => ({ label, value: values[i] }))
-
-// prevValue = second-to-last cumulative point → drives the MoM % on each card.
-const prev = <T extends readonly number[]>(arr: T) => arr[arr.length - 2]
-const last = <T extends readonly number[]>(arr: T) => arr[arr.length - 1]
-
 export const mockExecutive: ExecutiveOverview = {
   headline: {
-    projectedRevenueThb: { value: last(REVENUE_CUM), prevValue: prev(REVENUE_CUM) },
-    activeFarmers: { value: last(FARMERS_CUM), prevValue: prev(FARMERS_CUM) },
-    totalRai: { value: last(RAI_CUM), prevValue: prev(RAI_CUM) },
-    availableCreditsTco2e: { value: AVAILABLE, prevValue: 1_980 },
-    soldCreditsTco2e: { value: SOLD, prevValue: 1_300 },
+    projectedRevenueThb: { value: 78_000, prevValue: 71_500 },
+    activeFarmers: { value: 1_150, prevValue: 1_090 },
+    totalRai: { value: 18_540, prevValue: 17_900 },
+    availableCreditsTco2e: { value: 3_200, prevValue: 2_750 },
+    soldCreditsTco2e: { value: 1_300, prevValue: 1_150 },
   },
   funnel: {
-    estimated: 12_500,
-    verified: 8_200,
-    submitted: 5_400,
-    certified: CERTIFIED,
-    available: AVAILABLE,
-    sold: SOLD,
+    estimated: 12_000,
+    verified: 8_400,
+    submitted: 6_200,
+    certified: 4_500,
+    available: 3_200,
+    sold: 1_300,
   },
   trends: {
-    revenueByMonth: series(REVENUE_CUM),
-    farmerGrowthByMonth: series(FARMERS_CUM),
-    raiGrowthByMonth: series(RAI_CUM),
+    // 12 rolling months ending ก.ค. (the current snapshot).
+    revenueByMonth: [
+      { label: 'ส.ค.', value: 22_000 },
+      { label: 'ก.ย.', value: 26_500 },
+      { label: 'ต.ค.', value: 31_000 },
+      { label: 'พ.ย.', value: 35_000 },
+      { label: 'ธ.ค.', value: 40_000 },
+      { label: 'ม.ค.', value: 44_000 },
+      { label: 'ก.พ.', value: 49_000 },
+      { label: 'มี.ค.', value: 54_000 },
+      { label: 'เม.ย.', value: 60_000 },
+      { label: 'พ.ค.', value: 66_000 },
+      { label: 'มิ.ย.', value: 71_500 },
+      { label: 'ก.ค.', value: 78_000 },
+    ],
+    farmerGrowthByMonth: [
+      { label: 'ส.ค.', value: 520 },
+      { label: 'ก.ย.', value: 590 },
+      { label: 'ต.ค.', value: 655 },
+      { label: 'พ.ย.', value: 720 },
+      { label: 'ธ.ค.', value: 780 },
+      { label: 'ม.ค.', value: 840 },
+      { label: 'ก.พ.', value: 900 },
+      { label: 'มี.ค.', value: 955 },
+      { label: 'เม.ย.', value: 1_005 },
+      { label: 'พ.ค.', value: 1_050 },
+      { label: 'มิ.ย.', value: 1_090 },
+      { label: 'ก.ค.', value: 1_150 },
+    ],
+    raiGrowthByMonth: [
+      { label: 'ส.ค.', value: 12_000 },
+      { label: 'ก.ย.', value: 12_900 },
+      { label: 'ต.ค.', value: 13_700 },
+      { label: 'พ.ย.', value: 14_500 },
+      { label: 'ธ.ค.', value: 15_200 },
+      { label: 'ม.ค.', value: 15_900 },
+      { label: 'ก.พ.', value: 16_500 },
+      { label: 'มี.ค.', value: 17_050 },
+      { label: 'เม.ย.', value: 17_450 },
+      { label: 'พ.ค.', value: 17_700 },
+      { label: 'มิ.ย.', value: 17_900 },
+      { label: 'ก.ค.', value: 18_540 },
+    ],
+    // Last point = the KPI value; 2nd-to-last = its prevValue (see headline).
+    availableCreditsByMonth: [
+      { label: 'ส.ค.', value: 1_200 },
+      { label: 'ก.ย.', value: 1_500 },
+      { label: 'ต.ค.', value: 1_750 },
+      { label: 'พ.ย.', value: 1_980 },
+      { label: 'ธ.ค.', value: 2_180 },
+      { label: 'ม.ค.', value: 2_360 },
+      { label: 'ก.พ.', value: 2_500 },
+      { label: 'มี.ค.', value: 2_600 },
+      { label: 'เม.ย.', value: 2_680 },
+      { label: 'พ.ค.', value: 2_720 },
+      { label: 'มิ.ย.', value: 2_750 },
+      { label: 'ก.ค.', value: 3_200 },
+    ],
+    soldCreditsByMonth: [
+      { label: 'ส.ค.', value: 350 },
+      { label: 'ก.ย.', value: 450 },
+      { label: 'ต.ค.', value: 560 },
+      { label: 'พ.ย.', value: 660 },
+      { label: 'ธ.ค.', value: 760 },
+      { label: 'ม.ค.', value: 860 },
+      { label: 'ก.พ.', value: 950 },
+      { label: 'มี.ค.', value: 1_030 },
+      { label: 'เม.ย.', value: 1_080 },
+      { label: 'พ.ค.', value: 1_120 },
+      { label: 'มิ.ย.', value: 1_150 },
+      { label: 'ก.ค.', value: 1_300 },
+    ],
   },
   opportunity: {
-    sellableValueThb: AVAILABLE * PRICE_THB_PER_TON,
-    projectedCommissionThb: commission(AVAILABLE),
+    sellableValueThb: 960_000,
+    projectedCommissionThb: 192_000,
   },
   assumptions: {
-    commissionRatePct: COMMISSION_RATE_PCT,
-    marketPriceThbPerTon: PRICE_THB_PER_TON,
+    commissionRatePct: 20,
+    marketPriceThbPerTon: 300,
   },
   asOf: '2026-07-08T00:00:00+07:00',
 }

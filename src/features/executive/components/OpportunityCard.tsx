@@ -1,11 +1,11 @@
-import { HandCoins, Tag } from 'lucide-react'
+import { Wallet } from 'lucide-react'
 import { formatNumber } from '@/lib/utils/format'
-import type { Opportunity, Assumptions } from '@/features/executive/types'
+import type { Assumptions, Opportunity } from '@/features/executive/types'
 
 /**
- * Unsold-inventory opportunity — the money still sitting in certified-but-unsold
- * credits — plus the visible planning assumptions (commission %, market price)
- * behind every money figure on the page.
+ * Outstanding opportunity — the projected commission still on the table from
+ * credits that are certified but not yet sold. The assumption chip keeps the
+ * commission rate and market price visible so the number reads as a projection.
  */
 export function OpportunityCard({
   opportunity,
@@ -16,37 +16,35 @@ export function OpportunityCard({
 }) {
   return (
     <section className="rounded-2xl border border-primary-muted bg-primary-subtle p-5">
-      <div className="flex items-center gap-2 text-primary">
-        <HandCoins className="h-4 w-4" strokeWidth={1.9} />
-        <h2 className="text-base font-semibold">มูลค่าโอกาสคงค้าง</h2>
-      </div>
-      <p className="mt-1 text-xs text-primary/70">เครดิตที่รับรองแล้วแต่ยังไม่ได้ขาย</p>
-
-      <div className="mt-4 grid gap-4 sm:grid-cols-2">
-        <div>
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-primary/70">
-            มูลค่าเครดิตพร้อมขาย
-          </p>
-          <p className="mt-1 text-2xl font-bold tracking-tight text-primary">
-            ฿{formatNumber(opportunity.sellableValueThb)}
-          </p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-panel text-primary shadow-sm">
+            <Wallet className="h-5 w-5" strokeWidth={1.9} />
+          </span>
+          <div>
+            <p className="text-[12px] font-semibold uppercase tracking-wide text-primary">
+              มูลค่าโอกาสคงค้าง
+            </p>
+            <p className="mt-1 flex items-baseline gap-1">
+              <span className="text-2xl font-bold tracking-tight text-ink">
+                ฿{formatNumber(opportunity.projectedCommissionThb)}
+              </span>
+              <span className="text-xs font-medium text-ink-muted">ค่าคอมคาดการณ์</span>
+            </p>
+            <p className="mt-0.5 text-[12px] text-ink-secondary">
+              จากคาร์บอนพร้อมขายมูลค่าตลาด ฿{formatNumber(opportunity.sellableValueThb)}
+            </p>
+          </div>
         </div>
-        <div>
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-primary/70">
-            รายได้คาดการณ์ (ส่วนของ FarmFlow)
-          </p>
-          <p className="mt-1 text-2xl font-bold tracking-tight text-primary">
-            ฿{formatNumber(opportunity.projectedCommissionThb)}
-          </p>
-        </div>
-      </div>
 
-      <div className="mt-4 inline-flex items-center gap-1.5 rounded-lg border border-primary-muted bg-panel px-2.5 py-1.5 text-[11px] text-ink-secondary">
-        <Tag className="h-3.5 w-3.5 text-primary" strokeWidth={2} />
-        <span>
-          สมมติค่าคอม <span className="font-semibold text-ink">{assumptions.commissionRatePct}%</span>
-          {' · '}ราคา <span className="font-semibold text-ink">฿{formatNumber(assumptions.marketPriceThbPerTon)}</span>/ตัน
-        </span>
+        <div className="flex flex-wrap gap-2">
+          <span className="inline-flex items-center rounded-full border border-primary-muted bg-panel px-2.5 py-1 text-[11px] font-medium text-ink-secondary">
+            ค่าคอมมิชชัน {assumptions.commissionRatePct}%
+          </span>
+          <span className="inline-flex items-center rounded-full border border-primary-muted bg-panel px-2.5 py-1 text-[11px] font-medium text-ink-secondary">
+            ราคา ฿{formatNumber(assumptions.marketPriceThbPerTon)}/ตัน
+          </span>
+        </div>
       </div>
     </section>
   )

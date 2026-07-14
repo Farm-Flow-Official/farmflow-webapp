@@ -120,7 +120,7 @@ export default async function BatchDetailPage({
             </dl>
 
             <div className="h-48 overflow-hidden rounded-xl border border-line sm:h-full sm:min-h-[12rem]">
-              <BatchMiniMap polygon={batch.polygon} />
+              <BatchMiniMap polygon={batch.polygon} expandable />
             </div>
           </div>
         </section>

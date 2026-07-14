@@ -23,6 +23,21 @@ function Fit({ positions }: { positions: [number, number][] }) {
 }
 
 /**
+ * Recomputes the map's pixel size after mount. Needed when the map is created
+ * inside a container that sizes late (e.g. the expand modal) — without this,
+ * Leaflet renders grey tiles until the next interaction.
+ */
+function Resizer() {
+  const map = useMap()
+  useEffect(() => {
+    map.invalidateSize()
+    const t = setTimeout(() => map.invalidateSize(), 200)
+    return () => clearTimeout(t)
+  }, [map])
+  return null
+}
+
+/**
  * Small read-only satellite map showing one farm polygon. Optionally pins a
  * capture point ([lng, lat]) via a CircleMarker — avoids Leaflet's default
  * marker-icon asset (which 404s under bundlers). Used by V-04 and V-05.
@@ -31,10 +46,17 @@ export default function LeafletMiniMap({
   polygon,
   pin,
   pinColor = '#C8000E',
+  interactive = false,
 }: {
   polygon: [number, number][]
   pin?: [number, number]
   pinColor?: string
+  /**
+   * When false (default) the map is a fully locked reference thumbnail — no
+   * pan/zoom, so a stray finger on iPad can't move it. When true (the expand
+   * modal) all user interaction is enabled for exploration.
+   */
+  interactive?: boolean
 }) {
   // GeoJSON [lng, lat] → Leaflet [lat, lng].
   const positions = polygon.map(([lng, lat]) => [lat, lng] as [number, number])
@@ -46,7 +68,16 @@ export default function LeafletMiniMap({
       className="h-full w-full"
       center={center}
       zoom={6}
-      scrollWheelZoom={false}
+      // Locked thumbnail vs. interactive modal — every user-interaction flag
+      // follows `interactive`. The programmatic `Fit` below always frames the
+      // polygon regardless.
+      dragging={interactive}
+      touchZoom={interactive}
+      doubleClickZoom={interactive}
+      scrollWheelZoom={interactive}
+      boxZoom={interactive}
+      keyboard={interactive}
+      zoomControl={interactive}
     >
       <TileLayer
         url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
@@ -65,6 +96,7 @@ export default function LeafletMiniMap({
         />
       )}
       <Fit positions={pinLatLng ? [...positions, pinLatLng] : positions} />
+      <Resizer />
     </MapContainer>
   )
 }

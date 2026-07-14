@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { LayoutDashboard, ShieldCheck, Briefcase, ArrowRight, QrCode } from 'lucide-react'
+import { LayoutDashboard, ShieldCheck, Briefcase, LayoutGrid, ArrowRight, QrCode } from 'lucide-react'
 import { Logo } from '@/components/ui/logo'
 import { getVerifierSession } from '@/features/verifier/auth/session'
 import { getAdminSession } from '@/features/auth/services/adminSession'
@@ -35,6 +35,14 @@ const PORTALS = [
     desc: 'จัดการแพ็กเกจ ตรวจสลิป จ่ายเงินเกษตรกร และภาพรวมรายได้ (รอ backend API)',
     cta: 'ดูรายละเอียด',
   },
+  {
+    href: '/executive',
+    icon: LayoutGrid,
+    title: 'Executive Dashboard',
+    sub: 'สำหรับผู้บริหาร · DEMO',
+    desc: 'ภาพรวมสุขภาพธุรกิจ — รายได้ เกษตรกร พื้นที่ และวงจรคาร์บอน · ข้อมูลตัวอย่างเพื่อรีวิว KPI',
+    cta: 'ดูตัวอย่าง',
+  },
 ] as const
 
 export default async function PortalLandingPage() {
@@ -45,7 +53,7 @@ export default async function PortalLandingPage() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-surface p-6">
-      <div className="w-full max-w-3xl">
+      <div className="w-full max-w-5xl">
         {/* Brand */}
         <div className="mb-10 flex flex-col items-center gap-3 text-center">
           <Logo size={48} />
@@ -58,7 +66,7 @@ export default async function PortalLandingPage() {
         </div>
 
         {/* Portal cards */}
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {PORTALS.map((p) => {
             const Icon = p.icon
             return (

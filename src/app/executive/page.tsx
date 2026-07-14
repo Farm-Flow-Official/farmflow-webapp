@@ -1,116 +1,91 @@
 import type { Metadata } from 'next'
-import { Banknote, Users, Map, Leaf, Coins } from 'lucide-react'
-import { formatNumber, formatDate } from '@/lib/utils/format'
+import { Users, MapPin, Leaf, Coins } from 'lucide-react'
+import { formatNumber } from '@/lib/utils/format'
 import { fetchExecutiveOverview } from '@/features/executive/services/fetchExecutiveOverview'
 import { DemoBanner } from '@/features/executive/components/DemoBanner'
 import { ExecutiveKpiCard } from '@/features/executive/components/ExecutiveKpiCard'
+import { RevenueHeroCard } from '@/features/executive/components/RevenueHeroCard'
 import { CarbonFunnelBar } from '@/features/executive/components/CarbonFunnelBar'
-import { TrendBars } from '@/features/executive/components/TrendBars'
 import { OpportunityCard } from '@/features/executive/components/OpportunityCard'
 
 export const metadata: Metadata = {
   title: 'Executive Dashboard — FarmFlow',
 }
 
-const baht = (v: number) => `฿${formatNumber(v)}`
+const vals = (series: { value: number }[]) => series.map((p) => p.value)
 
-export default async function ExecutiveDashboardPage() {
-  const data = await fetchExecutiveOverview()
-  const { headline, funnel, trends, opportunity, assumptions } = data
-
-  const kpiCards = [
-    {
-      label: 'รายได้คาดการณ์สะสม',
-      value: baht(headline.projectedRevenueThb.value),
-      kpi: headline.projectedRevenueThb,
-      sub: 'จากเครดิตที่ขายแล้ว (ประเมิน)',
-      icon: Banknote,
-    },
-    {
-      label: 'เกษตรกร Active',
-      value: formatNumber(headline.activeFarmers.value),
-      unit: 'คน',
-      kpi: headline.activeFarmers,
-      icon: Users,
-    },
-    {
-      label: 'พื้นที่ฟาร์มรวม',
-      value: formatNumber(headline.totalRai.value),
-      unit: 'ไร่',
-      kpi: headline.totalRai,
-      icon: Map,
-    },
-    {
-      label: 'คาร์บอนพร้อมขาย',
-      value: formatNumber(headline.availableCreditsTco2e.value),
-      unit: 'ตัน',
-      kpi: headline.availableCreditsTco2e,
-      sub: `${formatNumber(headline.availableCreditsTco2e.value)} เครดิต`,
-      icon: Leaf,
-    },
-    {
-      label: 'คาร์บอนขายแล้วสะสม',
-      value: formatNumber(headline.soldCreditsTco2e.value),
-      unit: 'ตัน',
-      kpi: headline.soldCreditsTco2e,
-      sub: 'เครดิตที่ขายสู่ตลาด',
-      icon: Coins,
-    },
-  ]
+export default async function ExecutivePage() {
+  const { headline, funnel, trends, opportunity, assumptions } =
+    await fetchExecutiveOverview()
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-6">
       <DemoBanner />
 
       <header>
-        <h1 className="text-[26px] font-semibold leading-tight tracking-tight text-ink">
-          สุขภาพธุรกิจโดยรวม
+        <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-ink">
+          Executive Dashboard
         </h1>
-        <p className="mt-1 text-sm text-ink-secondary">
-          ข้อมูล ณ {formatDate(data.asOf)} · เทียบเดือนก่อนหน้า (MoM)
+        <p className="mt-1.5 text-sm text-ink-secondary">
+          สุขภาพธุรกิจโดยรวม — รายได้ เกษตรกร พื้นที่ และวงจรคาร์บอน (เทียบเดือนก่อน)
         </p>
       </header>
 
-      {/* Row A — headline KPIs */}
-      <section>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-          {kpiCards.map((card) => (
-            <ExecutiveKpiCard key={card.label} {...card} />
-          ))}
+      {/* ชั้น 1 — Hero revenue + supporting KPIs */}
+      <div className="grid gap-4 lg:grid-cols-2">
+        <RevenueHeroCard data={trends.revenueByMonth} kpi={headline.projectedRevenueThb} />
+
+        <div className="grid grid-cols-2 gap-4">
+          <ExecutiveKpiCard
+            label="เกษตรกร Active"
+            value={formatNumber(headline.activeFarmers.value)}
+            kpi={headline.activeFarmers}
+            unit="คน"
+            icon={Users}
+            accentClass="bg-info-bg text-info"
+            trend={vals(trends.farmerGrowthByMonth)}
+            sparkColor="#2563EB"
+          />
+          <ExecutiveKpiCard
+            label="พื้นที่ฟาร์มรวม"
+            value={formatNumber(headline.totalRai.value)}
+            kpi={headline.totalRai}
+            unit="ไร่"
+            icon={MapPin}
+            accentClass="bg-warning-bg text-warning"
+            trend={vals(trends.raiGrowthByMonth)}
+            sparkColor="#D97706"
+          />
+          <ExecutiveKpiCard
+            label="คาร์บอนพร้อมขาย"
+            value={formatNumber(headline.availableCreditsTco2e.value)}
+            kpi={headline.availableCreditsTco2e}
+            unit="ตัน"
+            sub={`≈ ${formatNumber(headline.availableCreditsTco2e.value)} เครดิต`}
+            icon={Leaf}
+            accentClass="bg-primary-subtle text-primary"
+            trend={vals(trends.availableCreditsByMonth)}
+            sparkColor="#16A34A"
+          />
+          <ExecutiveKpiCard
+            label="คาร์บอนขายแล้วสะสม"
+            value={formatNumber(headline.soldCreditsTco2e.value)}
+            kpi={headline.soldCreditsTco2e}
+            unit="ตัน"
+            sub="สะสมทั้งหมด"
+            icon={Coins}
+            accentClass="bg-success-bg text-success"
+            trend={vals(trends.soldCreditsByMonth)}
+            sparkColor="#166534"
+          />
         </div>
-      </section>
+      </div>
 
-      {/* Row B — funnel + revenue trend */}
-      <section className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <CarbonFunnelBar funnel={funnel} />
-        <TrendBars
-          title="รายได้คาดการณ์สะสม"
-          subtitle="รายเดือน · 12 เดือนล่าสุด (บาท)"
-          data={trends.revenueByMonth}
-          format={baht}
-        />
-      </section>
+      {/* ชั้น 2 — Carbon funnel */}
+      <CarbonFunnelBar funnel={funnel} />
 
-      {/* Row C — growth trends */}
-      <section className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <TrendBars
-          title="การเติบโตเกษตรกร"
-          subtitle="สะสมรายเดือน · 12 เดือนล่าสุด (คน)"
-          data={trends.farmerGrowthByMonth}
-          format={formatNumber}
-        />
-        <TrendBars
-          title="การเติบโตพื้นที่"
-          subtitle="สะสมรายเดือน · 12 เดือนล่าสุด (ไร่)"
-          data={trends.raiGrowthByMonth}
-          format={formatNumber}
-        />
-      </section>
-
-      {/* Row D — opportunity + assumptions */}
-      <section>
-        <OpportunityCard opportunity={opportunity} assumptions={assumptions} />
-      </section>
+      {/* ชั้น 3 — Opportunity */}
+      <OpportunityCard opportunity={opportunity} assumptions={assumptions} />
     </div>
   )
 }

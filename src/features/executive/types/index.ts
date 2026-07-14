@@ -1,86 +1,83 @@
 /**
- * API contract for the Executive Dashboard (mock-first). The real endpoint will
- * return these server-aggregated shapes directly —
- *   Seam: `GET /api/v1/admin/executive/overview?from&to&granularity=month`
+ * API contract for the Executive Overview (internal C-level dashboard).
  *
- * Aggregated from: users/farmers, farms (calculated_area_rai), assessment_sessions
- * (carbon by lifecycle stage), verifier batches (approvedCount → verified),
- * certification submissions/results (submitted/certified — NOT yet in the API),
- * credit_transactions (sold), carbon_market_config (price), and a commission
- * assumption. Money figures are ESTIMATES by nature — see `projectedRevenueThb`.
+ * DEMO-first: today this shape is served from a local mock so executives can
+ * validate the KPI set BEFORE the backend aggregation is built. The real
+ * endpoint is expected to return this exact shape server-aggregated —
+ *   Seam: `GET /api/v1/admin/executive/overview?from&to&granularity=month`
+ * Aggregated from: assessment_sessions, credit_transactions, farms, users,
+ * carbon_market_config. When the endpoint lands, only the service body changes;
+ * every field below keeps its meaning so the UI never moves.
  */
 
-/**
- * One metric with its value a period (month) ago, so the UI can render a MoM %
- * without a second round-trip. `prevValue` = same measure at end of last month.
- */
+/** A single metric with its prior-period value, so the UI can render MoM %. */
 export type Kpi = {
+  /** Current-period value. */
   value: number
+  /** Previous-period value (MoM baseline). `deltaPct()` derives the arrow. */
   prevValue: number
 }
 
-/** One month of a trend series. `label` = short Thai month, e.g. 'ม.ค.'. */
+/** One month on a trend line. `label` is a short Thai month, e.g. 'ก.ค.'. */
 export type MonthPoint = {
   label: string
   value: number
 }
 
+/** The five headline tiles. Each carries a prior value for the MoM chip. */
 export type Headline = {
-  /**
-   * Cumulative PROJECTED revenue to FarmFlow (THB) =
-   *   commissionRatePct × (soldCreditsTco2e × marketPriceThbPerTon).
-   * "Projected" because a sale must happen first AND the อบก./farmer split
-   * varies per project — FarmFlow can only estimate. Headline number.
-   */
+  /** Cumulative projected revenue = commissionRate × (soldCredits × price). */
   projectedRevenueThb: Kpi
-  /** Count of active (registered, not-deleted) farmer accounts. */
+  /** Farmers with activity in the period. */
   activeFarmers: Kpi
-  /** SUM `farms.calculated_area_rai` (not deleted). */
+  /** SUM farm area (rai). */
   totalRai: Kpi
-  /** Certified credits not yet sold (= certified − sold), in tCO₂e = credits. */
+  /** Credits certified but not yet sold, in tCO₂e (1 credit = 1 tCO₂e). */
   availableCreditsTco2e: Kpi
-  /** Cumulative credits sold to market, in tCO₂e. */
+  /** Cumulative sold credits, in tCO₂e. */
   soldCreditsTco2e: Kpi
 }
 
 /**
- * Carbon lifecycle, cumulative to date, in tCO₂e. Monotonically decreasing
- * left→right — each stage is a subset of the one before.
- *   estimated → verified → submitted → certified → available → sold
- * NOTE the domain rule: `verified` (Verifier approved a batch) is NOT `certified`
- * (an external certification body approved the request). FarmFlow submits; it
- * does not issue credits. `available` = `certified` − `sold`.
+ * Carbon lifecycle, tonnes (tCO₂e) per stage, ordered many → few. Verifier
+ * approval yields `verified`; `certified` is an EXTERNAL outcome (อบก. approves)
+ * — a verifier cannot issue credits. `available = certified − sold`.
  */
 export type CarbonFunnel = {
+  /** ประเมิน — carbon estimated from assessments. */
   estimated: number
+  /** ตรวจสอบแล้ว — approved by a FarmFlow verifier. */
   verified: number
+  /** ยื่นขอรับรอง — submitted for external certification. */
   submitted: number
+  /** รับรองแล้ว — certified as credits by the external body. */
   certified: number
+  /** พร้อมขาย — certified minus sold. */
   available: number
+  /** ขายแล้ว — sold credits (cumulative). */
   sold: number
 }
 
 export type Trends = {
-  /** Cumulative projected revenue by month (THB); last point = headline value. */
   revenueByMonth: MonthPoint[]
-  /** Cumulative active farmers by month; last point = headline value. */
   farmerGrowthByMonth: MonthPoint[]
-  /** Cumulative total rai by month; last point = headline value. */
   raiGrowthByMonth: MonthPoint[]
+  availableCreditsByMonth: MonthPoint[]
+  soldCreditsByMonth: MonthPoint[]
 }
 
 export type Opportunity = {
-  /** Market value of unsold credits = availableCreditsTco2e × price (100%). */
+  /** Gross market value of sellable credits = available × price. */
   sellableValueThb: number
-  /** FarmFlow's share of that opportunity = commissionRatePct × sellableValue. */
+  /** FarmFlow's projected cut of that = commissionRate × sellableValue. */
   projectedCommissionThb: number
 }
 
-/** Visible, adjustable planning assumptions behind the money figures. */
+/** Surfaced as an on-screen chip so the numbers read as assumptions, not fact. */
 export type Assumptions = {
-  /** FarmFlow commission on credit sales, percent. Default 20 (planning value). */
+  /** FarmFlow commission on carbon sales, percent (default 20). */
   commissionRatePct: number
-  /** Carbon market price, THB per tCO₂e. */
+  /** Market price per tonne, THB. */
   marketPriceThbPerTon: number
 }
 
