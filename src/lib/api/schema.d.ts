@@ -4908,8 +4908,11 @@ export interface operations {
                                 heightM: (number | null) | null;
                                 carbonKgCo2e: (number | null) | null;
                                 confidence: (number | null) | null;
-                                /** @description AI verdict: waiting | completed | rejected */
+                                /** @description AI verdict: waiting | completed | rejected | failed */
                                 status: string;
+                                /** @description Anomaly flags the vision model raised (ADR 0022); empty when none */
+                                aiFlags: string[];
+                                aiRationale: (string | null) | null;
                                 withinFarmBoundary: (boolean | null) | null;
                                 photoFileId: (string | null) | null;
                                 captureLat: (number | null) | null;
@@ -6447,7 +6450,7 @@ export interface operations {
                             /** @enum {string} */
                             syncStatus: "pending_local" | "uploading" | "synced" | "failed";
                             /** @enum {string} */
-                            aiBatchStatus: "waiting" | "processing" | "completed" | "rejected";
+                            aiBatchStatus: "waiting" | "processing" | "completed" | "rejected" | "failed";
                             totalSnaps: number;
                             firstSnapAt: (string | null) | null;
                             syncedAt: (string | null) | null;
@@ -6528,7 +6531,7 @@ export interface operations {
                             /** @enum {string} */
                             syncStatus: "pending_local" | "uploading" | "synced" | "failed";
                             /** @enum {string} */
-                            aiBatchStatus: "waiting" | "processing" | "completed" | "rejected";
+                            aiBatchStatus: "waiting" | "processing" | "completed" | "rejected" | "failed";
                             totalSnaps: number;
                             firstSnapAt: (string | null) | null;
                             syncedAt: (string | null) | null;
@@ -6688,7 +6691,7 @@ export interface operations {
                             /** @enum {string} */
                             syncStatus: "pending_local" | "uploading" | "synced" | "failed";
                             /** @enum {string} */
-                            aiBatchStatus: "waiting" | "processing" | "completed" | "rejected";
+                            aiBatchStatus: "waiting" | "processing" | "completed" | "rejected" | "failed";
                             totalSnaps: number;
                             firstSnapAt: (string | null) | null;
                             syncedAt: (string | null) | null;
@@ -6779,7 +6782,7 @@ export interface operations {
                             /** @enum {string} */
                             syncStatus: "pending_local" | "uploading" | "synced" | "failed";
                             /** @enum {string} */
-                            aiBatchStatus: "waiting" | "processing" | "completed" | "rejected";
+                            aiBatchStatus: "waiting" | "processing" | "completed" | "rejected" | "failed";
                             totalSnaps: number;
                             firstSnapAt: (string | null) | null;
                             syncedAt: (string | null) | null;

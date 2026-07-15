@@ -66,8 +66,12 @@ export type TreeSnapshot = {
   aiConfidenceScore: number | null
   /** Estimated carbon for this tree in kgCO₂e; null when no AI assessment yet. */
   estimatedCarbonKgco2e: number | null
-  /** AI assessment status: 'waiting' | 'completed' | 'rejected'; null when none. */
+  /** AI assessment status: 'waiting' | 'completed' | 'rejected' | 'failed'; null when none. */
   aiStatus: string | null
+  /** Anomaly flags the vision model raised (ADR 0022); empty when none. */
+  aiFlags: string[]
+  /** Vision model's Thai rationale, or a failure reason; null when not assessed. */
+  aiRationale: string | null
   /** Diameter at Breast Height (1.3 m) in cm. */
   dbhCm: number | null
   /** Tree height in metres. */
