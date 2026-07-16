@@ -17,7 +17,10 @@ import {
   Sun,
   Cloud,
   CloudRain,
+  TriangleAlert,
+  Sparkles,
 } from 'lucide-react'
+import { aiFlagLabel } from '@/features/verifier/lib/aiFlags'
 import { fetchBatchById } from '@/features/verifier/services/fetchBatchById'
 import { crossCheckTree } from '@/features/verifier/lib/crossCheck'
 import { treePlaceholderStyle } from '@/features/verifier/lib/treePlaceholder'
@@ -62,6 +65,7 @@ export default async function TreeInspectPage({
   const failed = checks.filter((c) => c.status === 'fail').length
   const gpsOk = checks.find((c) => c.key === 'gps')?.status === 'pass'
   const conf = tree.aiConfidenceScore ?? 0
+  const aiFailed = tree.aiStatus === 'failed'
   const weather = tree.weather && tree.weather in WEATHER
     ? WEATHER[tree.weather as WeatherCondition]
     : null
@@ -109,11 +113,17 @@ export default async function TreeInspectPage({
             ) : (
               <TreePine className="h-16 w-16 text-white/40" strokeWidth={1.25} />
             )}
-            <span
-              className={`absolute right-3 top-3 rounded-md bg-panel/90 px-2 py-1 font-mono text-sm font-bold backdrop-blur ${confidenceTextClass(conf)}`}
-            >
-              {Math.round(conf * 100)}%
-            </span>
+            {aiFailed ? (
+              <span className="absolute right-3 top-3 rounded-md bg-panel/90 px-2 py-1 text-xs font-semibold text-ink-secondary backdrop-blur">
+                ตรวจด้วยมือ
+              </span>
+            ) : tree.aiConfidenceScore != null ? (
+              <span
+                className={`absolute right-3 top-3 rounded-md bg-panel/90 px-2 py-1 font-mono text-sm font-bold backdrop-blur ${confidenceTextClass(conf)}`}
+              >
+                {Math.round(conf * 100)}%
+              </span>
+            ) : null}
             <span className="absolute bottom-3 left-3 rounded bg-ink/50 px-2 py-1 text-[11px] text-white/90 backdrop-blur">
               {tree.id}
             </span>
@@ -177,6 +187,53 @@ export default async function TreeInspectPage({
             </p>
           </section>
 
+          {/* AI vision assessment (ADR 0022) */}
+          <section className="rounded-2xl border border-line bg-panel p-5 shadow-sm">
+            <div className="mb-3 flex items-center justify-between">
+              <h2 className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.1em] text-ink-muted">
+                <Sparkles className="h-3.5 w-3.5" strokeWidth={1.9} />
+                ผลประเมินภาพด้วย AI
+              </h2>
+              {aiFailed ? (
+                <span className="rounded-full bg-surface px-2 py-0.5 text-[11px] font-semibold text-ink-secondary">
+                  ประเมินไม่สำเร็จ
+                </span>
+              ) : tree.aiConfidenceScore != null ? (
+                <span className={`font-mono text-sm font-bold ${confidenceTextClass(conf)}`}>
+                  {Math.round(conf * 100)}%
+                </span>
+              ) : null}
+            </div>
+
+            {aiFailed ? (
+              <p className="flex items-start gap-2 text-sm text-ink-secondary">
+                <TriangleAlert className="mt-0.5 h-4 w-4 shrink-0 text-ink-muted" strokeWidth={1.9} />
+                AI ประเมินภาพนี้ไม่สำเร็จ — โปรดตรวจสอบด้วยตนเอง
+              </p>
+            ) : tree.aiRationale || tree.aiFlags.length > 0 ? (
+              <>
+                {tree.aiRationale && (
+                  <p className="text-sm leading-relaxed text-ink-secondary">{tree.aiRationale}</p>
+                )}
+                {tree.aiFlags.length > 0 && (
+                  <ul className="mt-3 flex flex-wrap gap-1.5">
+                    {tree.aiFlags.map((f) => (
+                      <li
+                        key={f}
+                        className="inline-flex items-center gap-1 rounded-full bg-error-bg px-2 py-0.5 text-[11px] font-semibold text-error"
+                      >
+                        <TriangleAlert className="h-3 w-3" strokeWidth={1.9} />
+                        {aiFlagLabel(f)}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </>
+            ) : (
+              <p className="text-sm text-ink-muted">ยังไม่มีผลการประเมิน</p>
+            )}
+          </section>
+
           {/* Metadata */}
           <section className="rounded-2xl border border-line bg-panel p-5 shadow-sm">
             <h2 className="mb-3 text-[11px] font-bold uppercase tracking-[0.1em] text-ink-muted">
@@ -226,8 +283,14 @@ export default async function TreeInspectPage({
                 <dt className="flex items-center gap-1 text-xs text-ink-muted">
                   <Gauge className="h-3 w-3" strokeWidth={1.75} /> ความเชื่อมั่น AI
                 </dt>
-                <dd className={`font-mono font-semibold ${confidenceTextClass(conf)}`}>
-                  {Math.round(conf * 100)}%
+                <dd
+                  className={
+                    aiFailed || tree.aiConfidenceScore == null
+                      ? 'text-ink-disabled'
+                      : `font-mono font-semibold ${confidenceTextClass(conf)}`
+                  }
+                >
+                  {aiFailed ? 'ไม่สำเร็จ' : tree.aiConfidenceScore != null ? `${Math.round(conf * 100)}%` : '—'}
                 </dd>
               </div>
               <div>

@@ -4,6 +4,9 @@ import type { BatchDetail, TreeSnapshot } from '@/features/verifier/types'
 /** Confidence below this (or a rejected/out-of-bounds verdict) flags a tree for review. */
 const ANOMALY_THRESHOLD = 0.7
 
+/** Vision flags severe enough to flag a tree for review on their own (ADR 0022). */
+const HARD_VISION_FLAGS = ['not_a_tree', 'duplicate_or_stock_photo']
+
 /** Anomalies first, then lowest confidence — same priority as the queue. */
 function sortTrees(trees: TreeSnapshot[]): TreeSnapshot[] {
   return [...trees].sort((a, b) => {
@@ -31,12 +34,16 @@ export async function fetchBatchById(id: string): Promise<BatchDetail | null> {
       aiConfidenceScore: t.confidence,
       estimatedCarbonKgco2e: t.carbonKgCo2e,
       aiStatus: t.status,
+      aiFlags: t.aiFlags ?? [],
+      aiRationale: t.aiRationale,
       dbhCm: t.dbhCm,
       treeHeightM: t.heightM,
       anomaly:
         t.status === 'rejected' ||
+        t.status === 'failed' ||
         (t.confidence != null && t.confidence < ANOMALY_THRESHOLD) ||
-        t.withinFarmBoundary === false,
+        t.withinFarmBoundary === false ||
+        (t.aiFlags ?? []).some((f) => HARD_VISION_FLAGS.includes(f)),
     }),
   )
 

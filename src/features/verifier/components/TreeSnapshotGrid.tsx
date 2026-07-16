@@ -52,11 +52,17 @@ export function TreeSnapshotGrid({
               ) : (
                 <TreePine className="h-8 w-8 text-white/40" strokeWidth={1.5} />
               )}
-              <span
-                className={`absolute right-1.5 top-1.5 rounded px-1.5 py-0.5 font-mono text-[11px] font-bold ${confidenceBadgeClass(conf)}`}
-              >
-                {pct}%
-              </span>
+              {t.aiStatus === 'failed' ? (
+                <span className="absolute right-1.5 top-1.5 rounded bg-ink/50 px-1.5 py-0.5 text-[10px] font-semibold text-white/90 backdrop-blur">
+                  ตรวจมือ
+                </span>
+              ) : t.aiConfidenceScore != null ? (
+                <span
+                  className={`absolute right-1.5 top-1.5 rounded px-1.5 py-0.5 font-mono text-[11px] font-bold ${confidenceBadgeClass(conf)}`}
+                >
+                  {pct}%
+                </span>
+              ) : null}
               {t.anomaly && (
                 <span className="absolute left-1.5 top-1.5 flex h-5 w-5 items-center justify-center rounded bg-error text-white">
                   <TriangleAlert className="h-3 w-3" strokeWidth={2} />
