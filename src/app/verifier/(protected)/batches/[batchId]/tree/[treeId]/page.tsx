@@ -28,6 +28,9 @@ import { snapshotPhotoUrl } from '@/features/verifier/lib/files'
 import { confidenceTextClass } from '@/features/verifier/lib/confidence'
 import { BatchMiniMap } from '@/features/verifier/components/BatchMiniMap'
 import { PhotoLightbox } from '@/features/verifier/components/PhotoLightbox'
+import { TreeKeyboardNav } from '@/features/verifier/components/TreeKeyboardNav'
+import { LinkNavProgress } from '@/features/verifier/components/NavProgressBar'
+import { Kbd } from '@/components/ui/kbd'
 import { formatDateTime } from '@/lib/utils/format'
 type WeatherCondition = 'sunny' | 'cloudy' | 'rainy'
 
@@ -71,26 +74,51 @@ export default async function TreeInspectPage({
     : null
 
   const navBase = `/verifier/batches/${batch.id}/tree`
+  const batchHref = `/verifier/batches/${batch.id}`
+  const prevHref = prev ? `${navBase}/${prev.id}` : null
+  const nextHref = next ? `${navBase}/${next.id}` : null
 
   return (
     <div className="mx-auto max-w-[1440px] px-4 py-8 sm:px-8">
+      <TreeKeyboardNav prevHref={prevHref} nextHref={nextHref} backHref={batchHref} />
+
       {/* Top bar */}
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <Link
-          href={`/verifier/batches/${batch.id}`}
+          href={batchHref}
           className="inline-flex items-center gap-1.5 text-sm text-ink-muted transition-colors hover:text-ink"
         >
           <ArrowLeft className="h-4 w-4" strokeWidth={1.75} />
           กลับไป {batch.id}
+          <Kbd className="ml-0.5">Esc</Kbd>
         </Link>
 
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-ink-secondary">
-            ภาพที่ <span className="font-medium text-ink">{index + 1}</span> จาก{' '}
-            {batch.trees.length}
-          </span>
-          <NavBtn href={prev ? `${navBase}/${prev.id}` : null} dir="prev" />
-          <NavBtn href={next ? `${navBase}/${next.id}` : null} dir="next" />
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-ink-secondary">
+              ภาพที่ <span className="font-medium text-ink">{index + 1}</span> จาก{' '}
+              {batch.trees.length}
+            </span>
+            {/* Progress through the batch — a verifier reviewing 50 photos wants
+                to see how much is left without counting. */}
+            <span
+              className="hidden h-1.5 w-24 overflow-hidden rounded-full bg-surface sm:block"
+              role="progressbar"
+              aria-valuenow={index + 1}
+              aria-valuemin={1}
+              aria-valuemax={batch.trees.length}
+              aria-label="ความคืบหน้าการตรวจภาพ"
+            >
+              <span
+                className="block h-full rounded-full bg-primary transition-[width] duration-300 ease-out motion-reduce:transition-none"
+                style={{ width: `${((index + 1) / batch.trees.length) * 100}%` }}
+              />
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <NavBtn href={prevHref} dir="prev" />
+            <NavBtn href={nextHref} dir="next" />
+          </div>
         </div>
       </div>
 
@@ -327,6 +355,11 @@ export default async function TreeInspectPage({
           </section>
         </div>
       </div>
+
+      <p className="mt-6 hidden text-center text-xs text-ink-muted sm:block">
+        กด <Kbd>←</Kbd> <Kbd>→</Kbd> เพื่อเลื่อนภาพ · <Kbd>F</Kbd> ดูเต็มจอ · <Kbd>?</Kbd>{' '}
+        เปิดคู่มือและคีย์ลัด
+      </p>
     </div>
   )
 }
@@ -338,6 +371,7 @@ function NavBtn({ href, dir }: { href: string | null; dir: 'prev' | 'next' }) {
     <>
       {dir === 'prev' && <Icon className="h-4 w-4" strokeWidth={1.75} />}
       {label}
+      <Kbd className="hidden sm:inline-flex">{dir === 'prev' ? '←' : '→'}</Kbd>
       {dir === 'next' && <Icon className="h-4 w-4" strokeWidth={1.75} />}
     </>
   )
@@ -357,6 +391,7 @@ function NavBtn({ href, dir }: { href: string | null; dir: 'prev' | 'next' }) {
       className={`${cls} bg-panel text-ink-secondary hover:bg-surface hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary`}
     >
       {content}
+      <LinkNavProgress />
     </Link>
   )
 }

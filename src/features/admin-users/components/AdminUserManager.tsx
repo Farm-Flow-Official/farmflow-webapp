@@ -259,6 +259,7 @@ export function AdminUserManager({ initialAdmins }: Props) {
                 setPage(1)
               }}
               placeholder="ค้นหา username"
+            data-search-input
               className="h-10 w-full rounded-lg border border-line bg-panel pl-9 pr-3 text-sm text-ink placeholder:text-ink-muted transition-shadow focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15"
             />
           </div>

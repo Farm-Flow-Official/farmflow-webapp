@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import type { VerifierProfile } from '@/features/verifier/auth/types'
 import { VerifierTopbar } from '@/features/verifier/components/VerifierTopbar'
 import { VerifierSidebar } from '@/features/verifier/components/VerifierSidebar'
+import { VerifierGuideProvider } from '@/features/verifier/guide/GuideBook'
 
 /**
  * Client shell for the verifier portal — mirrors AdminShell. Owns the mobile
@@ -29,20 +30,23 @@ export function VerifierShell({
   }, [open])
 
   return (
-    <div className="min-h-screen bg-surface">
-      <VerifierTopbar verifier={verifier} menuOpen={open} onMenuClick={() => setOpen((v) => !v)} />
-      <VerifierSidebar open={open} onNavigate={close} />
+    // The guide provider wraps the chrome too — topbar and sidebar both open it.
+    <VerifierGuideProvider>
+      <div className="min-h-screen bg-surface">
+        <VerifierTopbar verifier={verifier} menuOpen={open} onMenuClick={() => setOpen((v) => !v)} />
+        <VerifierSidebar open={open} onNavigate={close} />
 
-      {open && (
-        <button
-          type="button"
-          aria-label="ปิดเมนู"
-          onClick={close}
-          className="fixed inset-0 top-16 z-30 bg-ink/40 lg:hidden"
-        />
-      )}
+        {open && (
+          <button
+            type="button"
+            aria-label="ปิดเมนู"
+            onClick={close}
+            className="fixed inset-0 top-16 z-30 bg-ink/40 lg:hidden"
+          />
+        )}
 
-      <main className="min-h-screen pt-16 lg:ml-60">{children}</main>
-    </div>
+        <main className="min-h-screen pt-16 lg:ml-60">{children}</main>
+      </div>
+    </VerifierGuideProvider>
   )
 }

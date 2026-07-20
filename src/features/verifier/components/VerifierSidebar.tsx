@@ -2,8 +2,10 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Boxes, QrCode, ExternalLink } from 'lucide-react'
+import { LayoutDashboard, Boxes, QrCode, ExternalLink, BookOpen } from 'lucide-react'
 import type { ComponentType, SVGProps } from 'react'
+import { Kbd } from '@/components/ui/kbd'
+import { useGuide } from '@/components/ui/guide-book'
 
 type IconType = ComponentType<SVGProps<SVGSVGElement>>
 type NavItem = { href: string; label: string; icon: IconType; newTab?: boolean }
@@ -34,6 +36,7 @@ type Props = {
 
 export function VerifierSidebar({ open = false, onNavigate }: Props) {
   const pathname = usePathname()
+  const guide = useGuide()
 
   const isActive = (href: string) =>
     href === '/verifier' ? pathname === '/verifier' : pathname.startsWith(href)
@@ -82,8 +85,22 @@ export function VerifierSidebar({ open = false, onNavigate }: Props) {
         ))}
       </nav>
 
-      <div className="border-t border-line px-4 py-4">
-        <p className="text-[11px] text-ink-muted">FarmFlow Verifier v1.0</p>
+      {/* Help sits at the foot of the nav — out of the daily path, but in the
+          place users have learned to look for it. */}
+      <div className="border-t border-line px-3 py-3">
+        <button
+          type="button"
+          onClick={() => {
+            guide.open()
+            onNavigate?.()
+          }}
+          className="flex h-10 w-full items-center gap-3 rounded-lg px-3 text-sm font-medium text-ink-secondary transition-colors hover:bg-surface hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1"
+        >
+          <BookOpen className="h-[18px] w-[18px] shrink-0 text-ink-muted" strokeWidth={1.75} />
+          คู่มือผู้ตรวจสอบ
+          <Kbd className="ml-auto">?</Kbd>
+        </button>
+        <p className="px-3 pt-2 text-[11px] text-ink-muted">FarmFlow Verifier v1.0</p>
       </div>
     </aside>
   )

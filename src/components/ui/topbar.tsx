@@ -1,7 +1,9 @@
 'use client'
 
-import { LogOut, Menu, X } from 'lucide-react'
+import { BookOpen, LogOut, Menu, X } from 'lucide-react'
 import { Logo } from '@/components/ui/logo'
+import { Kbd } from '@/components/ui/kbd'
+import { useGuide } from '@/components/ui/guide-book'
 import type { AdminProfile } from '@/features/auth/types'
 import { signOutAdmin } from '@/features/auth/actions/signOutAdmin'
 
@@ -13,6 +15,7 @@ type Props = {
 
 export function AdminTopbar({ admin, menuOpen = false, onMenuClick }: Props) {
   const initial = admin.username?.charAt(0).toUpperCase() || 'A'
+  const guide = useGuide()
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 flex h-16 items-center justify-between border-b border-line bg-panel/90 px-4 backdrop-blur sm:px-6">
@@ -46,6 +49,19 @@ export function AdminTopbar({ admin, menuOpen = false, onMenuClick }: Props) {
         <span className="hidden rounded-full border border-primary-muted bg-primary-subtle px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-success sm:inline">
           Admin
         </span>
+
+        {/* Help lives in the top-right, where users look for it — and stays put
+            on every screen so it can be relied on mid-task. */}
+        <button
+          type="button"
+          onClick={() => guide.open()}
+          title="คู่มือผู้ดูแลระบบ (กด ? เพื่อดูคีย์ลัด)"
+          className="flex h-9 items-center gap-1.5 rounded-lg border border-line bg-panel px-2.5 text-sm font-medium text-ink-secondary transition-colors hover:bg-surface hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+        >
+          <BookOpen className="h-4 w-4" strokeWidth={1.75} />
+          <span className="hidden md:inline">คู่มือ</span>
+          <Kbd className="hidden md:inline-flex">?</Kbd>
+        </button>
 
         <div className="flex items-center gap-2">
           <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-semibold text-white">

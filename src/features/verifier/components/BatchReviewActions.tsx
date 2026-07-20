@@ -3,6 +3,8 @@
 import { useId, useState } from 'react'
 import { Check, X, FileDown } from 'lucide-react'
 import { Badge, type BadgeVariant } from '@/components/ui/badge'
+import { Kbd } from '@/components/ui/kbd'
+import { useHotkeys } from '@/lib/hooks/useHotkeys'
 import { Modal } from '@/components/ui/modal'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { Toast, useToast } from '@/components/ui/toast'
@@ -61,6 +63,15 @@ export function BatchReviewActions({ batchId, initialStatus, verifierName }: Pro
   }
 
   const meta = STATUS_META[status]
+  const decidable = status === 'Pending'
+
+  // Both decisions open their confirm step — a shortcut never approves or
+  // rejects a batch outright.
+  useHotkeys({
+    a: () => decidable && setApproving(true),
+    r: () => decidable && setRejecting(true),
+    p: handlePdf,
+  })
 
   return (
     <div className="flex flex-wrap items-center gap-2">
@@ -76,9 +87,10 @@ export function BatchReviewActions({ batchId, initialStatus, verifierName }: Pro
         >
           <FileDown className="h-4 w-4" strokeWidth={1.75} />
           ดาวน์โหลด PDF
+          <Kbd className="hidden sm:inline-flex">P</Kbd>
         </button>
 
-        {status === 'Pending' && (
+        {decidable && (
           <>
             <button
               type="button"
@@ -87,6 +99,9 @@ export function BatchReviewActions({ batchId, initialStatus, verifierName }: Pro
             >
               <X className="h-4 w-4" strokeWidth={2} />
               ปฏิเสธ
+              <Kbd tone="on-error" className="hidden sm:inline-flex">
+                R
+              </Kbd>
             </button>
             <button
               type="button"
@@ -95,6 +110,7 @@ export function BatchReviewActions({ batchId, initialStatus, verifierName }: Pro
             >
               <Check className="h-4 w-4" strokeWidth={2} />
               อนุมัติ
+              <Kbd tone="on-primary" className="hidden sm:inline-flex">A</Kbd>
             </button>
           </>
         )}
@@ -173,6 +189,9 @@ function RejectForm({
           id="reject-reason"
           value={reason}
           onChange={(e) => setReason(e.target.value)}
+          onKeyDown={(e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') submit()
+          }}
           rows={4}
           placeholder="เช่น ภาพต้นไม้ไม่ชัด / พิกัดไม่ตรงกับแปลง — เกษตรกรจะได้รับเหตุผลนี้"
           aria-invalid={error}
@@ -185,7 +204,10 @@ function RejectForm({
         {error && <p className="mt-1.5 text-xs text-error">กรุณาระบุเหตุผล (จำเป็น)</p>}
       </div>
 
-      <div className="flex justify-end gap-2 border-t border-line px-6 py-4">
+      <div className="flex items-center justify-end gap-2 border-t border-line px-6 py-4">
+        <span className="mr-auto hidden text-[11px] text-ink-muted sm:block">
+          <Kbd>⌘</Kbd> / <Kbd>Ctrl</Kbd> + <Kbd>Enter</Kbd> เพื่อยืนยัน
+        </span>
         <button
           type="button"
           onClick={onClose}
