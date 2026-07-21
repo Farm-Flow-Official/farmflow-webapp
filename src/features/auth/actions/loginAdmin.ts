@@ -28,6 +28,9 @@ export async function loginAdmin(
 
     if (!data?.success) {
       if (response.status === 401) return { error: 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง' }
+      // Verifier credentials are valid but barred from the admin portal (WRONG_PORTAL).
+      if (response.status === 403)
+        return { error: 'บัญชีนี้เป็นผู้ตรวจสอบ (Verifier) กรุณาเข้าสู่ระบบที่พอร์ทัลผู้ตรวจสอบ' }
       if (response.status === 422) return { error: 'ข้อมูลไม่ถูกต้อง กรุณาตรวจสอบอีกครั้ง' }
       return { error: 'เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง' }
     }

@@ -3,6 +3,8 @@ export type AdminProfile = {
   id: string
   username: string
   roleId: string
+  /** Role name (e.g. MASTER, FINANCE). Verifiers use their own portal. */
+  roleName: string
   permissions: string[]
 }
 
