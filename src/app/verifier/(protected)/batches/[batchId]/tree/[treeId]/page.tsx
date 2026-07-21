@@ -29,6 +29,7 @@ import { confidenceTextClass } from '@/features/verifier/lib/confidence'
 import { BatchMiniMap } from '@/features/verifier/components/BatchMiniMap'
 import { PhotoLightbox } from '@/features/verifier/components/PhotoLightbox'
 import { TreeKeyboardNav } from '@/features/verifier/components/TreeKeyboardNav'
+import { ImageWithSkeleton } from '@/components/ui/image-with-skeleton'
 import { LinkNavProgress } from '@/features/verifier/components/NavProgressBar'
 import { Kbd } from '@/components/ui/kbd'
 import { formatDateTime } from '@/lib/utils/format'
@@ -132,11 +133,11 @@ export default async function TreeInspectPage({
             style={treePlaceholderStyle(tree.id)}
           >
             {tree.photoFileId ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
+              <ImageWithSkeleton
                 src={snapshotPhotoUrl(tree.photoFileId)}
                 alt={`ภาพต้นไม้ ${tree.id}`}
-                className="absolute inset-0 h-full w-full object-cover"
+                skeleton={false}
+                className="absolute inset-0 h-full w-full object-cover transition-opacity duration-500 ease-out"
               />
             ) : (
               <TreePine className="h-16 w-16 text-white/40" strokeWidth={1.25} />

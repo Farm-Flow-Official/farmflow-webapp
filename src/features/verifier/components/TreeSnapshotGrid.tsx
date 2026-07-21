@@ -7,6 +7,7 @@ type WeatherCondition = 'sunny' | 'cloudy' | 'rainy'
 import { treePlaceholderStyle } from '@/features/verifier/lib/treePlaceholder'
 import { snapshotPhotoUrl } from '@/features/verifier/lib/files'
 import { confidenceBadgeClass } from '@/features/verifier/lib/confidence'
+import { ImageWithSkeleton } from '@/components/ui/image-with-skeleton'
 
 const WEATHER_ICON: Record<WeatherCondition, ComponentType<SVGProps<SVGSVGElement>>> = {
   sunny: Sun,
@@ -42,12 +43,12 @@ export function TreeSnapshotGrid({
               style={treePlaceholderStyle(t.id)}
             >
               {t.photoFileId ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
+                <ImageWithSkeleton
                   src={snapshotPhotoUrl(t.photoFileId)}
                   alt=""
                   loading="lazy"
-                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-200 ease-out group-hover:scale-[1.02] motion-reduce:transform-none"
+                  skeleton={false}
+                  className="absolute inset-0 h-full w-full object-cover transition duration-300 ease-out group-hover:scale-[1.02] motion-reduce:transform-none"
                 />
               ) : (
                 <TreePine className="h-8 w-8 text-white/40" strokeWidth={1.5} />

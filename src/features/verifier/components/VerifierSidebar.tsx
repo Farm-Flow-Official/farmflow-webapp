@@ -6,6 +6,7 @@ import { LayoutDashboard, Boxes, QrCode, ExternalLink, BookOpen } from 'lucide-r
 import type { ComponentType, SVGProps } from 'react'
 import { Kbd } from '@/components/ui/kbd'
 import { useGuide } from '@/components/ui/guide-book'
+import { LinkNavProgress } from '@/components/ui/nav-progress'
 
 type IconType = ComponentType<SVGProps<SVGSVGElement>>
 type NavItem = { href: string; label: string; icon: IconType; newTab?: boolean }
@@ -75,8 +76,10 @@ export function VerifierSidebar({ open = false, onNavigate }: Props) {
                     strokeWidth={1.75}
                   />
                   {item.label}
-                  {item.newTab && (
+                  {item.newTab ? (
                     <ExternalLink className="ml-auto h-3.5 w-3.5 text-ink-muted" strokeWidth={1.75} />
+                  ) : (
+                    <LinkNavProgress />
                   )}
                 </Link>
               )
