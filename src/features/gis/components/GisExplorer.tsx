@@ -214,6 +214,7 @@ function FarmSearch({
         onFocus={() => setOpen(true)}
         onBlur={() => setTimeout(() => setOpen(false), 120)}
         placeholder="ค้นหาแปลง / เกษตรกร"
+            data-search-input
         aria-label="ค้นหาแปลง"
         className="h-9 w-full rounded-lg border border-line bg-panel pl-9 pr-3 text-sm text-ink placeholder:text-ink-muted transition-shadow focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15"
       />

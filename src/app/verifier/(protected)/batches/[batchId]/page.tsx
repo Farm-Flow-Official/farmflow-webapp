@@ -17,6 +17,8 @@ import { fetchBatchById } from '@/features/verifier/services/fetchBatchById'
 import { BatchReviewActions } from '@/features/verifier/components/BatchReviewActions'
 import { BatchMiniMap } from '@/features/verifier/components/BatchMiniMap'
 import { TreeSnapshotGrid } from '@/features/verifier/components/TreeSnapshotGrid'
+import { BackShortcut } from '@/features/verifier/components/BackShortcut'
+import { Kbd } from '@/components/ui/kbd'
 import { formatDate, formatNumber } from '@/lib/utils/format'
 import { confidenceTextClass } from '@/features/verifier/lib/confidence'
 
@@ -53,12 +55,15 @@ export default async function BatchDetailPage({
 
   return (
     <div className="mx-auto max-w-[1440px] px-4 py-8 sm:px-8">
+      <BackShortcut href="/verifier/batches" />
+
       <Link
         href="/verifier/batches"
         className="mb-6 inline-flex items-center gap-1.5 text-sm text-ink-muted transition-colors hover:text-ink"
       >
         <ArrowLeft className="h-4 w-4" strokeWidth={1.75} />
         กลับไปคิวงาน
+        <Kbd className="ml-0.5">Esc</Kbd>
       </Link>
 
       {/* Header + actions */}

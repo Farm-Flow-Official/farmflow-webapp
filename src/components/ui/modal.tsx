@@ -6,15 +6,28 @@ import { useEffect, useRef, type ReactNode } from 'react'
 const FOCUSABLE =
   'a[href],button:not([disabled]),textarea:not([disabled]),input:not([disabled]),select:not([disabled]),[tabindex]:not([tabindex="-1"])'
 
+type Placement = 'center' | 'right'
+
 type Props = {
   onClose: () => void
   /** id of the element labelling the dialog (for aria-labelledby). */
   labelledBy?: string
   /** Close when the backdrop is clicked. Disable for forms with unsaved input. */
   closeOnBackdrop?: boolean
+  /** `right` docks the panel as a full-height drawer (reference material the
+   *  user reads *beside* their work); `center` is the default dialog. */
+  placement?: Placement
   /** Classes for the panel — controls width/padding/layout. */
   panelClassName?: string
   children: ReactNode
+}
+
+const PLACEMENTS: Record<Placement, { container: string; panel: string }> = {
+  center: { container: 'items-center justify-center p-4', panel: 'rounded-2xl border' },
+  right: {
+    container: 'items-stretch justify-end',
+    panel: 'h-full border-l animate-[drawer-in_0.18s_ease-out]',
+  },
 }
 
 /**
@@ -27,10 +40,12 @@ export function Modal({
   onClose,
   labelledBy,
   closeOnBackdrop = true,
+  placement = 'center',
   panelClassName = 'w-full max-w-sm p-6',
   children,
 }: Props) {
   const panelRef = useRef<HTMLDivElement>(null)
+  const place = PLACEMENTS[placement]
 
   useEffect(() => {
     const previouslyFocused = document.activeElement as HTMLElement | null
@@ -85,10 +100,12 @@ export function Modal({
     // z-index sits above Leaflet's internal panes/controls (~700–1000) so map
     // tiles never cover a dialog (e.g. the V-04 mini-map vs the approve dialog).
     <div
-      className="fixed inset-0 z-[1100] flex items-center justify-center p-4"
+      className={`fixed inset-0 z-[1100] flex ${place.container}`}
       role="dialog"
       aria-modal="true"
       aria-labelledby={labelledBy}
+      // Suspends page-level keyboard shortcuts while a dialog is up (useHotkeys).
+      data-modal-blocking
     >
       {closeOnBackdrop ? (
         <button
@@ -105,7 +122,7 @@ export function Modal({
       <div
         ref={panelRef}
         tabIndex={-1}
-        className={`relative rounded-2xl border border-line bg-panel shadow-xl focus:outline-none ${panelClassName}`}
+        className={`relative border-line bg-panel shadow-xl focus:outline-none ${place.panel} ${panelClassName}`}
       >
         {children}
       </div>

@@ -70,3 +70,28 @@ h2,
 h3 {
   font-family: var(--font-display);
 }
+
+/* Indeterminate sweep for the navigation progress bar (NavProgressBar). */
+@keyframes nav-progress {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(400%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Keep the bar visible but still — the point is "something is loading". */
+  .animate-\[nav-progress_0\.9s_ease-in-out_infinite\] {
+    animation: none;
+    width: 100%;
+    opacity: 0.6;
+  }
+}
+
+/* Right-docked Modal (the verifier Guide Book) slides in from the edge. */
+@keyframes drawer-in {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-\[drawer-in_0\.18s_ease-out\] { animation: none; }
+}
