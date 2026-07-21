@@ -80,6 +80,8 @@ export type TreeSnapshot = {
 }
 
 export type BatchDetail = VerificationBatch & {
+  /** Farm cover photo file id (public); null when the farmer set none. */
+  coverPhotoFileId: string | null
   /** Phone — not exposed by the review endpoint. */
   phone: string | null
   /** Free-text farm address; falls back to the province name when absent. */

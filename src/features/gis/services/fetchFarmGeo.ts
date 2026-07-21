@@ -21,6 +21,7 @@ export async function fetchFarmGeo(): Promise<FarmGeo[]> {
     .map((f) => ({
       id: f.id,
       farmName: f.farmName,
+      coverPhotoFileId: f.coverPhotoFileId ?? null,
       ownerUserId: f.ownerUserId,
       ownerName: f.ownerName,
       province: f.province ?? '',

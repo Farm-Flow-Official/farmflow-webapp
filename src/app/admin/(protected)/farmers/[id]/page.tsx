@@ -5,6 +5,7 @@ import type { Metadata } from 'next'
 import { fetchFarmerById } from '@/features/farmers/services/fetchFarmerById'
 import { DataTable, type Column } from '@/components/ui/data-table'
 import { formatDate, formatPhone, formatNumber } from '@/lib/utils/format'
+import { coverPhotoUrl } from '@/lib/farm-cover'
 import { FarmerProfileHeader } from '@/features/farmers/components/FarmerProfileHeader'
 import type { Farm } from '@/features/farmers/types'
 
@@ -33,7 +34,27 @@ const farmColumns: Column<Farm>[] = [
   {
     key: 'name',
     header: 'ชื่อแปลง',
-    cell: (f) => <span className="font-medium text-ink">{f.name}</span>,
+    cell: (f) => {
+      const cover = coverPhotoUrl(f.coverPhotoFileId)
+      return (
+        <div className="flex items-center gap-2.5">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-line bg-surface">
+            {cover ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={cover}
+                alt=""
+                loading="lazy"
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <Sprout className="h-4 w-4 text-ink-disabled" strokeWidth={1.5} />
+            )}
+          </span>
+          <span className="font-medium text-ink">{f.name}</span>
+        </div>
+      )
+    },
   },
   {
     key: 'province',

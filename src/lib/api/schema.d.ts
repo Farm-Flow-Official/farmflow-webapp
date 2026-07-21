@@ -2206,6 +2206,8 @@ export interface operations {
                                 id: string;
                                 username: string;
                                 roleId: string;
+                                /** @description Role name (e.g. MASTER, FINANCE) — verifiers use their own portal */
+                                roleName: string;
                                 permissions: string[];
                             };
                         };
@@ -2218,6 +2220,29 @@ export interface operations {
             };
             /** @description Unauthorized - missing or invalid admin session. */
             401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden - this account may not use the admin portal (e.g. a verifier — use the verifier portal). */
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -2374,6 +2399,8 @@ export interface operations {
                             id: string;
                             username: string;
                             roleId: string;
+                            /** @description Role name (e.g. MASTER, FINANCE) — verifiers use their own portal */
+                            roleName: string;
                             permissions: string[];
                         };
                         meta: {
@@ -2385,6 +2412,29 @@ export interface operations {
             };
             /** @description Unauthorized - missing or invalid admin session. */
             401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden - this account may not use the admin portal (e.g. a verifier — use the verifier portal). */
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -2527,6 +2577,7 @@ export interface operations {
                             farms: {
                                 id: string;
                                 name: string;
+                                coverPhotoFileId: (string | null) | null;
                                 province: (string | null) | null;
                                 areaRai: (number | null) | null;
                                 cropType: (string | null) | null;
@@ -4302,6 +4353,7 @@ export interface operations {
                         data: {
                             id: string;
                             farmName: string;
+                            coverPhotoFileId: (string | null) | null;
                             ownerUserId: string;
                             /** @description Personal Data, or a non-PII fallback (ADR 0013) */
                             ownerName: string;
@@ -4882,6 +4934,7 @@ export interface operations {
                             farm: {
                                 id: string;
                                 name: string;
+                                coverPhotoFileId: (string | null) | null;
                                 address: (string | null) | null;
                                 province: (string | null) | null;
                                 checkinLat: (number | null) | null;

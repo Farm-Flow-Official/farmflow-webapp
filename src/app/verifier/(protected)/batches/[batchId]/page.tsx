@@ -11,7 +11,9 @@ import {
   TreePine,
   TriangleAlert,
   LandPlot,
+  ImageIcon,
 } from 'lucide-react'
+import { coverPhotoUrl } from '@/lib/farm-cover'
 import { getVerifierSession } from '@/features/verifier/auth/session'
 import { fetchBatchById } from '@/features/verifier/services/fetchBatchById'
 import { BatchReviewActions } from '@/features/verifier/components/BatchReviewActions'
@@ -43,6 +45,7 @@ export default async function BatchDetailPage({
   ])
   if (!batch) notFound()
 
+  const coverUrl = coverPhotoUrl(batch.coverPhotoFileId)
   const anomalyTrees = batch.trees.filter((t) => t.anomaly).length
   const areaDiscrepancyPct =
     batch.declaredAreaRai != null &&
@@ -67,23 +70,44 @@ export default async function BatchDetailPage({
       </Link>
 
       {/* Header + actions */}
-      <div className="mb-6 flex flex-col gap-4 rounded-2xl border border-line bg-panel p-6 shadow-sm">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-xl font-semibold text-ink">{batch.farmName}</h1>
-              <span className="font-mono text-xs text-ink-muted">{batch.id}</span>
-            </div>
-            <p className="mt-1 text-sm text-ink-muted">
-              {batch.ownerName} · ส่งเมื่อ {formatDate(batch.submittedAt)}
-            </p>
+      <div className="mb-6 overflow-hidden rounded-2xl border border-line bg-panel shadow-sm">
+        {coverUrl && (
+          <div className="relative h-40 w-full sm:h-56">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={coverUrl}
+              alt={`ภาพหน้าปกแปลง ${batch.farmName}`}
+              className="h-full w-full object-cover"
+            />
+            {/* Bottom fade so the caption chip stays legible on any photo. */}
+            <div
+              className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/45 to-transparent"
+              aria-hidden
+            />
+            <span className="absolute bottom-3 left-4 inline-flex items-center gap-1.5 rounded-full bg-black/45 px-2.5 py-1 text-[11px] font-medium text-white/95 backdrop-blur">
+              <ImageIcon className="h-3 w-3" strokeWidth={1.9} />
+              ภาพหน้าปกจากเกษตรกร
+            </span>
           </div>
+        )}
+        <div className="flex flex-col gap-4 p-6">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="text-xl font-semibold text-ink">{batch.farmName}</h1>
+                <span className="font-mono text-xs text-ink-muted">{batch.id}</span>
+              </div>
+              <p className="mt-1 text-sm text-ink-muted">
+                {batch.ownerName} · ส่งเมื่อ {formatDate(batch.submittedAt)}
+              </p>
+            </div>
+          </div>
+          <BatchReviewActions
+            batchId={batch.id}
+            initialStatus={batch.status}
+            verifierName={verifier?.username ?? 'Verifier'}
+          />
         </div>
-        <BatchReviewActions
-          batchId={batch.id}
-          initialStatus={batch.status}
-          verifierName={verifier?.username ?? 'Verifier'}
-        />
       </div>
 
       {/* Farm overview + MRV */}
