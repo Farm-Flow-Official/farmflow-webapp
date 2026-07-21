@@ -19,6 +19,7 @@ import { fetchBatchById } from '@/features/verifier/services/fetchBatchById'
 import { BatchReviewActions } from '@/features/verifier/components/BatchReviewActions'
 import { BatchMiniMap } from '@/features/verifier/components/BatchMiniMap'
 import { TreeSnapshotGrid } from '@/features/verifier/components/TreeSnapshotGrid'
+import { ImageWithSkeleton } from '@/components/ui/image-with-skeleton'
 import { BackShortcut } from '@/features/verifier/components/BackShortcut'
 import { Kbd } from '@/components/ui/kbd'
 import { formatDate, formatNumber } from '@/lib/utils/format'
@@ -73,11 +74,10 @@ export default async function BatchDetailPage({
       <div className="mb-6 overflow-hidden rounded-2xl border border-line bg-panel shadow-sm">
         {coverUrl && (
           <div className="relative h-40 w-full sm:h-56">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <ImageWithSkeleton
               src={coverUrl}
               alt={`ภาพหน้าปกแปลง ${batch.farmName}`}
-              className="h-full w-full object-cover"
+              className="h-full w-full object-cover transition-opacity duration-500 ease-out"
             />
             {/* Bottom fade so the caption chip stays legible on any photo. */}
             <div

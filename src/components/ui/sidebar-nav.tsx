@@ -15,6 +15,7 @@ import {
 import type { ComponentType, SVGProps } from 'react'
 import { Kbd } from '@/components/ui/kbd'
 import { useGuide } from '@/components/ui/guide-book'
+import { LinkNavProgress } from '@/components/ui/nav-progress'
 
 type IconType = ComponentType<SVGProps<SVGSVGElement>>
 
@@ -105,6 +106,7 @@ export function AdminSidebar({ open = false, onNavigate }: Props) {
                   />
                   {item.label}
                   <Kbd className="ml-auto hidden lg:inline-flex">{item.key}</Kbd>
+                  <LinkNavProgress />
                 </Link>
               )
             })}
