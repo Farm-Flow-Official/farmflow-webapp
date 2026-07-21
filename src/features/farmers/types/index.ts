@@ -19,6 +19,8 @@ export type Farmer = {
 export type Farm = {
   id: string
   name: string
+  /** Farm cover photo file id (public); null when the farmer set none. */
+  coverPhotoFileId: string | null
   /** Province name; null when unset. */
   province: string | null
   areaRai: number | null
