@@ -13,8 +13,11 @@ export function CarbonHeroCard({
   totalCarbonKgco2e: number
   marketPriceThb: number | null
 }) {
+  // marketPriceThb is THB per tonne (tCO₂e); carbon is stored in kg → divide by 1,000.
   const estimatedValueThb =
-    marketPriceThb != null ? totalCarbonKgco2e * marketPriceThb : null
+    marketPriceThb != null
+      ? Math.round((totalCarbonKgco2e / 1000) * marketPriceThb)
+      : null
 
   return (
     <section
@@ -59,7 +62,7 @@ export function CarbonHeroCard({
           )}
           {marketPriceThb != null && (
             <span className="text-xs text-white/50">
-              @ ฿{marketPriceThb.toFixed(2)} / kgCO₂e
+              @ ฿{formatNumber(marketPriceThb)} / tCO₂e
             </span>
           )}
         </div>
