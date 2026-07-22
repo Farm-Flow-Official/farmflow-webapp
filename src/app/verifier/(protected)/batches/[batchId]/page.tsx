@@ -18,6 +18,7 @@ import { fetchBatchById } from '@/features/verifier/services/fetchBatchById'
 import { BatchReviewActions } from '@/features/verifier/components/BatchReviewActions'
 import { BatchMiniMap } from '@/features/verifier/components/BatchMiniMap'
 import { TreeSnapshotGrid } from '@/features/verifier/components/TreeSnapshotGrid'
+import { CultivationInfo } from '@/features/verifier/components/CultivationInfo'
 import { ImageWithSkeleton } from '@/components/ui/image-with-skeleton'
 import { BackShortcut } from '@/features/verifier/components/BackShortcut'
 import { Kbd } from '@/components/ui/kbd'
@@ -249,6 +250,15 @@ export default async function BatchDetailPage({
             )}
           </dl>
         </section>
+      </div>
+
+      {/* Cultivation facts of the assessed subplot */}
+      <div className="mb-8">
+        <CultivationInfo
+          cultivation={batch.cultivation}
+          fallbackAreaRai={batch.declaredAreaRai}
+          equationStatus={batch.equation.status}
+        />
       </div>
 
       {/* Tree snapshot grid */}
