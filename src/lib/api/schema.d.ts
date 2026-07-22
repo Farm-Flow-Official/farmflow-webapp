@@ -4949,6 +4949,25 @@ export interface operations {
                             cropType: (string | null) | null;
                             /** @enum {string} */
                             equationStatus: "approved" | "provisional";
+                            cultivation: {
+                                speciesNameTh: (string | null) | null;
+                                speciesNameEn: (string | null) | null;
+                                plantingYear: (number | null) | null;
+                                treeDensityPerRai: (number | null) | null;
+                                subplotName: (string | null) | null;
+                                subplotAreaRai: (number | null) | null;
+                                /** @description True = whole-farm default subplot (ADR 0007) */
+                                isDefaultSubplot: boolean;
+                            };
+                            equation: {
+                                code: (string | null) | null;
+                                reference: (string | null) | null;
+                                /** @enum {string} */
+                                status: "approved" | "provisional";
+                                rValue: (number | null) | null;
+                                cfValue: (number | null) | null;
+                                speciesNameEn: (string | null) | null;
+                            };
                             treeCount: number;
                             avgConfidence: (number | null) | null;
                             anomalyFlag: boolean;
@@ -4972,6 +4991,20 @@ export interface operations {
                                 captureLng: (number | null) | null;
                                 capturedAt: (string | null) | null;
                                 weatherCondition: (string | null) | null;
+                                carbon: ({
+                                    d2h: (number | null) | null;
+                                    wsKg: (number | null) | null;
+                                    wbKg: (number | null) | null;
+                                    wlKg: (number | null) | null;
+                                    wtAbgKg: (number | null) | null;
+                                    bAbgT: (number | null) | null;
+                                    bBlgT: (number | null) | null;
+                                    bTreeT: (number | null) | null;
+                                    cTreeTc: (number | null) | null;
+                                    carbonTco2e: (number | null) | null;
+                                    /** @description Coefficients + inputs + reference actually used */
+                                    formulaSnapshot: unknown;
+                                } | null) | null;
                             }[];
                         };
                         meta: {

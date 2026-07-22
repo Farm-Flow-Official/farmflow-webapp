@@ -1,5 +1,5 @@
 import { api } from '@/lib/api'
-import type { BatchDetail, TreeSnapshot } from '@/features/verifier/types'
+import type { BatchDetail, TreeSnapshot, FormulaSnapshot } from '@/features/verifier/types'
 
 /** Confidence below this (or a rejected/out-of-bounds verdict) flags a tree for review. */
 const ANOMALY_THRESHOLD = 0.7
@@ -38,6 +38,21 @@ export async function fetchBatchById(id: string): Promise<BatchDetail | null> {
       aiRationale: t.aiRationale,
       dbhCm: t.dbhCm,
       treeHeightM: t.heightM,
+      carbon: t.carbon
+        ? {
+            d2h: t.carbon.d2h,
+            wsKg: t.carbon.wsKg,
+            wbKg: t.carbon.wbKg,
+            wlKg: t.carbon.wlKg,
+            wtAbgKg: t.carbon.wtAbgKg,
+            bAbgT: t.carbon.bAbgT,
+            bBlgT: t.carbon.bBlgT,
+            bTreeT: t.carbon.bTreeT,
+            cTreeTc: t.carbon.cTreeTc,
+            carbonTco2e: t.carbon.carbonTco2e,
+            formulaSnapshot: (t.carbon.formulaSnapshot as FormulaSnapshot | null) ?? null,
+          }
+        : null,
       anomaly:
         t.status === 'rejected' ||
         t.status === 'failed' ||
@@ -67,6 +82,24 @@ export async function fetchBatchById(id: string): Promise<BatchDetail | null> {
     calculatedAreaRai: s.farm.calculatedAreaRai,
     areaDiscrepancyFlag: s.farm.areaDiscrepancyFlag,
     polygon: s.farm.polygon as [number, number][],
+    speciesNameTh: s.cropType,
+    cultivation: {
+      speciesNameTh: s.cultivation.speciesNameTh,
+      speciesNameEn: s.cultivation.speciesNameEn,
+      plantingYear: s.cultivation.plantingYear,
+      treeDensityPerRai: s.cultivation.treeDensityPerRai,
+      subplotName: s.cultivation.subplotName,
+      subplotAreaRai: s.cultivation.subplotAreaRai,
+      isDefaultSubplot: s.cultivation.isDefaultSubplot,
+    },
+    equation: {
+      code: s.equation.code,
+      reference: s.equation.reference,
+      status: s.equation.status,
+      rValue: s.equation.rValue,
+      cfValue: s.equation.cfValue,
+      speciesNameEn: s.equation.speciesNameEn,
+    },
     trees: sortTrees(trees),
   }
 }

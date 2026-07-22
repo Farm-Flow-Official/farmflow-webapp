@@ -11,10 +11,24 @@ export default function VerifierDashboardLoading() {
         <Skeleton className="mt-2 h-4 w-72" />
       </header>
 
-      <div className="mb-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {Array.from({ length: 4 }).map((_, i) => (
+      <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+        {Array.from({ length: 5 }).map((_, i) => (
           <SkeletonKpiCard key={i} />
         ))}
+      </div>
+
+      {/* Review distribution bar */}
+      <div className="mb-8 rounded-2xl border border-line bg-panel p-5 shadow-sm">
+        <Skeleton className="h-4 w-40" />
+        <Skeleton className="mt-4 h-3.5 w-full rounded-full" />
+        <div className="mt-4 grid grid-cols-3 gap-3">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i}>
+              <Skeleton className="h-3 w-16" />
+              <Skeleton className="mt-1.5 h-5 w-12" />
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Anomaly alert panel */}

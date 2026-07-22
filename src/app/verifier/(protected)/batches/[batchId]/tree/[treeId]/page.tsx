@@ -8,25 +8,23 @@ import {
   ChevronRight,
   MapPin,
   Clock,
-  Gauge,
-  Ruler,
-  ArrowUpFromLine,
   TreePine,
   CircleCheck,
   CircleX,
   Sun,
   Cloud,
   CloudRain,
-  TriangleAlert,
-  Sparkles,
 } from 'lucide-react'
-import { aiFlagLabel } from '@/features/verifier/lib/aiFlags'
 import { fetchBatchById } from '@/features/verifier/services/fetchBatchById'
 import { crossCheckTree } from '@/features/verifier/lib/crossCheck'
 import { treePlaceholderStyle } from '@/features/verifier/lib/treePlaceholder'
 import { snapshotPhotoUrl } from '@/features/verifier/lib/files'
 import { confidenceTextClass } from '@/features/verifier/lib/confidence'
 import { BatchMiniMap } from '@/features/verifier/components/BatchMiniMap'
+import { AiAssessmentCard } from '@/features/verifier/components/AiAssessmentCard'
+import { TreeMeasurements } from '@/features/verifier/components/TreeMeasurements'
+import { SpeciesEquationBar } from '@/features/verifier/components/SpeciesEquationBar'
+import { CarbonCalculationPanel } from '@/features/verifier/components/CarbonCalculationPanel'
 import { PhotoLightbox } from '@/features/verifier/components/PhotoLightbox'
 import { TreeKeyboardNav } from '@/features/verifier/components/TreeKeyboardNav'
 import { ImageWithSkeleton } from '@/components/ui/image-with-skeleton'
@@ -124,8 +122,11 @@ export default async function TreeInspectPage({
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        {/* Photo */}
+        {/* LEFT — field evidence: photo, measurements, species & equation */}
         <section>
+          <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.1em] text-ink-muted">
+            หลักฐานภาคสนาม
+          </p>
           <div
             className={`relative flex aspect-[4/3] items-center justify-center overflow-hidden rounded-2xl border shadow-sm ${
               tree.anomaly ? 'border-error/60 ring-1 ring-error/30' : 'border-line'
@@ -168,10 +169,35 @@ export default async function TreeInspectPage({
               ไม่มีภาพถ่ายสำหรับต้นไม้นี้
             </p>
           )}
+
+          {/* Key dendrometric figures */}
+          <div className="mt-4">
+            <TreeMeasurements
+              dbhCm={tree.dbhCm}
+              heightM={tree.treeHeightM}
+              carbonKgco2e={tree.estimatedCarbonKgco2e}
+            />
+          </div>
+
+          {/* Registered species + the allometric equation the engine used */}
+          <SpeciesEquationBar speciesNameTh={batch.speciesNameTh} equation={batch.equation} />
         </section>
 
-        {/* Info */}
+        {/* RIGHT — assessment: AI verdict, cross-check, map, image data */}
         <div className="flex flex-col gap-4">
+          <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-ink-muted">
+            ผลการประเมิน
+          </p>
+
+          {/* AI vision assessment (ADR 0022) — the headline verdict */}
+          <AiAssessmentCard
+            confidenceScore={tree.aiConfidenceScore}
+            status={tree.aiStatus}
+            rationale={tree.aiRationale}
+            flags={tree.aiFlags}
+            anomaly={tree.anomaly}
+          />
+
           {/* Cross-check */}
           <section className="rounded-2xl border border-line bg-panel p-5 shadow-sm">
             <div className="mb-3 flex items-center justify-between">
@@ -216,54 +242,21 @@ export default async function TreeInspectPage({
             </p>
           </section>
 
-          {/* AI vision assessment (ADR 0022) */}
-          <section className="rounded-2xl border border-line bg-panel p-5 shadow-sm">
-            <div className="mb-3 flex items-center justify-between">
-              <h2 className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.1em] text-ink-muted">
-                <Sparkles className="h-3.5 w-3.5" strokeWidth={1.9} />
-                ผลประเมินภาพด้วย AI
-              </h2>
-              {aiFailed ? (
-                <span className="rounded-full bg-surface px-2 py-0.5 text-[11px] font-semibold text-ink-secondary">
-                  ประเมินไม่สำเร็จ
-                </span>
-              ) : tree.aiConfidenceScore != null ? (
-                <span className={`font-mono text-sm font-bold ${confidenceTextClass(conf)}`}>
-                  {Math.round(conf * 100)}%
-                </span>
-              ) : null}
+          {/* Mini-map with capture pin */}
+          <section className="overflow-hidden rounded-2xl border border-line shadow-sm">
+            <div className="h-56">
+              <BatchMiniMap
+                polygon={batch.polygon}
+                pin={tree.captureLng != null && tree.captureLat != null
+                  ? [tree.captureLng, tree.captureLat]
+                  : undefined}
+                pinColor={gpsOk ? '#2563EB' : '#C8000E'}
+                expandable
+              />
             </div>
-
-            {aiFailed ? (
-              <p className="flex items-start gap-2 text-sm text-ink-secondary">
-                <TriangleAlert className="mt-0.5 h-4 w-4 shrink-0 text-ink-muted" strokeWidth={1.9} />
-                AI ประเมินภาพนี้ไม่สำเร็จ — โปรดตรวจสอบด้วยตนเอง
-              </p>
-            ) : tree.aiRationale || tree.aiFlags.length > 0 ? (
-              <>
-                {tree.aiRationale && (
-                  <p className="text-sm leading-relaxed text-ink-secondary">{tree.aiRationale}</p>
-                )}
-                {tree.aiFlags.length > 0 && (
-                  <ul className="mt-3 flex flex-wrap gap-1.5">
-                    {tree.aiFlags.map((f) => (
-                      <li
-                        key={f}
-                        className="inline-flex items-center gap-1 rounded-full bg-error-bg px-2 py-0.5 text-[11px] font-semibold text-error"
-                      >
-                        <TriangleAlert className="h-3 w-3" strokeWidth={1.9} />
-                        {aiFlagLabel(f)}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </>
-            ) : (
-              <p className="text-sm text-ink-muted">ยังไม่มีผลการประเมิน</p>
-            )}
           </section>
 
-          {/* Metadata */}
+          {/* Metadata — capture provenance (confidence lives in the AI card above) */}
           <section className="rounded-2xl border border-line bg-panel p-5 shadow-sm">
             <h2 className="mb-3 text-[11px] font-bold uppercase tracking-[0.1em] text-ink-muted">
               ข้อมูลภาพ
@@ -308,54 +301,13 @@ export default async function TreeInspectPage({
                   <dd className="text-ink">{weather.label}</dd>
                 </div>
               )}
-              <div className={weather ? 'col-span-2' : ''}>
-                <dt className="flex items-center gap-1 text-xs text-ink-muted">
-                  <Gauge className="h-3 w-3" strokeWidth={1.75} /> ความเชื่อมั่น AI
-                </dt>
-                <dd
-                  className={
-                    aiFailed || tree.aiConfidenceScore == null
-                      ? 'text-ink-disabled'
-                      : `font-mono font-semibold ${confidenceTextClass(conf)}`
-                  }
-                >
-                  {aiFailed ? 'ไม่สำเร็จ' : tree.aiConfidenceScore != null ? `${Math.round(conf * 100)}%` : '—'}
-                </dd>
-              </div>
-              <div>
-                <dt className="flex items-center gap-1 text-xs text-ink-muted">
-                  <Ruler className="h-3 w-3" strokeWidth={1.75} /> DBH
-                </dt>
-                <dd className="font-mono text-ink">
-                  {tree.dbhCm != null ? `${tree.dbhCm.toFixed(1)} cm` : <span className="text-ink-disabled">—</span>}
-                </dd>
-              </div>
-              <div>
-                <dt className="flex items-center gap-1 text-xs text-ink-muted">
-                  <ArrowUpFromLine className="h-3 w-3" strokeWidth={1.75} /> ความสูง
-                </dt>
-                <dd className="font-mono text-ink">
-                  {tree.treeHeightM != null ? `${tree.treeHeightM.toFixed(1)} m` : <span className="text-ink-disabled">—</span>}
-                </dd>
-              </div>
             </dl>
-          </section>
-
-          {/* Mini-map with capture pin */}
-          <section className="overflow-hidden rounded-2xl border border-line shadow-sm">
-            <div className="h-56">
-              <BatchMiniMap
-                polygon={batch.polygon}
-                pin={tree.captureLng != null && tree.captureLat != null
-                  ? [tree.captureLng, tree.captureLat]
-                  : undefined}
-                pinColor={gpsOk ? '#2563EB' : '#C8000E'}
-                expandable
-              />
-            </div>
           </section>
         </div>
       </div>
+
+      {/* Auditable worked calculation — the real engine steps that produced the carbon */}
+      {tree.carbon && <CarbonCalculationPanel carbon={tree.carbon} />}
 
       <p className="mt-6 hidden text-center text-xs text-ink-muted sm:block">
         กด <Kbd>←</Kbd> <Kbd>→</Kbd> เพื่อเลื่อนภาพ · <Kbd>F</Kbd> ดูเต็มจอ · <Kbd>?</Kbd>{' '}

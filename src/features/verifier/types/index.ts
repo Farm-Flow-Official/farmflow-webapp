@@ -10,6 +10,8 @@ export type VerifierOverview = {
   anomalyAlerts: number
   approvedThisMonth: number
   rejectedThisMonth: number
+  /** Total tree snapshots the AI has assessed (cumulative). */
+  totalTreesAssessed: number
 }
 
 /**
@@ -53,6 +55,42 @@ export type VerificationBatch = {
 
 export type WeatherCondition = 'sunny' | 'cloudy' | 'rainy'
 
+/** Coefficient + input snapshot the engine recorded for a tree's calculation. */
+export type FormulaSnapshot = {
+  equationFormula: string
+  equationStatus: string | null
+  reference: string | null
+  inputs: {
+    dbhCm: number | null
+    heightM: number | null
+    rValue: number
+    cfValue: number
+    co2Multiplier: number
+  }
+  /** Family-specific coefficients, e.g. { ws: [0.0396, 0.933], wb: [...], wl: "…" }. */
+  coefficients: Record<string, unknown>
+}
+
+/**
+ * The reproducible worked breakdown the carbon engine logged for one tree
+ * (carbon_calculation_logs, ADR 0016): every intermediate from D²H through to
+ * the final tCO₂e, plus the coefficient snapshot actually used. Values in null
+ * for the steps a given equation family doesn't use (e.g. WS/WB/WL only for OGW).
+ */
+export type CarbonBreakdown = {
+  d2h: number | null
+  wsKg: number | null
+  wbKg: number | null
+  wlKg: number | null
+  wtAbgKg: number | null
+  bAbgT: number | null
+  bBlgT: number | null
+  bTreeT: number | null
+  cTreeTc: number | null
+  carbonTco2e: number | null
+  formulaSnapshot: FormulaSnapshot | null
+}
+
 export type TreeSnapshot = {
   id: string
   /** Snapshot photo file id; null when no photo was captured. */
@@ -76,10 +114,52 @@ export type TreeSnapshot = {
   dbhCm: number | null
   /** Tree height in metres. */
   treeHeightM: number | null
+  /** Reproducible carbon calculation breakdown; null when none was logged. */
+  carbon: CarbonBreakdown | null
   anomaly: boolean
 }
 
+/**
+ * Allometric equation provenance for the batch's species — read straight from
+ * the engine's `species_equations` row (the one that produced the carbon), so
+ * the verifier sees the real equation, never a frontend guess.
+ */
+export type SpeciesEquation = {
+  /** Family code, e.g. 'D2H_OGW'. */
+  code: string | null
+  /** Citation, e.g. 'Ogawa et al. (1965)'. */
+  reference: string | null
+  /** 'provisional' = pending TGO sign-off / approximation (ADR 0016). */
+  status: 'approved' | 'provisional'
+  /** Root:shoot ratio (R). */
+  rValue: number | null
+  /** Carbon fraction (CF). */
+  cfValue: number | null
+  speciesNameEn: string | null
+}
+
+/**
+ * Cultivation facts of the assessed subplot (the unit carbon is computed for,
+ * ADR 0007). A farm has ≥1 subplot; a single-species farm is one whole-farm
+ * `isDefaultSubplot` unit. `plantingYear` may be Buddhist- or Gregorian-era.
+ */
+export type Cultivation = {
+  speciesNameTh: string | null
+  speciesNameEn: string | null
+  plantingYear: number | null
+  treeDensityPerRai: number | null
+  subplotName: string | null
+  subplotAreaRai: number | null
+  isDefaultSubplot: boolean
+}
+
 export type BatchDetail = VerificationBatch & {
+  /** Registered species (Thai), e.g. 'ยางพารา'. */
+  speciesNameTh: string | null
+  /** Cultivation facts of the assessed subplot. */
+  cultivation: Cultivation
+  /** Allometric equation used by the carbon engine for this species. */
+  equation: SpeciesEquation
   /** Farm cover photo file id (public); null when the farmer set none. */
   coverPhotoFileId: string | null
   /** Phone — not exposed by the review endpoint. */
