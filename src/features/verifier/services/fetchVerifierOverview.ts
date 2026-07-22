@@ -21,6 +21,7 @@ export async function fetchVerifierOverview(): Promise<VerifierOverviewData> {
       anomalyAlerts: o.anomalyCount,
       approvedThisMonth: o.approvedCount,
       rejectedThisMonth: o.rejectedCount,
+      totalTreesAssessed: o.totalTreesAssessed,
     },
     alerts,
   }

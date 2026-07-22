@@ -10,6 +10,8 @@ export type VerifierOverview = {
   anomalyAlerts: number
   approvedThisMonth: number
   rejectedThisMonth: number
+  /** Total tree snapshots the AI has assessed (cumulative). */
+  totalTreesAssessed: number
 }
 
 /**

@@ -11,12 +11,15 @@ export default function AdminDashboardLoading() {
         <Skeleton className="mt-2 h-4 w-64" />
       </header>
 
+      {/* Carbon hero */}
+      <Skeleton className="mb-6 h-36 rounded-2xl" />
+
       <section className="mb-10">
         <h2 className="mb-4 text-xs font-semibold uppercase tracking-wider text-ink-muted">
           Overview
         </h2>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-          {Array.from({ length: 5 }).map((_, i) => (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, i) => (
             <SkeletonKpiCard key={i} />
           ))}
         </div>

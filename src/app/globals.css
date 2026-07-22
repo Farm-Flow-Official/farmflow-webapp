@@ -95,6 +95,39 @@ h3 {
   }
 }
 
+/* Radial confidence gauge — the ring sweeps from empty to its value on mount.
+   The element sets `--ring-dash` (circumference) and `--ring-offset` (target)
+   inline; the keyframe animates from full offset (empty) to that target. */
+@keyframes ring-fill {
+  from { stroke-dashoffset: var(--ring-dash); }
+  to   { stroke-dashoffset: var(--ring-offset); }
+}
+
+/* Dashboard card entrance — a small fade + rise, staggered via inline delay. */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up {
+  animation: fade-up 0.4s ease-out both;
+}
+
+/* Soft attention glow for anomaly cards (pulses gently, never harsh). */
+@keyframes soft-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgb(239 68 68 / 0.0); }
+  50%      { box-shadow: 0 0 0 4px rgb(239 68 68 / 0.12); }
+}
+.animate-soft-glow {
+  animation: soft-glow 2.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Reveal gauges/cards at their final state; drop the ambient glow. */
+  .animate-\[ring-fill_0\.9s_ease-out_forwards\] { animation: none; }
+  .animate-fade-up { animation: none; }
+  .animate-soft-glow { animation: none; }
+}
+
 /* Right-docked Modal (the verifier Guide Book) slides in from the edge. */
 @keyframes drawer-in {
   from { transform: translateX(100%); }

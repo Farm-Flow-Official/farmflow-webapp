@@ -7,7 +7,6 @@ import {
   MapPin,
   ExternalLink,
   Leaf,
-  Gauge,
   TreePine,
   TriangleAlert,
   LandPlot,
@@ -23,7 +22,8 @@ import { ImageWithSkeleton } from '@/components/ui/image-with-skeleton'
 import { BackShortcut } from '@/features/verifier/components/BackShortcut'
 import { Kbd } from '@/components/ui/kbd'
 import { formatDate, formatNumber } from '@/lib/utils/format'
-import { confidenceTextClass } from '@/features/verifier/lib/confidence'
+import { ConfidenceRing } from '@/features/verifier/components/ConfidenceRing'
+import { confidenceHex, confidenceToneLabel } from '@/features/verifier/lib/confidence'
 
 export async function generateMetadata({
   params,
@@ -224,13 +224,11 @@ export default async function BatchDetailPage({
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-surface text-ink-secondary">
-                <Gauge className="h-4 w-4" strokeWidth={1.9} />
-              </span>
+              <ConfidenceRing score={batch.avgConfidence} size="sm" showLabel={false} />
               <div>
                 <dt className="text-xs text-ink-muted">ความเชื่อมั่น AI เฉลี่ย</dt>
-                <dd className={`font-mono text-lg font-semibold ${confidenceTextClass(batch.avgConfidence)}`}>
-                  {Math.round(batch.avgConfidence * 100)}%
+                <dd className="text-sm font-semibold" style={{ color: confidenceHex(batch.avgConfidence) }}>
+                  {confidenceToneLabel(batch.avgConfidence)}
                 </dd>
               </div>
             </div>

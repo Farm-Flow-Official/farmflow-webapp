@@ -2,13 +2,13 @@ import type { Metadata } from 'next'
 import { getAdminSession } from '@/features/auth/services/adminSession'
 import { fetchAdminSummary } from '@/features/dashboard/services/fetchAdminSummary'
 import { KpiCard } from '@/features/dashboard/components/KpiCard'
+import { CarbonHeroCard } from '@/features/dashboard/components/CarbonHeroCard'
 import { QuickLinkCard } from '@/features/dashboard/components/QuickLinkCard'
 import {
   Users,
-  Wallet,
-  Leaf,
+  Sprout,
+  Boxes,
   AlertTriangle,
-  TrendingUp,
   Map,
   Megaphone,
   Settings,
@@ -66,6 +66,12 @@ export default async function AdminDashboardPage() {
     day: 'numeric',
   })
 
+  // Share of farms currently flagged for GIS overlap review — a real ratio, not a trend.
+  const overlapPct =
+    summary.totalFarms > 0
+      ? Math.round((summary.overlapFlaggedFarms / summary.totalFarms) * 100)
+      : 0
+
   const kpiCards = [
     {
       label: 'Active Farmers',
@@ -73,20 +79,23 @@ export default async function AdminDashboardPage() {
       sublabel: 'registered accounts',
       alert: false,
       Icon: Users,
+      accentClass: 'bg-info-bg text-info',
+    },
+    {
+      label: 'Total Farms',
+      value: summary.totalFarms.toLocaleString('en-US'),
+      sublabel: 'registered plots',
+      alert: false,
+      Icon: Sprout,
+      accentClass: 'bg-primary-subtle text-primary',
     },
     {
       label: 'Pending Batches',
       value: String(summary.pendingBatchCount),
       sublabel: 'sessions awaiting processing',
       alert: summary.pendingBatchCount > 0,
-      Icon: Wallet,
-    },
-    {
-      label: 'Carbon Issued',
-      value: `${summary.totalCarbonKgco2e.toLocaleString('en-US')} kgCO₂e`,
-      sublabel: 'total credits issued',
-      alert: false,
-      Icon: Leaf,
+      Icon: Boxes,
+      accentClass: 'bg-warning-bg text-warning',
     },
     {
       label: 'Overlap Flags',
@@ -94,13 +103,20 @@ export default async function AdminDashboardPage() {
       sublabel: 'farms pending GIS review',
       alert: summary.overlapFlaggedFarms > 0,
       Icon: AlertTriangle,
-    },
-    {
-      label: 'Market Price',
-      value: summary.marketPriceThb != null ? `฿${summary.marketPriceThb.toFixed(2)}` : '—',
-      sublabel: 'per kgCO₂e',
-      alert: false,
-      Icon: TrendingUp,
+      accentClass: 'bg-error-bg text-error',
+      foot: (
+        <div>
+          <div className="h-1.5 w-full overflow-hidden rounded-full bg-sunken">
+            <div
+              className="h-full rounded-full"
+              style={{ width: `${overlapPct}%`, backgroundColor: '#F59E0B' }}
+            />
+          </div>
+          <p className="mt-1 text-[11px] text-ink-muted">
+            {overlapPct}% ของ {summary.totalFarms.toLocaleString('en-US')} แปลง
+          </p>
+        </div>
+      ),
     },
   ]
 
@@ -116,14 +132,28 @@ export default async function AdminDashboardPage() {
         </p>
       </header>
 
+      {/* Headline carbon hero */}
+      <div className="mb-6 animate-fade-up">
+        <CarbonHeroCard
+          totalCarbonKgco2e={summary.totalCarbonKgco2e}
+          marketPriceThb={summary.marketPriceThb}
+        />
+      </div>
+
       {/* KPI overview */}
       <section className="mb-10">
         <h2 className="mb-4 text-xs font-semibold uppercase tracking-wider text-ink-muted">
           Overview
         </h2>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-          {kpiCards.map((card) => (
-            <KpiCard key={card.label} {...card} />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {kpiCards.map((card, i) => (
+            <div
+              key={card.label}
+              className="animate-fade-up"
+              style={{ animationDelay: `${(i + 1) * 60}ms` }}
+            >
+              <KpiCard {...card} />
+            </div>
           ))}
         </div>
       </section>

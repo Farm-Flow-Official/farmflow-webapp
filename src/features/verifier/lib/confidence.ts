@@ -27,6 +27,23 @@ const BADGE: Record<ConfidenceTone, string> = {
   critical: 'bg-error-bg text-error',
 }
 
+/**
+ * Vivid hex per tone for SVG gauges (stroke/conic) — the GIS status ramp, which
+ * reads brighter on a ring than the muted `text-*` tokens. Kept in sync with the
+ * tone bands so a passing score always draws green.
+ */
+const HEX: Record<ConfidenceTone, string> = {
+  ok: '#22C55E', // --color-gis-verified
+  watch: '#F59E0B', // --color-gis-pending
+  critical: '#EF4444', // --color-gis-flagged
+}
+
+const TONE_LABEL: Record<ConfidenceTone, string> = {
+  ok: 'เชื่อมั่นสูง',
+  watch: 'ควรตรวจซ้ำ',
+  critical: 'ความเชื่อมั่นต่ำ',
+}
+
 /** Text colour class for a confidence score. */
 export function confidenceTextClass(score: number): string {
   return TEXT[confidenceTone(score)]
@@ -35,4 +52,14 @@ export function confidenceTextClass(score: number): string {
 /** Chip (bg + text) classes for a confidence score. */
 export function confidenceBadgeClass(score: number): string {
   return BADGE[confidenceTone(score)]
+}
+
+/** Vivid hex for a confidence score — for gauge strokes / conic fills. */
+export function confidenceHex(score: number): string {
+  return HEX[confidenceTone(score)]
+}
+
+/** Short Thai tone label ('เชื่อมั่นสูง' / 'ควรตรวจซ้ำ' / 'ความเชื่อมั่นต่ำ'). */
+export function confidenceToneLabel(score: number): string {
+  return TONE_LABEL[confidenceTone(score)]
 }
