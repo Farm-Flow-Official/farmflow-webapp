@@ -16,6 +16,7 @@ import {
   CloudRain,
 } from 'lucide-react'
 import { fetchBatchById } from '@/features/verifier/services/fetchBatchById'
+import { batchHref } from '@/features/verifier/lib/routes'
 import { crossCheckTree } from '@/features/verifier/lib/crossCheck'
 import { treePlaceholderStyle } from '@/features/verifier/lib/treePlaceholder'
 import { snapshotPhotoUrl } from '@/features/verifier/lib/files'
@@ -36,7 +37,7 @@ type WeatherCondition = 'sunny' | 'cloudy' | 'rainy'
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ batchId: string; treeId: string }>
+  params: Promise<{ projectId: string; batchId: string; treeId: string }>
 }): Promise<Metadata> {
   const { treeId } = await params
   return { title: `${treeId} — FarmFlow Verifier` }
@@ -51,9 +52,9 @@ const WEATHER: Record<WeatherCondition, { icon: ComponentType<SVGProps<SVGSVGEle
 export default async function TreeInspectPage({
   params,
 }: {
-  params: Promise<{ batchId: string; treeId: string }>
+  params: Promise<{ projectId: string; batchId: string; treeId: string }>
 }) {
-  const { batchId, treeId } = await params
+  const { projectId, batchId, treeId } = await params
   const batch = await fetchBatchById(batchId)
   if (!batch) notFound()
 
@@ -72,19 +73,19 @@ export default async function TreeInspectPage({
     ? WEATHER[tree.weather as WeatherCondition]
     : null
 
-  const navBase = `/verifier/batches/${batch.id}/tree`
-  const batchHref = `/verifier/batches/${batch.id}`
+  const navBase = `${batchHref(projectId, batch.id)}/tree`
+  const currentBatchHref = batchHref(projectId, batch.id)
   const prevHref = prev ? `${navBase}/${prev.id}` : null
   const nextHref = next ? `${navBase}/${next.id}` : null
 
   return (
     <div className="mx-auto max-w-[1440px] px-4 py-8 sm:px-8">
-      <TreeKeyboardNav prevHref={prevHref} nextHref={nextHref} backHref={batchHref} />
+      <TreeKeyboardNav prevHref={prevHref} nextHref={nextHref} backHref={currentBatchHref} />
 
       {/* Top bar */}
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <Link
-          href={batchHref}
+          href={currentBatchHref}
           className="inline-flex items-center gap-1.5 text-sm text-ink-muted transition-colors hover:text-ink"
         >
           <ArrowLeft className="h-4 w-4" strokeWidth={1.75} />

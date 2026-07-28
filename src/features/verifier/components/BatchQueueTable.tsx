@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Search, Boxes, TriangleAlert } from 'lucide-react'
 import { DataTable, type Column } from '@/components/ui/data-table'
+import { batchHref } from '@/features/verifier/lib/routes'
 import { Badge, type BadgeVariant } from '@/components/ui/badge'
 import { FilterPills } from '@/components/ui/filter-pills'
 import { Pagination } from '@/components/ui/pagination'
@@ -175,7 +176,7 @@ export function BatchQueueTable({ batches }: { batches: VerificationBatch[] }) {
         columns={columns}
         rows={pageRows}
         getRowKey={(b) => b.id}
-        onRowClick={(b) => router.push(`/verifier/batches/${b.id}`)}
+        onRowClick={(b) => router.push(batchHref(b.projectId, b.id))}
         empty={{
           icon: <Boxes className="mb-2 h-8 w-8 text-ink-disabled" strokeWidth={1.5} />,
           title: 'ไม่พบ batch',

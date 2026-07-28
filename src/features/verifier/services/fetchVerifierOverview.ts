@@ -1,9 +1,11 @@
 import { api, unwrap } from '@/lib/api'
 import type { AnomalyAlert, VerifierOverviewData } from '@/features/verifier/types'
 
-/** Verifier dashboard summary counts + anomaly alerts. */
-export async function fetchVerifierOverview(): Promise<VerifierOverviewData> {
-  const o = await unwrap(api.GET('/api/v1/verifier/overview'))
+/** Verifier dashboard summary counts + anomaly alerts, scoped to one project. */
+export async function fetchVerifierOverview(projectId: string): Promise<VerifierOverviewData> {
+  const o = await unwrap(
+    api.GET('/api/v1/verifier/overview', { params: { query: { projectId } } }),
+  )
 
   // The overview exposes only sessionId/farmName/reason per alert; richer
   // per-alert fields aren't available here (they live on the batch detail), so

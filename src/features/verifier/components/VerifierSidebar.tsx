@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Boxes, QrCode, ExternalLink, BookOpen } from 'lucide-react'
+import { LayoutDashboard, Boxes, QrCode, ExternalLink, BookOpen, FolderTree } from 'lucide-react'
 import type { ComponentType, SVGProps } from 'react'
 import { Kbd } from '@/components/ui/kbd'
 import { useGuide } from '@/components/ui/guide-book'
@@ -12,23 +12,52 @@ type IconType = ComponentType<SVGProps<SVGSVGElement>>
 type NavItem = { href: string; label: string; icon: IconType; newTab?: boolean }
 type NavSection = { heading: string; items: NavItem[] }
 
-const NAV: NavSection[] = [
-  {
-    heading: 'Overview',
-    items: [{ href: '/verifier', label: 'Dashboard', icon: LayoutDashboard }],
-  },
-  {
-    heading: 'Verification',
-    items: [{ href: '/verifier/batches', label: 'Batch Queue', icon: Boxes }],
-  },
-  {
-    heading: 'Tools',
-    // Public, shell-less page → open in a new tab so the portal stays put.
-    items: [
-      { href: '/verifier/verify/qr-check', label: 'QR Verify', icon: QrCode, newTab: true },
-    ],
-  },
-]
+/**
+ * Review links hang off the project the verifier is currently inside, so the
+ * sidebar reads the active project out of the URL rather than holding it in
+ * state — a stale switcher must never point the queue at another project.
+ */
+function navFor(projectId: string | null): NavSection[] {
+  const projectSections: NavSection[] = projectId
+    ? [
+        {
+          heading: 'Overview',
+          items: [
+            {
+              href: `/verifier/projects/${projectId}`,
+              label: 'Dashboard',
+              icon: LayoutDashboard,
+            },
+          ],
+        },
+        {
+          heading: 'Verification',
+          items: [
+            {
+              href: `/verifier/projects/${projectId}/batches`,
+              label: 'Batch Queue',
+              icon: Boxes,
+            },
+          ],
+        },
+      ]
+    : []
+
+  return [
+    {
+      heading: 'Projects',
+      items: [{ href: '/verifier', label: 'เลือกโครงการ', icon: FolderTree }],
+    },
+    ...projectSections,
+    {
+      heading: 'Tools',
+      // Public, shell-less page → open in a new tab so the portal stays put.
+      items: [
+        { href: '/verifier/verify/qr-check', label: 'QR Verify', icon: QrCode, newTab: true },
+      ],
+    },
+  ]
+}
 
 type Props = {
   open?: boolean
@@ -39,8 +68,16 @@ export function VerifierSidebar({ open = false, onNavigate }: Props) {
   const pathname = usePathname()
   const guide = useGuide()
 
-  const isActive = (href: string) =>
-    href === '/verifier' ? pathname === '/verifier' : pathname.startsWith(href)
+  // /verifier/projects/<id>[/...] — the segment after "projects".
+  const projectId = pathname.match(/^\/verifier\/projects\/([^/]+)/)?.[1] ?? null
+  const NAV = navFor(projectId)
+
+  const isActive = (href: string) => {
+    if (href === '/verifier') return pathname === '/verifier'
+    // The project overview would otherwise stay lit while inside its own queue.
+    if (projectId && href === `/verifier/projects/${projectId}`) return pathname === href
+    return pathname.startsWith(href)
+  }
 
   return (
     <aside

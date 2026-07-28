@@ -12,13 +12,20 @@ function smartSort(batches: VerificationBatch[]): VerificationBatch[] {
   })
 }
 
-/** The verifier review queue (assessment sessions awaiting a decision). */
-export async function fetchBatches(): Promise<VerificationBatch[]> {
-  const batches = await unwrap(api.GET('/api/v1/verifier/batches'))
+/**
+ * The verifier review queue (assessment sessions awaiting a decision), scoped to
+ * one project. Pass `"unassigned"` for farms enrolled in no project.
+ */
+export async function fetchBatches(projectId: string): Promise<VerificationBatch[]> {
+  const batches = await unwrap(
+    api.GET('/api/v1/verifier/batches', { params: { query: { projectId } } }),
+  )
   return smartSort(
     batches.map((b) => ({
       id: b.id,
       farmName: b.farmName,
+      projectId: b.projectId,
+      projectName: b.projectName,
       ownerName: b.farmerName,
       submittedAt: b.submittedAt,
       treeCount: b.treeCount,

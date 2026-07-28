@@ -1,8 +1,16 @@
 import Link from 'next/link'
 import { TriangleAlert, ChevronRight, ShieldCheck } from 'lucide-react'
 import type { AnomalyAlert } from '@/features/verifier/types'
+import { batchHref } from '@/features/verifier/lib/routes'
 
-export function AnomalyAlertPanel({ alerts }: { alerts: AnomalyAlert[] }) {
+export function AnomalyAlertPanel({
+  alerts,
+  projectId,
+}: {
+  alerts: AnomalyAlert[]
+  /** Project whose overview is on screen — the alerts are all from its queue. */
+  projectId: string
+}) {
   const count = alerts.length
   const hasAlerts = count > 0
 
@@ -46,7 +54,7 @@ export function AnomalyAlertPanel({ alerts }: { alerts: AnomalyAlert[] }) {
           {alerts.map((a) => (
             <li key={a.id}>
               <Link
-                href={`/verifier/batches/${a.batchId}`}
+                href={batchHref(projectId, a.batchId)}
                 className="group flex items-center gap-4 px-5 py-4 transition-colors hover:bg-error-bg/40 focus-visible:bg-error-bg/40 focus-visible:outline-none"
               >
                 {/* Severity accent rail */}

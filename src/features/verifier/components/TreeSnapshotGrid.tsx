@@ -8,6 +8,7 @@ import { treePlaceholderStyle } from '@/features/verifier/lib/treePlaceholder'
 import { snapshotPhotoUrl } from '@/features/verifier/lib/files'
 import { confidenceBadgeClass } from '@/features/verifier/lib/confidence'
 import { ImageWithSkeleton } from '@/components/ui/image-with-skeleton'
+import { treeHref } from '@/features/verifier/lib/routes'
 
 const WEATHER_ICON: Record<WeatherCondition, ComponentType<SVGProps<SVGSVGElement>>> = {
   sunny: Sun,
@@ -16,9 +17,12 @@ const WEATHER_ICON: Record<WeatherCondition, ComponentType<SVGProps<SVGSVGElemen
 }
 
 export function TreeSnapshotGrid({
+  projectId,
   batchId,
   trees,
 }: {
+  /** Project the batch belongs to; null for an unenrolled farm. */
+  projectId: string | null
   batchId: string
   trees: TreeSnapshot[]
 }) {
@@ -31,7 +35,7 @@ export function TreeSnapshotGrid({
         return (
           <Link
             key={t.id}
-            href={`/verifier/batches/${batchId}/tree/${t.id}`}
+            href={treeHref(projectId, batchId, t.id)}
             className={`group flex flex-col overflow-hidden rounded-xl border bg-panel shadow-sm transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md motion-reduce:transform-none motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
               t.anomaly ? 'border-error/60 ring-1 ring-error/30' : 'border-line'
             }`}

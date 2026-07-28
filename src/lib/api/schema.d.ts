@@ -613,6 +613,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/verifier/projects": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List the projects this verifier may review
+         * @description The portal's landing page. Returns the projects appointed to the verifier's accrediting body plus any project not yet appointed, each with its pending count. Farms enrolled in no project appear under the id "unassigned".
+         */
+        get: operations["getApiV1VerifierProjects"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/verifier/overview": {
         parameters: {
             query?: never;
@@ -622,7 +642,7 @@ export interface paths {
         };
         /**
          * Verifier dashboard overview
-         * @description Summary counts (pending/approved/rejected, trees) and anomaly alerts.
+         * @description Summary counts (pending/approved/rejected, trees) and anomaly alerts, optionally narrowed to one project.
          */
         get: operations["getApiV1VerifierOverview"];
         put?: never;
@@ -642,7 +662,7 @@ export interface paths {
         };
         /**
          * List the review queue
-         * @description Completed, AI-assessed sessions awaiting (or having had) a verification decision, with per-batch tree counts, average confidence, anomaly flag, and total carbon.
+         * @description Completed, AI-assessed sessions awaiting (or having had) a verification decision, with per-batch tree counts, average confidence, anomaly flag, and total carbon. Scoped to the verifier's accrediting body, and narrowable to one project.
          */
         get: operations["getApiV1VerifierBatches"];
         put?: never;
@@ -662,7 +682,7 @@ export interface paths {
         };
         /**
          * Get one review batch
-         * @description Batch detail: each tree's measurements, AI verdict, carbon, and photo reference, plus the farm boundary geometry. Snapshot photos are read via GET /files/:id/content with the verifier session.
+         * @description Batch detail: each tree's measurements, AI verdict, carbon, and photo reference, plus the farm boundary geometry. Snapshot photos are read via GET /files/:id/content with the verifier session. A batch outside the verifier's accrediting body reads as 404.
          */
         get: operations["getApiV1VerifierBatchesById"];
         put?: never;
@@ -765,6 +785,146 @@ export interface paths {
          * @description Streams the raw file bytes, gated by access level. Public files get a long-lived cache header; private-file reads require the uploader's token and are audit-logged. Purged files return 404.
          */
         get: operations["getApiV1FilesByIdContent"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/projects/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List projects */
+        get: operations["getApiV1AdminProjects"];
+        put?: never;
+        /** Create a project */
+        post: operations["postApiV1AdminProjects"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/projects/lookups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Pickers for the project editor
+         * @description The species catalogue, the farms not yet enrolled anywhere, and the accrediting bodies — in one call, since the editor needs all three.
+         */
+        get: operations["getApiV1AdminProjectsLookups"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/projects/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get a project
+         * @description Includes the allowed species, the member farms, and both the declared and effective (ST_Union of member boundaries) areas.
+         */
+        get: operations["getApiV1AdminProjectsById"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete a project
+         * @description Soft delete. Refused while the project still has enrolled farms.
+         */
+        delete: operations["deleteApiV1AdminProjectsById"];
+        options?: never;
+        head?: never;
+        /** Update a project */
+        patch: operations["patchApiV1AdminProjectsById"];
+        trace?: never;
+    };
+    "/api/v1/admin/projects/{id}/species": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Replace the project's allowed species
+         * @description Sends the complete set. An empty array leaves the project unrestricted; it does not bar every species.
+         */
+        put: operations["putApiV1AdminProjectsByIdSpecies"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/projects/{id}/farms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Enrol a farm into the project
+         * @description Refused if the farm already belongs to another project, or grows species this project does not allow.
+         */
+        post: operations["postApiV1AdminProjectsByIdFarms"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/projects/{id}/farms/{farmId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Withdraw a farm from the project */
+        delete: operations["deleteApiV1AdminProjectsByIdFarmsByFarmId"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List projects open for enrollment
+         * @description Projects a farmer may register a farm into, each with the species that project allows. An empty `allowedSpecies` means the project has not restricted its species.
+         */
+        get: operations["getApiV1Projects"];
         put?: never;
         post?: never;
         delete?: never;
@@ -3628,7 +3788,7 @@ export interface operations {
                         data: {
                             id: string;
                             username: string;
-                            /** @description Role name (MASTER | VERIFIER | FINANCE | GENERAL) */
+                            /** @description Role name (MASTER | VERIFIER | PROJECT_DEV | FINANCE | GENERAL) */
                             role: string;
                             org: (string | null) | null;
                             /** @description "Active" | "Inactive" */
@@ -3703,17 +3863,17 @@ export interface operations {
             content: {
                 "application/json": {
                     username: string;
-                    /** @description Role name (MASTER | VERIFIER | FINANCE | GENERAL) */
+                    /** @description Role name (MASTER | VERIFIER | PROJECT_DEV | FINANCE | GENERAL) */
                     role: string;
                 };
                 "application/x-www-form-urlencoded": {
                     username: string;
-                    /** @description Role name (MASTER | VERIFIER | FINANCE | GENERAL) */
+                    /** @description Role name (MASTER | VERIFIER | PROJECT_DEV | FINANCE | GENERAL) */
                     role: string;
                 };
                 "multipart/form-data": {
                     username: string;
-                    /** @description Role name (MASTER | VERIFIER | FINANCE | GENERAL) */
+                    /** @description Role name (MASTER | VERIFIER | PROJECT_DEV | FINANCE | GENERAL) */
                     role: string;
                 };
             };
@@ -3732,7 +3892,7 @@ export interface operations {
                         data: {
                             id: string;
                             username: string;
-                            /** @description Role name (MASTER | VERIFIER | FINANCE | GENERAL) */
+                            /** @description Role name (MASTER | VERIFIER | PROJECT_DEV | FINANCE | GENERAL) */
                             role: string;
                             org: (string | null) | null;
                             /** @description "Active" | "Inactive" */
@@ -3901,7 +4061,7 @@ export interface operations {
                         data: {
                             id: string;
                             username: string;
-                            /** @description Role name (MASTER | VERIFIER | FINANCE | GENERAL) */
+                            /** @description Role name (MASTER | VERIFIER | PROJECT_DEV | FINANCE | GENERAL) */
                             role: string;
                             org: (string | null) | null;
                             /** @description "Active" | "Inactive" */
@@ -4073,7 +4233,7 @@ export interface operations {
                         data: {
                             id: string;
                             username: string;
-                            /** @description Role name (MASTER | VERIFIER | FINANCE | GENERAL) */
+                            /** @description Role name (MASTER | VERIFIER | PROJECT_DEV | FINANCE | GENERAL) */
                             role: string;
                             org: (string | null) | null;
                             /** @description "Active" | "Inactive" */
@@ -4729,9 +4889,96 @@ export interface operations {
             };
         };
     };
-    getApiV1VerifierOverview: {
+    getApiV1VerifierProjects: {
         parameters: {
             query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Projects this verifier may review, with pending counts */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            /** @description Project id, or "unassigned" for farms in no project */
+                            id: string;
+                            projectCode: (string | null) | null;
+                            projectName: string;
+                            verifierOrgId: (string | null) | null;
+                            /** @description Sessions awaiting a decision */
+                            pendingCount: number;
+                            /** @description All sessions in the queue for this project */
+                            totalCount: number;
+                        }[];
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized — missing or invalid verifier session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden — missing the verify:read / verify:approve permission. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    getApiV1VerifierOverview: {
+        parameters: {
+            query?: {
+                projectId?: string;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -4817,7 +5064,9 @@ export interface operations {
     };
     getApiV1VerifierBatches: {
         parameters: {
-            query?: never;
+            query?: {
+                projectId?: string;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -4840,6 +5089,8 @@ export interface operations {
                             /** @description Personal Data, or a non-PII fallback (ADR 0013) */
                             farmerName: string;
                             farmName: string;
+                            projectId: (string | null) | null;
+                            projectName: (string | null) | null;
                             cropType: (string | null) | null;
                             treeCount: number;
                             avgConfidence: (number | null) | null;
@@ -4931,6 +5182,8 @@ export interface operations {
                             /** @enum {string} */
                             status: "Pending" | "Approved" | "Rejected";
                             farmerName: string;
+                            projectId: (string | null) | null;
+                            projectName: (string | null) | null;
                             farm: {
                                 id: string;
                                 name: string;
@@ -5543,6 +5796,1643 @@ export interface operations {
         requestBody?: never;
         responses: never;
     };
+    getApiV1AdminProjects: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description All projects */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            id: string;
+                            projectCode: string;
+                            nameTh: string;
+                            nameEn: string | null;
+                            /** @enum {string} */
+                            status: "draft" | "open" | "active" | "closed" | "archived";
+                            /** @enum {string} */
+                            implementationMode: "standalone" | "bundled";
+                            /** @enum {string} */
+                            projectScale: "undetermined" | "xsmall" | "small" | "large";
+                            creditingPeriodYears: number | null;
+                            creditingStartDate: string | null;
+                            creditingEndDate: string | null;
+                            expectedReductionTco2eYr: number | null;
+                            verifierOrgId: string | null;
+                            verifierOrgName: (string | null) | null;
+                            /** @description Enrolled, non-deleted farms */
+                            farmCount: number;
+                            /** Format: date-time */
+                            createdAt: string;
+                            /** Format: date-time */
+                            updatedAt: string;
+                        }[];
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized - missing or invalid session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden - the requester lacks the required permission. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    postApiV1AdminProjects: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description A new project; only the code and Thai name are required to start a draft. */
+        requestBody: {
+            content: {
+                "application/json": {
+                    projectCode: string;
+                    nameTh: string;
+                    /** @description English project name */
+                    nameEn?: string;
+                    /** @enum {string} */
+                    status?: "draft" | "open" | "active" | "closed" | "archived";
+                    /** @enum {string} */
+                    implementationMode?: "standalone" | "bundled";
+                    /** @description Crediting period in years (T-VER forestry: 7 or 10) */
+                    creditingPeriodYears?: string | number;
+                    /** Format: date */
+                    creditingStartDate?: string;
+                    /** Format: date */
+                    creditingEndDate?: string;
+                    expectedReductionTco2eYr?: number;
+                    totalInvestmentMillionThb?: number;
+                    /** @description Farm boundary as a GeoJSON Polygon or MultiPolygon; coordinates [lng, lat] */
+                    declaredBoundary?: {
+                        /** @constant */
+                        type: "Polygon";
+                        coordinates: [
+                            number,
+                            number
+                        ][][];
+                    } | {
+                        /** @constant */
+                        type: "MultiPolygon";
+                        coordinates: [
+                            number,
+                            number
+                        ][][][];
+                    };
+                    verifierOrgId?: (string | null) | null;
+                };
+                "application/x-www-form-urlencoded": {
+                    projectCode: string;
+                    nameTh: string;
+                    /** @description English project name */
+                    nameEn?: string;
+                    /** @enum {string} */
+                    status?: "draft" | "open" | "active" | "closed" | "archived";
+                    /** @enum {string} */
+                    implementationMode?: "standalone" | "bundled";
+                    /** @description Crediting period in years (T-VER forestry: 7 or 10) */
+                    creditingPeriodYears?: string | number;
+                    /** Format: date */
+                    creditingStartDate?: string;
+                    /** Format: date */
+                    creditingEndDate?: string;
+                    expectedReductionTco2eYr?: number;
+                    totalInvestmentMillionThb?: number;
+                    /** @description Farm boundary as a GeoJSON Polygon or MultiPolygon; coordinates [lng, lat] */
+                    declaredBoundary?: {
+                        /** @constant */
+                        type: "Polygon";
+                        coordinates: [
+                            number,
+                            number
+                        ][][];
+                    } | {
+                        /** @constant */
+                        type: "MultiPolygon";
+                        coordinates: [
+                            number,
+                            number
+                        ][][][];
+                    };
+                    verifierOrgId?: (string | null) | null;
+                };
+                "multipart/form-data": {
+                    projectCode: string;
+                    nameTh: string;
+                    /** @description English project name */
+                    nameEn?: string;
+                    /** @enum {string} */
+                    status?: "draft" | "open" | "active" | "closed" | "archived";
+                    /** @enum {string} */
+                    implementationMode?: "standalone" | "bundled";
+                    /** @description Crediting period in years (T-VER forestry: 7 or 10) */
+                    creditingPeriodYears?: string | number;
+                    /** Format: date */
+                    creditingStartDate?: string;
+                    /** Format: date */
+                    creditingEndDate?: string;
+                    expectedReductionTco2eYr?: number;
+                    totalInvestmentMillionThb?: number;
+                    /** @description Farm boundary as a GeoJSON Polygon or MultiPolygon; coordinates [lng, lat] */
+                    declaredBoundary?: {
+                        /** @constant */
+                        type: "Polygon";
+                        coordinates: [
+                            number,
+                            number
+                        ][][];
+                    } | {
+                        /** @constant */
+                        type: "MultiPolygon";
+                        coordinates: [
+                            number,
+                            number
+                        ][][][];
+                    };
+                    verifierOrgId?: (string | null) | null;
+                };
+            };
+        };
+        responses: {
+            /** @description A single project with members and species */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            id: string;
+                            projectCode: string;
+                            nameTh: string;
+                            nameEn: string | null;
+                            /** @enum {string} */
+                            status: "draft" | "open" | "active" | "closed" | "archived";
+                            /** @enum {string} */
+                            implementationMode: "standalone" | "bundled";
+                            /** @enum {string} */
+                            projectScale: "undetermined" | "xsmall" | "small" | "large";
+                            scaleOverriddenBy: string | null;
+                            creditingPeriodYears: number | null;
+                            creditingStartDate: string | null;
+                            creditingEndDate: string | null;
+                            expectedReductionTco2eYr: number | null;
+                            totalInvestmentMillionThb: number | null;
+                            declaredBoundary: ({
+                                type: string;
+                                coordinates: unknown;
+                            } | null) | null;
+                            declaredAreaRai: number | null;
+                            effectiveAreaRai: (number | null) | null;
+                            verifierOrgId: string | null;
+                            verifierOrgName: (string | null) | null;
+                            allowedSpecies: {
+                                speciesId: string;
+                                speciesNameTh: (string | null) | null;
+                                speciesNameEn: (string | null) | null;
+                            }[];
+                            farms: {
+                                id: string;
+                                farmName: string;
+                                farmStatus: string;
+                                ownerName: (string | null) | null;
+                                calculatedAreaRai: (number | null) | null;
+                                withinDeclaredBoundary: (boolean | null) | null;
+                            }[];
+                            /** Format: date-time */
+                            createdAt: string;
+                            /** Format: date-time */
+                            updatedAt: string;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized - missing or invalid session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden - the requester lacks the required permission. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Conflict - e.g. the project code is taken, the project still has farms, or the farm is already enrolled elsewhere. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Validation error - the request failed schema validation. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    getApiV1AdminProjectsLookups: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Pickers for the project editor */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            species: {
+                                id: string;
+                                speciesCode: string;
+                                speciesNameTh: string;
+                                speciesNameEn: (string | null) | null;
+                            }[];
+                            /** @description Non-deleted farms not yet enrolled in any project */
+                            enrollableFarms: {
+                                id: string;
+                                farmName: string;
+                                farmStatus: string;
+                                calculatedAreaRai: (number | null) | null;
+                                ownerName: string;
+                            }[];
+                            verifierOrgs: {
+                                id: string;
+                                code: string;
+                                nameTh: string;
+                            }[];
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized - missing or invalid session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden - the requester lacks the required permission. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    getApiV1AdminProjectsById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A single project with members and species */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            id: string;
+                            projectCode: string;
+                            nameTh: string;
+                            nameEn: string | null;
+                            /** @enum {string} */
+                            status: "draft" | "open" | "active" | "closed" | "archived";
+                            /** @enum {string} */
+                            implementationMode: "standalone" | "bundled";
+                            /** @enum {string} */
+                            projectScale: "undetermined" | "xsmall" | "small" | "large";
+                            scaleOverriddenBy: string | null;
+                            creditingPeriodYears: number | null;
+                            creditingStartDate: string | null;
+                            creditingEndDate: string | null;
+                            expectedReductionTco2eYr: number | null;
+                            totalInvestmentMillionThb: number | null;
+                            declaredBoundary: ({
+                                type: string;
+                                coordinates: unknown;
+                            } | null) | null;
+                            declaredAreaRai: number | null;
+                            effectiveAreaRai: (number | null) | null;
+                            verifierOrgId: string | null;
+                            verifierOrgName: (string | null) | null;
+                            allowedSpecies: {
+                                speciesId: string;
+                                speciesNameTh: (string | null) | null;
+                                speciesNameEn: (string | null) | null;
+                            }[];
+                            farms: {
+                                id: string;
+                                farmName: string;
+                                farmStatus: string;
+                                ownerName: (string | null) | null;
+                                calculatedAreaRai: (number | null) | null;
+                                withinDeclaredBoundary: (boolean | null) | null;
+                            }[];
+                            /** Format: date-time */
+                            createdAt: string;
+                            /** Format: date-time */
+                            updatedAt: string;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized - missing or invalid session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden - the requester lacks the required permission. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Not found - the project does not exist. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    deleteApiV1AdminProjectsById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Soft-delete confirmation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            /** @description Id of the soft-deleted project */
+                            id: string;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized - missing or invalid session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden - the requester lacks the required permission. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Not found - the project does not exist. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Conflict - e.g. the project code is taken, the project still has farms, or the farm is already enrolled elsewhere. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    patchApiV1AdminProjectsById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        /** @description Any subset of editable project fields. */
+        requestBody: {
+            content: {
+                "application/json": {
+                    projectCode?: string;
+                    nameTh?: string;
+                    /** @description English project name */
+                    nameEn?: string;
+                    /** @enum {string} */
+                    status?: "draft" | "open" | "active" | "closed" | "archived";
+                    /** @enum {string} */
+                    implementationMode?: "standalone" | "bundled";
+                    /** @enum {string} */
+                    projectScale?: "undetermined" | "xsmall" | "small" | "large";
+                    /** @description Crediting period in years (T-VER forestry: 7 or 10) */
+                    creditingPeriodYears?: string | number;
+                    /** Format: date */
+                    creditingStartDate?: string;
+                    /** Format: date */
+                    creditingEndDate?: string;
+                    expectedReductionTco2eYr?: number;
+                    totalInvestmentMillionThb?: number;
+                    /** @description Farm boundary as a GeoJSON Polygon or MultiPolygon; coordinates [lng, lat] */
+                    declaredBoundary?: {
+                        /** @constant */
+                        type: "Polygon";
+                        coordinates: [
+                            number,
+                            number
+                        ][][];
+                    } | {
+                        /** @constant */
+                        type: "MultiPolygon";
+                        coordinates: [
+                            number,
+                            number
+                        ][][][];
+                    };
+                    verifierOrgId?: (string | null) | null;
+                };
+                "application/x-www-form-urlencoded": {
+                    projectCode?: string;
+                    nameTh?: string;
+                    /** @description English project name */
+                    nameEn?: string;
+                    /** @enum {string} */
+                    status?: "draft" | "open" | "active" | "closed" | "archived";
+                    /** @enum {string} */
+                    implementationMode?: "standalone" | "bundled";
+                    /** @enum {string} */
+                    projectScale?: "undetermined" | "xsmall" | "small" | "large";
+                    /** @description Crediting period in years (T-VER forestry: 7 or 10) */
+                    creditingPeriodYears?: string | number;
+                    /** Format: date */
+                    creditingStartDate?: string;
+                    /** Format: date */
+                    creditingEndDate?: string;
+                    expectedReductionTco2eYr?: number;
+                    totalInvestmentMillionThb?: number;
+                    /** @description Farm boundary as a GeoJSON Polygon or MultiPolygon; coordinates [lng, lat] */
+                    declaredBoundary?: {
+                        /** @constant */
+                        type: "Polygon";
+                        coordinates: [
+                            number,
+                            number
+                        ][][];
+                    } | {
+                        /** @constant */
+                        type: "MultiPolygon";
+                        coordinates: [
+                            number,
+                            number
+                        ][][][];
+                    };
+                    verifierOrgId?: (string | null) | null;
+                };
+                "multipart/form-data": {
+                    projectCode?: string;
+                    nameTh?: string;
+                    /** @description English project name */
+                    nameEn?: string;
+                    /** @enum {string} */
+                    status?: "draft" | "open" | "active" | "closed" | "archived";
+                    /** @enum {string} */
+                    implementationMode?: "standalone" | "bundled";
+                    /** @enum {string} */
+                    projectScale?: "undetermined" | "xsmall" | "small" | "large";
+                    /** @description Crediting period in years (T-VER forestry: 7 or 10) */
+                    creditingPeriodYears?: string | number;
+                    /** Format: date */
+                    creditingStartDate?: string;
+                    /** Format: date */
+                    creditingEndDate?: string;
+                    expectedReductionTco2eYr?: number;
+                    totalInvestmentMillionThb?: number;
+                    /** @description Farm boundary as a GeoJSON Polygon or MultiPolygon; coordinates [lng, lat] */
+                    declaredBoundary?: {
+                        /** @constant */
+                        type: "Polygon";
+                        coordinates: [
+                            number,
+                            number
+                        ][][];
+                    } | {
+                        /** @constant */
+                        type: "MultiPolygon";
+                        coordinates: [
+                            number,
+                            number
+                        ][][][];
+                    };
+                    verifierOrgId?: (string | null) | null;
+                };
+            };
+        };
+        responses: {
+            /** @description A single project with members and species */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            id: string;
+                            projectCode: string;
+                            nameTh: string;
+                            nameEn: string | null;
+                            /** @enum {string} */
+                            status: "draft" | "open" | "active" | "closed" | "archived";
+                            /** @enum {string} */
+                            implementationMode: "standalone" | "bundled";
+                            /** @enum {string} */
+                            projectScale: "undetermined" | "xsmall" | "small" | "large";
+                            scaleOverriddenBy: string | null;
+                            creditingPeriodYears: number | null;
+                            creditingStartDate: string | null;
+                            creditingEndDate: string | null;
+                            expectedReductionTco2eYr: number | null;
+                            totalInvestmentMillionThb: number | null;
+                            declaredBoundary: ({
+                                type: string;
+                                coordinates: unknown;
+                            } | null) | null;
+                            declaredAreaRai: number | null;
+                            effectiveAreaRai: (number | null) | null;
+                            verifierOrgId: string | null;
+                            verifierOrgName: (string | null) | null;
+                            allowedSpecies: {
+                                speciesId: string;
+                                speciesNameTh: (string | null) | null;
+                                speciesNameEn: (string | null) | null;
+                            }[];
+                            farms: {
+                                id: string;
+                                farmName: string;
+                                farmStatus: string;
+                                ownerName: (string | null) | null;
+                                calculatedAreaRai: (number | null) | null;
+                                withinDeclaredBoundary: (boolean | null) | null;
+                            }[];
+                            /** Format: date-time */
+                            createdAt: string;
+                            /** Format: date-time */
+                            updatedAt: string;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Bad request - e.g. an unknown species id. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized - missing or invalid session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden - the requester lacks the required permission. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Not found - the project does not exist. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Conflict - e.g. the project code is taken, the project still has farms, or the farm is already enrolled elsewhere. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Validation error - the request failed schema validation. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    putApiV1AdminProjectsByIdSpecies: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        /** @description Replace the project's allowed species */
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description The complete allowed set — replaces any previous set. Empty = unrestricted. */
+                    speciesIds: string[];
+                };
+                "application/x-www-form-urlencoded": {
+                    /** @description The complete allowed set — replaces any previous set. Empty = unrestricted. */
+                    speciesIds: string[];
+                };
+                "multipart/form-data": {
+                    /** @description The complete allowed set — replaces any previous set. Empty = unrestricted. */
+                    speciesIds: string[];
+                };
+            };
+        };
+        responses: {
+            /** @description The project's allowed species */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            speciesId: string;
+                            speciesNameTh: (string | null) | null;
+                            speciesNameEn: (string | null) | null;
+                        }[];
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Bad request - e.g. an unknown species id. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized - missing or invalid session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden - the requester lacks the required permission. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Not found - the project does not exist. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Validation error - the request failed schema validation. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    postApiV1AdminProjectsByIdFarms: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Farm id (cuid2) to enrol into this project */
+                    farmId: string;
+                };
+                "application/x-www-form-urlencoded": {
+                    /** @description Farm id (cuid2) to enrol into this project */
+                    farmId: string;
+                };
+                "multipart/form-data": {
+                    /** @description Farm id (cuid2) to enrol into this project */
+                    farmId: string;
+                };
+            };
+        };
+        responses: {
+            /** @description A single project with members and species */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            id: string;
+                            projectCode: string;
+                            nameTh: string;
+                            nameEn: string | null;
+                            /** @enum {string} */
+                            status: "draft" | "open" | "active" | "closed" | "archived";
+                            /** @enum {string} */
+                            implementationMode: "standalone" | "bundled";
+                            /** @enum {string} */
+                            projectScale: "undetermined" | "xsmall" | "small" | "large";
+                            scaleOverriddenBy: string | null;
+                            creditingPeriodYears: number | null;
+                            creditingStartDate: string | null;
+                            creditingEndDate: string | null;
+                            expectedReductionTco2eYr: number | null;
+                            totalInvestmentMillionThb: number | null;
+                            declaredBoundary: ({
+                                type: string;
+                                coordinates: unknown;
+                            } | null) | null;
+                            declaredAreaRai: number | null;
+                            effectiveAreaRai: (number | null) | null;
+                            verifierOrgId: string | null;
+                            verifierOrgName: (string | null) | null;
+                            allowedSpecies: {
+                                speciesId: string;
+                                speciesNameTh: (string | null) | null;
+                                speciesNameEn: (string | null) | null;
+                            }[];
+                            farms: {
+                                id: string;
+                                farmName: string;
+                                farmStatus: string;
+                                ownerName: (string | null) | null;
+                                calculatedAreaRai: (number | null) | null;
+                                withinDeclaredBoundary: (boolean | null) | null;
+                            }[];
+                            /** Format: date-time */
+                            createdAt: string;
+                            /** Format: date-time */
+                            updatedAt: string;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized - missing or invalid session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden - the requester lacks the required permission. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Not found - the project does not exist. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Conflict - e.g. the project code is taken, the project still has farms, or the farm is already enrolled elsewhere. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Validation error - the request failed schema validation. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    deleteApiV1AdminProjectsByIdFarmsByFarmId: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                farmId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A single project with members and species */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            id: string;
+                            projectCode: string;
+                            nameTh: string;
+                            nameEn: string | null;
+                            /** @enum {string} */
+                            status: "draft" | "open" | "active" | "closed" | "archived";
+                            /** @enum {string} */
+                            implementationMode: "standalone" | "bundled";
+                            /** @enum {string} */
+                            projectScale: "undetermined" | "xsmall" | "small" | "large";
+                            scaleOverriddenBy: string | null;
+                            creditingPeriodYears: number | null;
+                            creditingStartDate: string | null;
+                            creditingEndDate: string | null;
+                            expectedReductionTco2eYr: number | null;
+                            totalInvestmentMillionThb: number | null;
+                            declaredBoundary: ({
+                                type: string;
+                                coordinates: unknown;
+                            } | null) | null;
+                            declaredAreaRai: number | null;
+                            effectiveAreaRai: (number | null) | null;
+                            verifierOrgId: string | null;
+                            verifierOrgName: (string | null) | null;
+                            allowedSpecies: {
+                                speciesId: string;
+                                speciesNameTh: (string | null) | null;
+                                speciesNameEn: (string | null) | null;
+                            }[];
+                            farms: {
+                                id: string;
+                                farmName: string;
+                                farmStatus: string;
+                                ownerName: (string | null) | null;
+                                calculatedAreaRai: (number | null) | null;
+                                withinDeclaredBoundary: (boolean | null) | null;
+                            }[];
+                            /** Format: date-time */
+                            createdAt: string;
+                            /** Format: date-time */
+                            updatedAt: string;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized - missing or invalid session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden - the requester lacks the required permission. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Not found - the project does not exist. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    getApiV1Projects: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Projects currently open for farm enrollment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            id: string;
+                            projectCode: string;
+                            nameTh: string;
+                            nameEn: string | null;
+                            creditingPeriodYears: number | null;
+                            creditingStartDate: string | null;
+                            creditingEndDate: string | null;
+                            /** @description Species a farm in this project may plant; empty means unrestricted. */
+                            allowedSpecies: {
+                                speciesId: string;
+                                speciesNameTh: (string | null) | null;
+                                speciesNameEn: (string | null) | null;
+                            }[];
+                        }[];
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized - missing or invalid session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
     getApiV1Farms: {
         parameters: {
             query?: never;
@@ -5571,6 +7461,7 @@ export interface operations {
                             coverPhotoFileId: string | null;
                             /** @enum {string} */
                             farmStatus: "draft" | "pending" | "active" | "rejected" | "suspended";
+                            projectId: string | null;
                             /** Format: date-time */
                             createdAt: string;
                             /** Format: date-time */
@@ -5623,6 +7514,8 @@ export interface operations {
                     farmAddress?: string;
                     /** @description Area declared by the farmer, in Rai */
                     declaredAreaRai?: number;
+                    /** @description T-VER project to enrol this farm into (see GET /projects) */
+                    projectId?: string;
                 };
                 "application/x-www-form-urlencoded": {
                     farmName: string;
@@ -5630,6 +7523,8 @@ export interface operations {
                     farmAddress?: string;
                     /** @description Area declared by the farmer, in Rai */
                     declaredAreaRai?: number;
+                    /** @description T-VER project to enrol this farm into (see GET /projects) */
+                    projectId?: string;
                 };
                 "multipart/form-data": {
                     farmName: string;
@@ -5637,6 +7532,8 @@ export interface operations {
                     farmAddress?: string;
                     /** @description Area declared by the farmer, in Rai */
                     declaredAreaRai?: number;
+                    /** @description T-VER project to enrol this farm into (see GET /projects) */
+                    projectId?: string;
                 };
             };
         };
@@ -5660,6 +7557,7 @@ export interface operations {
                             coverPhotoFileId: string | null;
                             /** @enum {string} */
                             farmStatus: "draft" | "pending" | "active" | "rejected" | "suspended";
+                            projectId: string | null;
                             areaDiscrepancyFlag: (boolean | null) | null;
                             overlapValidationFlag: boolean;
                             farmBoundary: ({
@@ -5765,6 +7663,7 @@ export interface operations {
                             coverPhotoFileId: string | null;
                             /** @enum {string} */
                             farmStatus: "draft" | "pending" | "active" | "rejected" | "suspended";
+                            projectId: string | null;
                             areaDiscrepancyFlag: (boolean | null) | null;
                             overlapValidationFlag: boolean;
                             farmBoundary: ({
@@ -5961,6 +7860,7 @@ export interface operations {
                             number
                         ];
                     };
+                    projectId?: (string | null) | null;
                 };
                 "application/x-www-form-urlencoded": {
                     farmName?: string;
@@ -5991,6 +7891,7 @@ export interface operations {
                             number
                         ];
                     };
+                    projectId?: (string | null) | null;
                 };
                 "multipart/form-data": {
                     farmName?: string;
@@ -6021,6 +7922,7 @@ export interface operations {
                             number
                         ];
                     };
+                    projectId?: (string | null) | null;
                 };
             };
         };
@@ -6044,6 +7946,7 @@ export interface operations {
                             coverPhotoFileId: string | null;
                             /** @enum {string} */
                             farmStatus: "draft" | "pending" | "active" | "rejected" | "suspended";
+                            projectId: string | null;
                             areaDiscrepancyFlag: (boolean | null) | null;
                             overlapValidationFlag: boolean;
                             farmBoundary: ({
