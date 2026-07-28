@@ -913,6 +913,175 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/projects/{id}/pdd": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Open the project's PDD
+         * @description Returns the editable draft, or the latest version if none is open. Creates the first draft on demand — opening the wizard is what brings the document into being.
+         */
+        get: operations["getApiV1AdminProjectsByIdPdd"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/pdd/{pddId}/sections/{section}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Autosave one wizard step
+         * @description Merges at section level, so concurrent steps never clobber each other. Field-level validation is deferred to submit — a draft is saved half-filled by design.
+         */
+        patch: operations["patchApiV1AdminPddByPddIdSectionsBySection"];
+        trace?: never;
+    };
+    "/api/v1/admin/pdd/{pddId}/contacts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add a developer contact */
+        post: operations["postApiV1AdminPddByPddIdContacts"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/pdd/{pddId}/contacts/{childId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove a developer contact */
+        delete: operations["deleteApiV1AdminPddByPddIdContactsByChildId"];
+        options?: never;
+        head?: never;
+        /** Update a developer contact */
+        patch: operations["patchApiV1AdminPddByPddIdContactsByChildId"];
+        trace?: never;
+    };
+    "/api/v1/admin/pdd/{pddId}/attachments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Attach a supporting file
+         * @description Images and PDFs for a named slot of the form. The KMZ/KML boundary has its own endpoint because it is parsed, not merely stored.
+         */
+        post: operations["postApiV1AdminPddByPddIdAttachments"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/pdd/{pddId}/attachments/{childId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove an attachment */
+        delete: operations["deleteApiV1AdminPddByPddIdAttachmentsByChildId"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/pdd/{pddId}/boundary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Import the project boundary from a KMZ/KML file
+         * @description Parses the file server-side, repairs the geometry with ST_MakeValid, stores it as the project's declared boundary, and keeps the original as the submitted artifact. Replacing supersedes the previous file. Points and paths are rejected — a boundary must enclose an area.
+         */
+        put: operations["putApiV1AdminPddByPddIdBoundary"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/projects/{id}/sample-plots": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Add a sample plot
+         * @description The sub-areas the monitoring plan measures. Area is derived from the geometry.
+         */
+        post: operations["postApiV1AdminProjectsByIdSample-plots"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/projects/{id}/sample-plots/{plotId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove a sample plot */
+        delete: operations["deleteApiV1AdminProjectsByIdSample-plotsByPlotId"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/projects/": {
         parameters: {
             query?: never;
@@ -5697,7 +5866,7 @@ export interface operations {
                         data: {
                             id: string;
                             /** @enum {string} */
-                            category: "avatar" | "cover_photo" | "tree_snapshot";
+                            category: "avatar" | "cover_photo" | "tree_snapshot" | "pdd_attachment";
                             mimeType: string;
                             sizeBytes: number;
                             /** @enum {string} */
@@ -7367,6 +7536,2150 @@ export interface operations {
             };
         };
     };
+    getApiV1AdminProjectsByIdPdd: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The PDD document with its children */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            id: string;
+                            projectId: string;
+                            version: number;
+                            /** @enum {string} */
+                            status: "draft" | "in_review" | "submitted" | "registered";
+                            sectionProgress: {
+                                [key: string]: boolean;
+                            };
+                            content: {
+                                [key: string]: unknown;
+                            };
+                            lastEditedBy: string | null;
+                            /** Format: date-time */
+                            createdAt: string;
+                            /** Format: date-time */
+                            updatedAt: string;
+                            project: {
+                                id: string;
+                                projectCode: string;
+                                nameTh: string;
+                                nameEn: (string | null) | null;
+                                status: string;
+                                implementationMode: string;
+                                projectScale: string;
+                                creditingPeriodYears: (number | null) | null;
+                                creditingStartDate: (string | null) | null;
+                                creditingEndDate: (string | null) | null;
+                                expectedReductionTco2eYr: (number | null) | null;
+                                totalInvestmentMillionThb: (number | null) | null;
+                                declaredBoundary: ({
+                                    type: string;
+                                    coordinates: unknown;
+                                } | null) | null;
+                                declaredAreaRai: (number | null) | null;
+                            };
+                            contacts: {
+                                id: string;
+                                isPrimary: boolean;
+                                orgName: string;
+                                coordinatorName: (string | null) | null;
+                                position: (string | null) | null;
+                                address: (string | null) | null;
+                                phone: (string | null) | null;
+                                fax: (string | null) | null;
+                                email: (string | null) | null;
+                            }[];
+                            samplePlots: {
+                                id: string;
+                                plotName: string;
+                                boundary: ({
+                                    type: string;
+                                    coordinates: unknown;
+                                } | null) | null;
+                                areaRai: (number | null) | null;
+                            }[];
+                            attachments: {
+                                id: string;
+                                slot: string;
+                                fileId: string;
+                                displayName: (string | null) | null;
+                                mimeType: string;
+                                sizeBytes: number;
+                                /** Format: date-time */
+                                createdAt: string;
+                            }[];
+                            reconciliation: {
+                                declaredAreaRai: (number | null) | null;
+                                effectiveAreaRai: (number | null) | null;
+                                farmsOutside: {
+                                    id: string;
+                                    farmName: string;
+                                }[];
+                                farmsUnknown: {
+                                    id: string;
+                                    farmName: string;
+                                }[];
+                            };
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized — missing or invalid session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden — the requester lacks the required permission. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Not found — the project or document does not exist. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    patchApiV1AdminPddByPddIdSectionsBySection: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                pddId: string;
+                section: "step2" | "step3" | "step4" | "step5" | "step6" | "step7" | "step8";
+            };
+            cookie?: never;
+        };
+        /** @description Autosave one wizard step */
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description The step's fields, stored as-is under `content.<section>` */
+                    data: {
+                        [key: string]: unknown;
+                    };
+                    /** @description Marks the step done in `section_progress` (drives the wizard's badges) */
+                    complete?: boolean;
+                };
+                "application/x-www-form-urlencoded": {
+                    /** @description The step's fields, stored as-is under `content.<section>` */
+                    data: {
+                        [key: string]: unknown;
+                    };
+                    /** @description Marks the step done in `section_progress` (drives the wizard's badges) */
+                    complete?: boolean;
+                };
+                "multipart/form-data": {
+                    /** @description The step's fields, stored as-is under `content.<section>` */
+                    data: {
+                        [key: string]: unknown;
+                    };
+                    /** @description Marks the step done in `section_progress` (drives the wizard's badges) */
+                    complete?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description The PDD document with its children */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            id: string;
+                            projectId: string;
+                            version: number;
+                            /** @enum {string} */
+                            status: "draft" | "in_review" | "submitted" | "registered";
+                            sectionProgress: {
+                                [key: string]: boolean;
+                            };
+                            content: {
+                                [key: string]: unknown;
+                            };
+                            lastEditedBy: string | null;
+                            /** Format: date-time */
+                            createdAt: string;
+                            /** Format: date-time */
+                            updatedAt: string;
+                            project: {
+                                id: string;
+                                projectCode: string;
+                                nameTh: string;
+                                nameEn: (string | null) | null;
+                                status: string;
+                                implementationMode: string;
+                                projectScale: string;
+                                creditingPeriodYears: (number | null) | null;
+                                creditingStartDate: (string | null) | null;
+                                creditingEndDate: (string | null) | null;
+                                expectedReductionTco2eYr: (number | null) | null;
+                                totalInvestmentMillionThb: (number | null) | null;
+                                declaredBoundary: ({
+                                    type: string;
+                                    coordinates: unknown;
+                                } | null) | null;
+                                declaredAreaRai: (number | null) | null;
+                            };
+                            contacts: {
+                                id: string;
+                                isPrimary: boolean;
+                                orgName: string;
+                                coordinatorName: (string | null) | null;
+                                position: (string | null) | null;
+                                address: (string | null) | null;
+                                phone: (string | null) | null;
+                                fax: (string | null) | null;
+                                email: (string | null) | null;
+                            }[];
+                            samplePlots: {
+                                id: string;
+                                plotName: string;
+                                boundary: ({
+                                    type: string;
+                                    coordinates: unknown;
+                                } | null) | null;
+                                areaRai: (number | null) | null;
+                            }[];
+                            attachments: {
+                                id: string;
+                                slot: string;
+                                fileId: string;
+                                displayName: (string | null) | null;
+                                mimeType: string;
+                                sizeBytes: number;
+                                /** Format: date-time */
+                                createdAt: string;
+                            }[];
+                            reconciliation: {
+                                declaredAreaRai: (number | null) | null;
+                                effectiveAreaRai: (number | null) | null;
+                                farmsOutside: {
+                                    id: string;
+                                    farmName: string;
+                                }[];
+                                farmsUnknown: {
+                                    id: string;
+                                    farmName: string;
+                                }[];
+                            };
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized — missing or invalid session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden — the requester lacks the required permission. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Not found — the project or document does not exist. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Conflict — the document is submitted and no longer editable. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Validation error — the request failed schema validation. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    postApiV1AdminPddByPddIdContacts: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                pddId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    isPrimary?: boolean;
+                    orgName: string;
+                    coordinatorName?: (string | null) | null;
+                    position?: (string | null) | null;
+                    address?: (string | null) | null;
+                    phone?: (string | null) | null;
+                    fax?: (string | null) | null;
+                    email?: (string | null) | null;
+                };
+                "application/x-www-form-urlencoded": {
+                    isPrimary?: boolean;
+                    orgName: string;
+                    coordinatorName?: (string | null) | null;
+                    position?: (string | null) | null;
+                    address?: (string | null) | null;
+                    phone?: (string | null) | null;
+                    fax?: (string | null) | null;
+                    email?: (string | null) | null;
+                };
+                "multipart/form-data": {
+                    isPrimary?: boolean;
+                    orgName: string;
+                    coordinatorName?: (string | null) | null;
+                    position?: (string | null) | null;
+                    address?: (string | null) | null;
+                    phone?: (string | null) | null;
+                    fax?: (string | null) | null;
+                    email?: (string | null) | null;
+                };
+            };
+        };
+        responses: {
+            /** @description The PDD document with its children */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            id: string;
+                            projectId: string;
+                            version: number;
+                            /** @enum {string} */
+                            status: "draft" | "in_review" | "submitted" | "registered";
+                            sectionProgress: {
+                                [key: string]: boolean;
+                            };
+                            content: {
+                                [key: string]: unknown;
+                            };
+                            lastEditedBy: string | null;
+                            /** Format: date-time */
+                            createdAt: string;
+                            /** Format: date-time */
+                            updatedAt: string;
+                            project: {
+                                id: string;
+                                projectCode: string;
+                                nameTh: string;
+                                nameEn: (string | null) | null;
+                                status: string;
+                                implementationMode: string;
+                                projectScale: string;
+                                creditingPeriodYears: (number | null) | null;
+                                creditingStartDate: (string | null) | null;
+                                creditingEndDate: (string | null) | null;
+                                expectedReductionTco2eYr: (number | null) | null;
+                                totalInvestmentMillionThb: (number | null) | null;
+                                declaredBoundary: ({
+                                    type: string;
+                                    coordinates: unknown;
+                                } | null) | null;
+                                declaredAreaRai: (number | null) | null;
+                            };
+                            contacts: {
+                                id: string;
+                                isPrimary: boolean;
+                                orgName: string;
+                                coordinatorName: (string | null) | null;
+                                position: (string | null) | null;
+                                address: (string | null) | null;
+                                phone: (string | null) | null;
+                                fax: (string | null) | null;
+                                email: (string | null) | null;
+                            }[];
+                            samplePlots: {
+                                id: string;
+                                plotName: string;
+                                boundary: ({
+                                    type: string;
+                                    coordinates: unknown;
+                                } | null) | null;
+                                areaRai: (number | null) | null;
+                            }[];
+                            attachments: {
+                                id: string;
+                                slot: string;
+                                fileId: string;
+                                displayName: (string | null) | null;
+                                mimeType: string;
+                                sizeBytes: number;
+                                /** Format: date-time */
+                                createdAt: string;
+                            }[];
+                            reconciliation: {
+                                declaredAreaRai: (number | null) | null;
+                                effectiveAreaRai: (number | null) | null;
+                                farmsOutside: {
+                                    id: string;
+                                    farmName: string;
+                                }[];
+                                farmsUnknown: {
+                                    id: string;
+                                    farmName: string;
+                                }[];
+                            };
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized — missing or invalid session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden — the requester lacks the required permission. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Not found — the project or document does not exist. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Conflict — the document is submitted and no longer editable. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Validation error — the request failed schema validation. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    deleteApiV1AdminPddByPddIdContactsByChildId: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                pddId: string;
+                childId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The PDD document with its children */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            id: string;
+                            projectId: string;
+                            version: number;
+                            /** @enum {string} */
+                            status: "draft" | "in_review" | "submitted" | "registered";
+                            sectionProgress: {
+                                [key: string]: boolean;
+                            };
+                            content: {
+                                [key: string]: unknown;
+                            };
+                            lastEditedBy: string | null;
+                            /** Format: date-time */
+                            createdAt: string;
+                            /** Format: date-time */
+                            updatedAt: string;
+                            project: {
+                                id: string;
+                                projectCode: string;
+                                nameTh: string;
+                                nameEn: (string | null) | null;
+                                status: string;
+                                implementationMode: string;
+                                projectScale: string;
+                                creditingPeriodYears: (number | null) | null;
+                                creditingStartDate: (string | null) | null;
+                                creditingEndDate: (string | null) | null;
+                                expectedReductionTco2eYr: (number | null) | null;
+                                totalInvestmentMillionThb: (number | null) | null;
+                                declaredBoundary: ({
+                                    type: string;
+                                    coordinates: unknown;
+                                } | null) | null;
+                                declaredAreaRai: (number | null) | null;
+                            };
+                            contacts: {
+                                id: string;
+                                isPrimary: boolean;
+                                orgName: string;
+                                coordinatorName: (string | null) | null;
+                                position: (string | null) | null;
+                                address: (string | null) | null;
+                                phone: (string | null) | null;
+                                fax: (string | null) | null;
+                                email: (string | null) | null;
+                            }[];
+                            samplePlots: {
+                                id: string;
+                                plotName: string;
+                                boundary: ({
+                                    type: string;
+                                    coordinates: unknown;
+                                } | null) | null;
+                                areaRai: (number | null) | null;
+                            }[];
+                            attachments: {
+                                id: string;
+                                slot: string;
+                                fileId: string;
+                                displayName: (string | null) | null;
+                                mimeType: string;
+                                sizeBytes: number;
+                                /** Format: date-time */
+                                createdAt: string;
+                            }[];
+                            reconciliation: {
+                                declaredAreaRai: (number | null) | null;
+                                effectiveAreaRai: (number | null) | null;
+                                farmsOutside: {
+                                    id: string;
+                                    farmName: string;
+                                }[];
+                                farmsUnknown: {
+                                    id: string;
+                                    farmName: string;
+                                }[];
+                            };
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized — missing or invalid session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden — the requester lacks the required permission. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Not found — the project or document does not exist. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Conflict — the document is submitted and no longer editable. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    patchApiV1AdminPddByPddIdContactsByChildId: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                pddId: string;
+                childId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    isPrimary?: boolean;
+                    orgName: string;
+                    coordinatorName?: (string | null) | null;
+                    position?: (string | null) | null;
+                    address?: (string | null) | null;
+                    phone?: (string | null) | null;
+                    fax?: (string | null) | null;
+                    email?: (string | null) | null;
+                };
+                "application/x-www-form-urlencoded": {
+                    isPrimary?: boolean;
+                    orgName: string;
+                    coordinatorName?: (string | null) | null;
+                    position?: (string | null) | null;
+                    address?: (string | null) | null;
+                    phone?: (string | null) | null;
+                    fax?: (string | null) | null;
+                    email?: (string | null) | null;
+                };
+                "multipart/form-data": {
+                    isPrimary?: boolean;
+                    orgName: string;
+                    coordinatorName?: (string | null) | null;
+                    position?: (string | null) | null;
+                    address?: (string | null) | null;
+                    phone?: (string | null) | null;
+                    fax?: (string | null) | null;
+                    email?: (string | null) | null;
+                };
+            };
+        };
+        responses: {
+            /** @description The PDD document with its children */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            id: string;
+                            projectId: string;
+                            version: number;
+                            /** @enum {string} */
+                            status: "draft" | "in_review" | "submitted" | "registered";
+                            sectionProgress: {
+                                [key: string]: boolean;
+                            };
+                            content: {
+                                [key: string]: unknown;
+                            };
+                            lastEditedBy: string | null;
+                            /** Format: date-time */
+                            createdAt: string;
+                            /** Format: date-time */
+                            updatedAt: string;
+                            project: {
+                                id: string;
+                                projectCode: string;
+                                nameTh: string;
+                                nameEn: (string | null) | null;
+                                status: string;
+                                implementationMode: string;
+                                projectScale: string;
+                                creditingPeriodYears: (number | null) | null;
+                                creditingStartDate: (string | null) | null;
+                                creditingEndDate: (string | null) | null;
+                                expectedReductionTco2eYr: (number | null) | null;
+                                totalInvestmentMillionThb: (number | null) | null;
+                                declaredBoundary: ({
+                                    type: string;
+                                    coordinates: unknown;
+                                } | null) | null;
+                                declaredAreaRai: (number | null) | null;
+                            };
+                            contacts: {
+                                id: string;
+                                isPrimary: boolean;
+                                orgName: string;
+                                coordinatorName: (string | null) | null;
+                                position: (string | null) | null;
+                                address: (string | null) | null;
+                                phone: (string | null) | null;
+                                fax: (string | null) | null;
+                                email: (string | null) | null;
+                            }[];
+                            samplePlots: {
+                                id: string;
+                                plotName: string;
+                                boundary: ({
+                                    type: string;
+                                    coordinates: unknown;
+                                } | null) | null;
+                                areaRai: (number | null) | null;
+                            }[];
+                            attachments: {
+                                id: string;
+                                slot: string;
+                                fileId: string;
+                                displayName: (string | null) | null;
+                                mimeType: string;
+                                sizeBytes: number;
+                                /** Format: date-time */
+                                createdAt: string;
+                            }[];
+                            reconciliation: {
+                                declaredAreaRai: (number | null) | null;
+                                effectiveAreaRai: (number | null) | null;
+                                farmsOutside: {
+                                    id: string;
+                                    farmName: string;
+                                }[];
+                                farmsUnknown: {
+                                    id: string;
+                                    farmName: string;
+                                }[];
+                            };
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized — missing or invalid session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden — the requester lacks the required permission. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Not found — the project or document does not exist. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Conflict — the document is submitted and no longer editable. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Validation error — the request failed schema validation. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    postApiV1AdminPddByPddIdAttachments: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                pddId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    slot: "boundary_image" | "land_right" | "power_of_attorney" | "area_photo" | "qa_diagram" | "monitoring_map" | "appendix";
+                    /**
+                     * Format: binary
+                     * @description Supporting document or image
+                     * @default File
+                     */
+                    file: string;
+                };
+                "application/x-www-form-urlencoded": {
+                    /** @enum {string} */
+                    slot: "boundary_image" | "land_right" | "power_of_attorney" | "area_photo" | "qa_diagram" | "monitoring_map" | "appendix";
+                    /**
+                     * Format: binary
+                     * @description Supporting document or image
+                     * @default File
+                     */
+                    file: string;
+                };
+                "multipart/form-data": {
+                    /** @enum {string} */
+                    slot: "boundary_image" | "land_right" | "power_of_attorney" | "area_photo" | "qa_diagram" | "monitoring_map" | "appendix";
+                    /**
+                     * Format: binary
+                     * @description Supporting document or image
+                     * @default File
+                     */
+                    file: string;
+                };
+            };
+        };
+        responses: {
+            /** @description The PDD document with its children */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            id: string;
+                            projectId: string;
+                            version: number;
+                            /** @enum {string} */
+                            status: "draft" | "in_review" | "submitted" | "registered";
+                            sectionProgress: {
+                                [key: string]: boolean;
+                            };
+                            content: {
+                                [key: string]: unknown;
+                            };
+                            lastEditedBy: string | null;
+                            /** Format: date-time */
+                            createdAt: string;
+                            /** Format: date-time */
+                            updatedAt: string;
+                            project: {
+                                id: string;
+                                projectCode: string;
+                                nameTh: string;
+                                nameEn: (string | null) | null;
+                                status: string;
+                                implementationMode: string;
+                                projectScale: string;
+                                creditingPeriodYears: (number | null) | null;
+                                creditingStartDate: (string | null) | null;
+                                creditingEndDate: (string | null) | null;
+                                expectedReductionTco2eYr: (number | null) | null;
+                                totalInvestmentMillionThb: (number | null) | null;
+                                declaredBoundary: ({
+                                    type: string;
+                                    coordinates: unknown;
+                                } | null) | null;
+                                declaredAreaRai: (number | null) | null;
+                            };
+                            contacts: {
+                                id: string;
+                                isPrimary: boolean;
+                                orgName: string;
+                                coordinatorName: (string | null) | null;
+                                position: (string | null) | null;
+                                address: (string | null) | null;
+                                phone: (string | null) | null;
+                                fax: (string | null) | null;
+                                email: (string | null) | null;
+                            }[];
+                            samplePlots: {
+                                id: string;
+                                plotName: string;
+                                boundary: ({
+                                    type: string;
+                                    coordinates: unknown;
+                                } | null) | null;
+                                areaRai: (number | null) | null;
+                            }[];
+                            attachments: {
+                                id: string;
+                                slot: string;
+                                fileId: string;
+                                displayName: (string | null) | null;
+                                mimeType: string;
+                                sizeBytes: number;
+                                /** Format: date-time */
+                                createdAt: string;
+                            }[];
+                            reconciliation: {
+                                declaredAreaRai: (number | null) | null;
+                                effectiveAreaRai: (number | null) | null;
+                                farmsOutside: {
+                                    id: string;
+                                    farmName: string;
+                                }[];
+                                farmsUnknown: {
+                                    id: string;
+                                    farmName: string;
+                                }[];
+                            };
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Bad request — e.g. an unparseable boundary file. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized — missing or invalid session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden — the requester lacks the required permission. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Not found — the project or document does not exist. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Conflict — the document is submitted and no longer editable. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Validation error — the request failed schema validation. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    deleteApiV1AdminPddByPddIdAttachmentsByChildId: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                pddId: string;
+                childId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The PDD document with its children */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            id: string;
+                            projectId: string;
+                            version: number;
+                            /** @enum {string} */
+                            status: "draft" | "in_review" | "submitted" | "registered";
+                            sectionProgress: {
+                                [key: string]: boolean;
+                            };
+                            content: {
+                                [key: string]: unknown;
+                            };
+                            lastEditedBy: string | null;
+                            /** Format: date-time */
+                            createdAt: string;
+                            /** Format: date-time */
+                            updatedAt: string;
+                            project: {
+                                id: string;
+                                projectCode: string;
+                                nameTh: string;
+                                nameEn: (string | null) | null;
+                                status: string;
+                                implementationMode: string;
+                                projectScale: string;
+                                creditingPeriodYears: (number | null) | null;
+                                creditingStartDate: (string | null) | null;
+                                creditingEndDate: (string | null) | null;
+                                expectedReductionTco2eYr: (number | null) | null;
+                                totalInvestmentMillionThb: (number | null) | null;
+                                declaredBoundary: ({
+                                    type: string;
+                                    coordinates: unknown;
+                                } | null) | null;
+                                declaredAreaRai: (number | null) | null;
+                            };
+                            contacts: {
+                                id: string;
+                                isPrimary: boolean;
+                                orgName: string;
+                                coordinatorName: (string | null) | null;
+                                position: (string | null) | null;
+                                address: (string | null) | null;
+                                phone: (string | null) | null;
+                                fax: (string | null) | null;
+                                email: (string | null) | null;
+                            }[];
+                            samplePlots: {
+                                id: string;
+                                plotName: string;
+                                boundary: ({
+                                    type: string;
+                                    coordinates: unknown;
+                                } | null) | null;
+                                areaRai: (number | null) | null;
+                            }[];
+                            attachments: {
+                                id: string;
+                                slot: string;
+                                fileId: string;
+                                displayName: (string | null) | null;
+                                mimeType: string;
+                                sizeBytes: number;
+                                /** Format: date-time */
+                                createdAt: string;
+                            }[];
+                            reconciliation: {
+                                declaredAreaRai: (number | null) | null;
+                                effectiveAreaRai: (number | null) | null;
+                                farmsOutside: {
+                                    id: string;
+                                    farmName: string;
+                                }[];
+                                farmsUnknown: {
+                                    id: string;
+                                    farmName: string;
+                                }[];
+                            };
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized — missing or invalid session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden — the requester lacks the required permission. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Not found — the project or document does not exist. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Conflict — the document is submitted and no longer editable. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    putApiV1AdminPddByPddIdBoundary: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                pddId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * Format: binary
+                     * @description KMZ or KML boundary file (PDD §5)
+                     * @default File
+                     */
+                    file: string;
+                };
+                "application/x-www-form-urlencoded": {
+                    /**
+                     * Format: binary
+                     * @description KMZ or KML boundary file (PDD §5)
+                     * @default File
+                     */
+                    file: string;
+                };
+                "multipart/form-data": {
+                    /**
+                     * Format: binary
+                     * @description KMZ or KML boundary file (PDD §5)
+                     * @default File
+                     */
+                    file: string;
+                };
+            };
+        };
+        responses: {
+            /** @description The parsed boundary, now stored on the project */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            declaredBoundary: ({
+                                type: string;
+                                coordinates: unknown;
+                            } | null) | null;
+                            declaredAreaRai: (number | null) | null;
+                            polygonCount: number;
+                            names: string[];
+                            attachment: {
+                                id: string;
+                                slot: string;
+                                fileId: string;
+                                displayName: (string | null) | null;
+                                mimeType: string;
+                                sizeBytes: number;
+                                /** Format: date-time */
+                                createdAt: string;
+                            };
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Bad request — e.g. an unparseable boundary file. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized — missing or invalid session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden — the requester lacks the required permission. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Not found — the project or document does not exist. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Conflict — the document is submitted and no longer editable. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Validation error — the request failed schema validation. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "postApiV1AdminProjectsByIdSample-plots": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    plotName: string;
+                    /** @description Farm boundary as a GeoJSON Polygon or MultiPolygon; coordinates [lng, lat] */
+                    boundary?: {
+                        /** @constant */
+                        type: "Polygon";
+                        coordinates: [
+                            number,
+                            number
+                        ][][];
+                    } | {
+                        /** @constant */
+                        type: "MultiPolygon";
+                        coordinates: [
+                            number,
+                            number
+                        ][][][];
+                    };
+                };
+                "application/x-www-form-urlencoded": {
+                    plotName: string;
+                    /** @description Farm boundary as a GeoJSON Polygon or MultiPolygon; coordinates [lng, lat] */
+                    boundary?: {
+                        /** @constant */
+                        type: "Polygon";
+                        coordinates: [
+                            number,
+                            number
+                        ][][];
+                    } | {
+                        /** @constant */
+                        type: "MultiPolygon";
+                        coordinates: [
+                            number,
+                            number
+                        ][][][];
+                    };
+                };
+                "multipart/form-data": {
+                    plotName: string;
+                    /** @description Farm boundary as a GeoJSON Polygon or MultiPolygon; coordinates [lng, lat] */
+                    boundary?: {
+                        /** @constant */
+                        type: "Polygon";
+                        coordinates: [
+                            number,
+                            number
+                        ][][];
+                    } | {
+                        /** @constant */
+                        type: "MultiPolygon";
+                        coordinates: [
+                            number,
+                            number
+                        ][][][];
+                    };
+                };
+            };
+        };
+        responses: {
+            /** @description The project's sample plots */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            id: string;
+                            plotName: string;
+                            boundary: ({
+                                type: string;
+                                coordinates: unknown;
+                            } | null) | null;
+                            areaRai: (number | null) | null;
+                        }[];
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized — missing or invalid session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden — the requester lacks the required permission. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Not found — the project or document does not exist. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Validation error — the request failed schema validation. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "deleteApiV1AdminProjectsByIdSample-plotsByPlotId": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                plotId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The project's sample plots */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            id: string;
+                            plotName: string;
+                            boundary: ({
+                                type: string;
+                                coordinates: unknown;
+                            } | null) | null;
+                            areaRai: (number | null) | null;
+                        }[];
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized — missing or invalid session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden — the requester lacks the required permission. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Not found — the project or document does not exist. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
     getApiV1Projects: {
         parameters: {
             query?: never;
@@ -8119,7 +10432,7 @@ export interface operations {
                         data: {
                             id: string;
                             /** @enum {string} */
-                            category: "avatar" | "cover_photo" | "tree_snapshot";
+                            category: "avatar" | "cover_photo" | "tree_snapshot" | "pdd_attachment";
                             mimeType: string;
                             sizeBytes: number;
                             /** @enum {string} */
