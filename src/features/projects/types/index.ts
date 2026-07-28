@@ -26,6 +26,12 @@ export type ProjectInput = {
   expectedReductionTco2eYr?: number
   totalInvestmentMillionThb?: number
   verifierOrgId?: string | null
+  /**
+   * Average annual removals from the ex-ante forecast. Not a stored field —
+   * sending it re-derives `projectScale` as an engine value, as opposed to
+   * sending `projectScale` directly, which records a human override.
+   */
+  avgAnnualTco2e?: number | null
 }
 
 /** Thai labels for the project lifecycle, shared by the table and the form. */

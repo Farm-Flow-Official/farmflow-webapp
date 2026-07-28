@@ -171,6 +171,120 @@ export const step5Submit = z.object({
 export const step5Draft = step5Submit.partial()
 export type Step5Values = z.input<typeof step5Draft>
 
+// ── Step 6 — methodology, emission sources, carbon pools ────────────────────
+
+export const SCOPE_OPTIONS = [
+  { value: 'baseline', label: 'กรณีฐาน (Baseline)' },
+  { value: 'project', label: 'โครงการ (Project)' },
+  { value: 'leakage', label: 'การรั่วไหล (Leakage)' },
+] as const
+
+export const GAS_OPTIONS = ['CO2', 'CH4', 'N2O'] as const
+
+export const CARBON_POOL_OPTIONS = [
+  { value: 'ABG', label: 'ABG — มวลชีวภาพเหนือพื้นดิน' },
+  { value: 'BLG', label: 'BLG — มวลชีวภาพใต้ดิน' },
+  { value: 'DOM', label: 'DOM — อินทรียวัตถุที่ตายแล้ว' },
+  { value: 'SOIL', label: 'Soil — คาร์บอนในดิน' },
+] as const
+
+export const step6Submit = z.object({
+  methodologies: z
+    .array(
+      z.object({
+        code: requiredText('กรุณาระบุรหัสระเบียบวิธี'),
+        version: text,
+        name: requiredText('กรุณาระบุชื่อระเบียบวิธี'),
+      }),
+    )
+    .min(1, 'ต้องมีระเบียบวิธีอย่างน้อย 1 รายการ'),
+  applicabilityDesc: requiredText('กรุณาอธิบายลักษณะกิจกรรมที่เข้าข่าย'),
+  applicabilityReason: requiredText('กรุณาอธิบายเหตุผลที่เข้าข่าย'),
+  conditions: z.array(z.object({ condition: text, reason: text })).optional(),
+  emissionSources: z
+    .array(
+      z.object({
+        scope: z.enum(['baseline', 'project', 'leakage']),
+        sourceName: text,
+        gasType: text,
+        detail: text,
+      }),
+    )
+    .optional(),
+  carbonPools: z
+    .array(
+      z.object({
+        scope: z.enum(['baseline', 'project', 'leakage']),
+        poolType: text,
+        detail: text,
+      }),
+    )
+    .optional(),
+})
+
+export const step6Draft = step6Submit.partial()
+export type Step6Values = z.input<typeof step6Draft>
+
+// ── Step 7 — the reduction calculation ──────────────────────────────────────
+
+export const step7Submit = z.object({
+  /** Rows the author accepted or typed over; the engine fills them on request. */
+  yearlyEstimates: z
+    .array(
+      z.object({
+        year: z.number().optional(),
+        baseline: z.number().optional(),
+        project: z.number().optional(),
+        leakage: z.number().optional(),
+        netReduction: z.number().optional(),
+        /** Which cells the author changed by hand — drives the ✎ badge. */
+        overridden: z.boolean().optional(),
+      }),
+    )
+    .optional(),
+  totalTco2e: optionalNumber,
+  periodYears: optionalNumber,
+  avgPerYear: optionalNumber,
+  /** Recorded so a reviewer can see whether the figures came from the engine. */
+  source: z.enum(['engine', 'manual']).optional(),
+  equationNote: text,
+})
+
+export const step7Draft = step7Submit.partial()
+export type Step7Values = z.input<typeof step7Draft>
+
+// ── Step 8 — monitoring plan ────────────────────────────────────────────────
+
+export const step8Submit = z.object({
+  monitoringOrgStructure: requiredText('กรุณาอธิบายโครงสร้างหน่วยงานและหน้าที่'),
+  monitoringDataProcess: requiredText('กรุณาอธิบายขั้นตอนจัดเก็บและคำนวณข้อมูล'),
+  fixedParams: z
+    .array(
+      z.object({
+        param: text,
+        value: text,
+        unit: text,
+        meaning: text,
+        source: text,
+      }),
+    )
+    .optional(),
+  monitoredParams: z
+    .array(
+      z.object({
+        param: text,
+        unit: text,
+        meaning: text,
+        source: text,
+        method: text,
+      }),
+    )
+    .optional(),
+})
+
+export const step8Draft = step8Submit.partial()
+export type Step8Values = z.input<typeof step8Draft>
+
 // ── Registry ────────────────────────────────────────────────────────────────
 
 export const STEP_SCHEMAS: Record<string, StepSchemas> = {
@@ -179,6 +293,9 @@ export const STEP_SCHEMAS: Record<string, StepSchemas> = {
   step3: { submit: step3Submit, draft: step3Draft },
   step4: { submit: step4Submit, draft: step4Draft },
   step5: { submit: step5Submit, draft: step5Draft },
+  step6: { submit: step6Submit, draft: step6Draft },
+  step7: { submit: step7Submit, draft: step7Draft },
+  step8: { submit: step8Submit, draft: step8Draft },
 }
 
 export const optionalNumberSchema = optionalNumber

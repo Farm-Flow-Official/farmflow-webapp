@@ -953,6 +953,26 @@ export interface paths {
         patch: operations["patchApiV1AdminPddByPddIdSectionsBySection"];
         trace?: never;
     };
+    "/api/v1/admin/pdd/{pddId}/forecast": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Project the crediting period's removals
+         * @description Runs the ex-ante engine over the project's enrolled farms (or caller-supplied stands) and returns the yearly table, the period total, and the derived project scale. **Computes but never stores** — these figures decide registration, so the author chooses which of them to accept into the form. The model is not TGO-verified; `formulaSnapshot.verified` says so.
+         */
+        post: operations["postApiV1AdminPddByPddIdForecast"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/pdd/{pddId}/contacts": {
         parameters: {
             query?: never;
@@ -6746,6 +6766,7 @@ export interface operations {
                         ][][][];
                     };
                     verifierOrgId?: (string | null) | null;
+                    avgAnnualTco2e?: (number | null) | null;
                 };
                 "application/x-www-form-urlencoded": {
                     projectCode?: string;
@@ -6783,6 +6804,7 @@ export interface operations {
                         ][][][];
                     };
                     verifierOrgId?: (string | null) | null;
+                    avgAnnualTco2e?: (number | null) | null;
                 };
                 "multipart/form-data": {
                     projectCode?: string;
@@ -6820,6 +6842,7 @@ export interface operations {
                         ][][][];
                     };
                     verifierOrgId?: (string | null) | null;
+                    avgAnnualTco2e?: (number | null) | null;
                 };
             };
         };
@@ -7582,6 +7605,7 @@ export interface operations {
                                 status: string;
                                 implementationMode: string;
                                 projectScale: string;
+                                scaleOverriddenBy: (string | null) | null;
                                 creditingPeriodYears: (number | null) | null;
                                 creditingStartDate: (string | null) | null;
                                 creditingEndDate: (string | null) | null;
@@ -7720,7 +7744,7 @@ export interface operations {
             header?: never;
             path: {
                 pddId: string;
-                section: "step2" | "step3" | "step4" | "step5" | "step6" | "step7" | "step8";
+                section: "step1" | "step2" | "step3" | "step4" | "step5" | "step6" | "step7" | "step8";
             };
             cookie?: never;
         };
@@ -7789,6 +7813,7 @@ export interface operations {
                                 status: string;
                                 implementationMode: string;
                                 projectScale: string;
+                                scaleOverriddenBy: (string | null) | null;
                                 creditingPeriodYears: (number | null) | null;
                                 creditingStartDate: (string | null) | null;
                                 creditingEndDate: (string | null) | null;
@@ -7967,6 +7992,212 @@ export interface operations {
             };
         };
     };
+    postApiV1AdminPddByPddIdForecast: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                pddId: string;
+            };
+            cookie?: never;
+        };
+        /** @description What to forecast. Every field is optional; defaults come from the project. */
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Replaces the planting profile derived from the project's enrolled farms. Omit to forecast the land actually signed up. */
+                    stands?: {
+                        /** @description Shown in the breakdown, usually the species name */
+                        label: string;
+                        areaRai: number;
+                        treeDensityPerRai: number;
+                        maiKgPerTreePerYear: number;
+                        rValue: number;
+                        cfValue: number;
+                        survivalRate?: number;
+                    }[];
+                    creditingPeriodYears?: number;
+                    baselineRemovalsTco2ePerYear?: number;
+                    leakageTco2ePerYear?: number;
+                };
+                "application/x-www-form-urlencoded": {
+                    /** @description Replaces the planting profile derived from the project's enrolled farms. Omit to forecast the land actually signed up. */
+                    stands?: {
+                        /** @description Shown in the breakdown, usually the species name */
+                        label: string;
+                        areaRai: number;
+                        treeDensityPerRai: number;
+                        maiKgPerTreePerYear: number;
+                        rValue: number;
+                        cfValue: number;
+                        survivalRate?: number;
+                    }[];
+                    creditingPeriodYears?: number;
+                    baselineRemovalsTco2ePerYear?: number;
+                    leakageTco2ePerYear?: number;
+                };
+                "multipart/form-data": {
+                    /** @description Replaces the planting profile derived from the project's enrolled farms. Omit to forecast the land actually signed up. */
+                    stands?: {
+                        /** @description Shown in the breakdown, usually the species name */
+                        label: string;
+                        areaRai: number;
+                        treeDensityPerRai: number;
+                        maiKgPerTreePerYear: number;
+                        rValue: number;
+                        cfValue: number;
+                        survivalRate?: number;
+                    }[];
+                    creditingPeriodYears?: number;
+                    baselineRemovalsTco2ePerYear?: number;
+                    leakageTco2ePerYear?: number;
+                };
+            };
+        };
+        responses: {
+            /** @description Projected removals. Computed, never stored — the author decides what enters the form. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            /** @description False when the inputs cannot support a forecast */
+                            supported: boolean;
+                            /** @description Why no forecast could be produced */
+                            reason?: string;
+                            /** @description "farms" = derived from enrolled farms; "override" = caller-supplied stands */
+                            source: string;
+                            yearly?: {
+                                year: number;
+                                periodYear: number;
+                                baselineRemovals: number;
+                                projectRemovals: number;
+                                leakage: number;
+                                netRemovals: number;
+                            }[];
+                            /** @description Period total, decimals truncated per the form */
+                            totalTco2e?: number;
+                            exactTotalTco2e?: number;
+                            periodYears?: number;
+                            avgPerYear?: number;
+                            /** @description Band derived from avgPerYear — drives the Additionality default */
+                            projectScale?: string;
+                            stands?: {
+                                label: string;
+                                treeCount: number;
+                                annualAbgBiomassKg: number;
+                                annualTco2e: number;
+                            }[];
+                            formulaSnapshot?: {
+                                [key: string]: unknown;
+                            };
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized — missing or invalid session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden — the requester lacks the required permission. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Not found — the project or document does not exist. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Validation error — the request failed schema validation. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
     postApiV1AdminPddByPddIdContacts: {
         parameters: {
             query?: never;
@@ -8046,6 +8277,7 @@ export interface operations {
                                 status: string;
                                 implementationMode: string;
                                 projectScale: string;
+                                scaleOverriddenBy: (string | null) | null;
                                 creditingPeriodYears: (number | null) | null;
                                 creditingStartDate: (string | null) | null;
                                 creditingEndDate: (string | null) | null;
@@ -8271,6 +8503,7 @@ export interface operations {
                                 status: string;
                                 implementationMode: string;
                                 projectScale: string;
+                                scaleOverriddenBy: (string | null) | null;
                                 creditingPeriodYears: (number | null) | null;
                                 creditingStartDate: (string | null) | null;
                                 creditingEndDate: (string | null) | null;
@@ -8506,6 +8739,7 @@ export interface operations {
                                 status: string;
                                 implementationMode: string;
                                 projectScale: string;
+                                scaleOverriddenBy: (string | null) | null;
                                 creditingPeriodYears: (number | null) | null;
                                 creditingStartDate: (string | null) | null;
                                 creditingEndDate: (string | null) | null;
@@ -8763,6 +8997,7 @@ export interface operations {
                                 status: string;
                                 implementationMode: string;
                                 projectScale: string;
+                                scaleOverriddenBy: (string | null) | null;
                                 creditingPeriodYears: (number | null) | null;
                                 creditingStartDate: (string | null) | null;
                                 creditingEndDate: (string | null) | null;
@@ -9011,6 +9246,7 @@ export interface operations {
                                 status: string;
                                 implementationMode: string;
                                 projectScale: string;
+                                scaleOverriddenBy: (string | null) | null;
                                 creditingPeriodYears: (number | null) | null;
                                 creditingStartDate: (string | null) | null;
                                 creditingEndDate: (string | null) | null;

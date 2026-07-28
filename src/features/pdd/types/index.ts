@@ -18,7 +18,7 @@ export type AttachmentSlot =
   | 'monitoring_map'
   | 'appendix'
 
-export type StepId = 'step1' | 'step2' | 'step3' | 'step4' | 'step5'
+export type StepId = 'step1' | 'step2' | 'step3' | 'step4' | 'step5' | 'step6' | 'step7' | 'step8'
 
 export type StepMeta = {
   id: StepId
@@ -29,16 +29,16 @@ export type StepMeta = {
   formRef: string
 }
 
-/**
- * Steps 1–5. Steps 6–8 (methodology, calculation, monitoring) arrive with the
- * ex-ante forecast engine; the stepper shows only what can actually be filled.
- */
+/** Every step of the official form, in its order. */
 export const WIZARD_STEPS: StepMeta[] = [
   { id: 'step1', number: 1, title: 'ข้อมูลหลักโครงการ', formRef: 'หน้าปก ส่วนที่ 1' },
   { id: 'step2', number: 2, title: 'ผู้เกี่ยวข้อง & ผู้จัดทำ', formRef: 'ส่วนที่ 2' },
   { id: 'step3', number: 3, title: 'รายละเอียด & ขอบเขต', formRef: 'ส่วน 1.1–1.2' },
   { id: 'step4', number: 4, title: 'เงื่อนไขการขึ้นทะเบียน', formRef: 'ส่วน 1.3–1.5' },
   { id: 'step5', number: 5, title: 'พื้นที่โครงการ', formRef: 'ส่วน 1.6' },
+  { id: 'step6', number: 6, title: 'ระเบียบวิธี & แหล่งปล่อย', formRef: 'ส่วนที่ 2' },
+  { id: 'step7', number: 7, title: 'การคำนวณการลดก๊าซ', formRef: 'ส่วนที่ 3' },
+  { id: 'step8', number: 8, title: 'แผนติดตามผล', formRef: 'ส่วนที่ 4' },
 ]
 
 /** A PDD that has been submitted is a record of what was filed, not a draft. */

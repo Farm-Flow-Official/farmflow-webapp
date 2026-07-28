@@ -9,6 +9,9 @@ import { Step2Parties } from '@/features/pdd/components/steps/Step2Parties'
 import { Step3Details } from '@/features/pdd/components/steps/Step3Details'
 import { Step4Conditions } from '@/features/pdd/components/steps/Step4Conditions'
 import { Step5Area } from '@/features/pdd/components/steps/Step5Area'
+import { Step6Methodology } from '@/features/pdd/components/steps/Step6Methodology'
+import { Step7Calculation } from '@/features/pdd/components/steps/Step7Calculation'
+import { Step8Monitoring } from '@/features/pdd/components/steps/Step8Monitoring'
 
 /** What the wizard shell hands every step. */
 export type StepProps = {
@@ -28,6 +31,9 @@ const STEP_COMPONENTS: Record<StepId, (props: StepProps) => React.ReactNode> = {
   step3: Step3Details,
   step4: Step4Conditions,
   step5: Step5Area,
+  step6: Step6Methodology,
+  step7: Step7Calculation,
+  step8: Step8Monitoring,
 }
 
 /**
@@ -157,11 +163,8 @@ export function PddWizard({ initial, canWrite }: { initial: PddDetail; canWrite:
             })}
           </ul>
 
-          {/* Steps 6-8 are not buildable until the ex-ante engine lands; showing
-              them greyed is more honest than pretending the form ends at 5. */}
-          <p className="mt-3 flex items-start gap-1.5 border-t border-line px-2.5 pt-3 text-[11px] text-ink-muted">
-            <Lock className="mt-px h-3 w-3 shrink-0" strokeWidth={2} />
-            ขั้นตอน 6–8 (ระเบียบวิธี · การคำนวณ · แผนติดตามผล) จะเปิดใช้พร้อมเครื่องมือคำนวณ
+          <p className="mt-3 border-t border-line px-2.5 pt-3 text-[11px] text-ink-muted">
+            ข้ามไปกรอกขั้นตอนใดก่อนก็ได้ — ระบบตรวจความครบถ้วนจริงตอนกดส่งเอกสาร
           </p>
         </div>
       </nav>
