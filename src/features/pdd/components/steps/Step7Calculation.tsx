@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   Calculator,
   Loader2,
@@ -52,7 +52,7 @@ const truncate = (n: number) => Math.trunc(n)
  * carbon model is not TGO-verified, which the step says out loud rather than
  * burying in a tooltip.
  */
-export function Step7Calculation({ pdd, editable, onSaved, onError }: StepProps) {
+export function Step7Calculation({ pdd, editable, onDirtyChange, onSaved, onError }: StepProps) {
   const saved = (pdd.content?.step7 ?? {}) as Step7Content
 
   const [rows, setRows] = useState<YearRow[]>(saved.yearlyEstimates ?? [])
@@ -65,28 +65,38 @@ export function Step7Calculation({ pdd, editable, onSaved, onError }: StepProps)
   const totals = summarise(rows)
   const dirtyRows = rows.some((r) => r.overridden)
 
+  // Unlike the other steps, this one is not driven by react-hook-form, so it
+  // has to report its own unsaved state — otherwise closing the tab with a
+  // half-typed cell loses the edit without the browser ever warning.
+  //
+  // The ref holds a ready-to-send payload rather than a callback, so leaving
+  // the step can flush it without capturing a render-scope function.
+  const pending = useRef<Step7Content | null>(null)
+  const pddId = pdd.id
+  useEffect(
+    () => () => {
+      // Leaving the step is a save point, exactly as `useStepAutosave` treats it.
+      if (pending.current) void saveSection(pddId, 'step7', pending.current)
+    },
+    [pddId],
+  )
+
   async function persist(next: {
     rows: YearRow[]
     source?: 'engine' | 'manual'
     note?: string
     complete?: boolean
   }) {
-    const summary = summarise(next.rows)
     const res = await saveSection(
       pdd.id,
       'step7',
-      {
-        yearlyEstimates: next.rows,
-        totalTco2e: summary.total,
-        periodYears: next.rows.length,
-        avgPerYear: summary.avgPerYear,
-        source: next.source ?? source,
-        equationNote: next.note ?? note,
-      },
+      step7Payload(next.rows, next.source ?? source, next.note ?? note),
       next.complete,
     )
-    if (res.ok) onSaved(res.data)
-    else onError(res.error)
+    if (res.ok) {
+      pending.current = null
+      onSaved(res.data)
+    } else onError(res.error)
   }
 
   async function handleCompute() {
@@ -128,18 +138,19 @@ export function Step7Calculation({ pdd, editable, onSaved, onError }: StepProps)
 
   function editCell(index: number, key: keyof YearRow, raw: string) {
     const value = raw === '' ? undefined : Number(raw)
-    setRows((prev) =>
-      prev.map((r, i) => {
-        if (i !== index) return r
-        const updated = { ...r, [key]: value, overridden: true }
-        // Keep the net consistent with the parts the author just changed.
-        if (key !== 'netReduction') {
-          updated.netReduction =
-            (updated.project ?? 0) - (updated.baseline ?? 0) - (updated.leakage ?? 0)
-        }
-        return updated
-      }),
-    )
+    const next = rows.map((r, i) => {
+      if (i !== index) return r
+      const updated = { ...r, [key]: value, overridden: true }
+      // Keep the net consistent with the parts the author just changed.
+      if (key !== 'netReduction') {
+        updated.netReduction =
+          (updated.project ?? 0) - (updated.baseline ?? 0) - (updated.leakage ?? 0)
+      }
+      return updated
+    })
+    setRows(next)
+    onDirtyChange(true)
+    pending.current = step7Payload(next, 'manual', note)
   }
 
   async function commitEdits() {
@@ -346,7 +357,11 @@ export function Step7Calculation({ pdd, editable, onSaved, onError }: StepProps)
           rows={4}
           value={note}
           disabled={!editable}
-          onChange={(e) => setNote(e.target.value)}
+          onChange={(e) => {
+            setNote(e.target.value)
+            onDirtyChange(true)
+            pending.current = step7Payload(rows, source, e.target.value)
+          }}
           onBlur={() => persist({ rows, note })}
           placeholder="อธิบายสมการที่ใช้ ค่าพารามิเตอร์ และแหล่งอ้างอิง — โดยเฉพาะเมื่อแก้ตัวเลขในตารางเอง"
           className="w-full resize-y rounded-lg border border-line bg-panel px-3 py-2 text-sm text-ink placeholder:text-ink-muted focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15 disabled:bg-sunken"
@@ -391,6 +406,23 @@ function SummaryTile({ label, value, hint }: { label: string; value: string; hin
       {hint && <p className="mt-0.5 text-xs text-ink-muted">{hint}</p>}
     </div>
   )
+}
+
+/** The §3.5 table as `content.step7` stores it — one shape, one place. */
+function step7Payload(
+  rows: YearRow[],
+  source: Step7Content['source'],
+  note: string,
+): Step7Content {
+  const summary = summarise(rows)
+  return {
+    yearlyEstimates: rows,
+    totalTco2e: summary.total,
+    periodYears: rows.length,
+    avgPerYear: summary.avgPerYear,
+    source,
+    equationNote: note,
+  }
 }
 
 function summarise(rows: YearRow[]) {

@@ -2,8 +2,11 @@ import { api, unwrap, ApiError } from '@/lib/api'
 import type { PddDetail } from '@/features/pdd/types'
 
 /**
- * The project's PDD. The API creates the first draft on demand, so this both
- * opens and (on a project's first visit) starts the document.
+ * The project's PDD, or `null` when it has not been started.
+ *
+ * Reading no longer creates: opening the print preview used to write a
+ * `pdd_documents` row and an audit entry, so `GET` now 404s and starting the
+ * document is a deliberate `POST` (`startPdd`).
  */
 export async function fetchPdd(projectId: string): Promise<PddDetail | null> {
   try {

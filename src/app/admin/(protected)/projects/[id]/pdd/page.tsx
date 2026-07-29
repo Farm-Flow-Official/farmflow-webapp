@@ -1,11 +1,13 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import Link from 'next/link'
 import { ChevronLeft, FileText } from 'lucide-react'
 import { getAdminSession } from '@/features/auth/services/adminSession'
 import { fetchPdd } from '@/features/pdd/services/fetchPdd'
-import { canSubmitPdd, canWriteProjects } from '@/features/projects/permissions'
+import { fetchProject } from '@/features/projects/services/fetchProjects'
+import { canSubmitPdd, canWritePdd, canWriteProjects } from '@/features/projects/permissions'
 import { PddWizard } from '@/features/pdd/components/PddWizard'
+import { PddStart } from '@/features/pdd/components/PddStart'
 import { Badge } from '@/components/ui/badge'
 
 export const metadata: Metadata = {
@@ -23,11 +25,17 @@ export default async function PddWizardPage({ params }: { params: Promise<{ id: 
   const { id } = await params
   const [pdd, admin] = await Promise.all([fetchPdd(id), getAdminSession()])
 
-  if (!pdd) notFound()
+  // Without a document there is nothing to name the page after, so fall back to
+  // the project itself — and 404 only if the project is genuinely gone.
+  const project = pdd?.project ?? (await fetchProject(id))
+  if (!project) notFound()
+  const title = `${project.nameTh} · ${project.projectCode}`
 
-  // The wizard writes to the project as well as the document (step 1 lives on
-  // `projects`), so it is the project write permission that gates editing.
-  const canWrite = admin ? canWriteProjects(admin) : false
+  // The wizard needs both codes, and used to check only the second: steps 2–8
+  // save through `pdd:write`, while step 1 and step 7's scale band write to the
+  // project itself under `projects:write`. Holding one without the other gave
+  // an editable form whose saves 403'd, so gate on the pair.
+  const canWrite = admin ? canWritePdd(admin) && canWriteProjects(admin) : false
   const canSubmit = admin ? canSubmitPdd(admin) : false
 
   return (
@@ -46,17 +54,22 @@ export default async function PddWizardPage({ params }: { params: Promise<{ id: 
             <FileText className="h-6 w-6 text-primary" strokeWidth={1.75} />
             PDD Wizard
           </h1>
-          <Badge variant={pdd.status === 'draft' ? 'neutral' : 'verified'} dot>
-            {STATUS_LABELS[pdd.status] ?? pdd.status}
-          </Badge>
+          {pdd && (
+            <Badge variant={pdd.status === 'draft' ? 'neutral' : 'verified'} dot>
+              {STATUS_LABELS[pdd.status] ?? pdd.status}
+            </Badge>
+          )}
         </div>
         <p className="mt-1.5 text-sm text-ink-secondary">
-          {pdd.project.nameTh} · {pdd.project.projectCode} — เอกสารข้อเสนอโครงการตามฟอร์ม อบก.
-          (T-VER-S-F001-PDD)
+          {title} — เอกสารข้อเสนอโครงการตามฟอร์ม อบก. (T-VER-S-F001-PDD)
         </p>
       </header>
 
-      <PddWizard initial={pdd} canWrite={canWrite} canSubmit={canSubmit} />
+      {pdd ? (
+        <PddWizard initial={pdd} canWrite={canWrite} canSubmit={canSubmit} />
+      ) : (
+        <PddStart projectId={id} canWrite={canWrite} />
+      )}
     </div>
   )
 }

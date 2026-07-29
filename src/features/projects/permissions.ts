@@ -19,6 +19,15 @@ export function canDeleteProjects(admin: AdminProfile): boolean {
 }
 
 /**
+ * Writing the PDD is its own permission too. The wizard used to gate on
+ * `projects:write`, but every route it calls checks `pdd:write` — so an admin
+ * holding one without the other got an editable form whose every save 403'd.
+ */
+export function canWritePdd(admin: AdminProfile): boolean {
+  return admin.permissions.includes('pdd:write')
+}
+
+/**
  * Filing the PDD is its own permission: writing the document and being
  * authorised to send it to the authority are different acts.
  */

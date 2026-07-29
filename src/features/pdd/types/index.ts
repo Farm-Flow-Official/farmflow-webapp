@@ -41,6 +41,28 @@ export const WIZARD_STEPS: StepMeta[] = [
   { id: 'step8', number: 8, title: 'แผนติดตามผล', formRef: 'ส่วนที่ 4' },
 ]
 
+/**
+ * A value that changes whenever anything the wizard renders has changed.
+ *
+ * `updatedAt` alone is not enough: sample plots hang off the *project*, and the
+ * declared boundary is a project column, so a change to either leaves the
+ * document's own timestamp untouched. Anything keyed on freshness — the
+ * wizard's own copy of the document, the review panel's readiness check —
+ * keys on this instead.
+ */
+export function pddFingerprint(pdd: PddDetail): string {
+  return [
+    pdd.id,
+    pdd.version,
+    pdd.status,
+    pdd.updatedAt,
+    pdd.contacts.length,
+    pdd.attachments.length,
+    pdd.samplePlots.length,
+    pdd.project.declaredAreaRai ?? '',
+  ].join('|')
+}
+
 /** A PDD that has been submitted is a record of what was filed, not a draft. */
 export function isEditable(pdd: PddDetail): boolean {
   return pdd.status === 'draft'

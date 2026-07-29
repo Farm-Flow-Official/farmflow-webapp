@@ -255,9 +255,10 @@ function SpeciesPanel({
   allowed: string[]
   catalogue: ProjectLookups['species']
   canWrite: boolean
-  onSave: (speciesIds: string[]) => void
+  onSave: (speciesIds: string[]) => Promise<void>
 }) {
   const [selected, setSelected] = useState<string[]>(allowed)
+  const [saving, setSaving] = useState(false)
   const dirty = useMemo(
     () => [...selected].sort().join() !== [...allowed].sort().join(),
     [selected, allowed],
@@ -284,10 +285,18 @@ function SpeciesPanel({
         {canWrite && dirty && (
           <button
             type="button"
-            onClick={() => onSave(selected)}
-            className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            // The species set is a full replace, so a double click sends the
+            // same list twice — harmless, but the second toast reads as a bug.
+            disabled={saving}
+            onClick={async () => {
+              if (saving) return
+              setSaving(true)
+              await onSave(selected)
+              setSaving(false)
+            }}
+            className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-60"
           >
-            บันทึกชนิดพันธุ์
+            {saving ? 'กำลังบันทึก…' : 'บันทึกชนิดพันธุ์'}
           </button>
         )}
       </div>

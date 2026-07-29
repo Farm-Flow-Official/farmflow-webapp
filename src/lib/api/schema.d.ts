@@ -941,12 +941,16 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Open the project's PDD
-         * @description Returns the editable draft, or the latest version if none is open. Creates the first draft on demand — opening the wizard is what brings the document into being.
+         * Read the project's PDD
+         * @description Returns the editable draft, or the latest version if none is open. **Reads only** — 404 when the project has no PDD yet; use POST to start one. Reading used to create, which meant opening the print preview wrote a document.
          */
         get: operations["getApiV1AdminProjectsByIdPdd"];
         put?: never;
-        post?: never;
+        /**
+         * Start the project's PDD
+         * @description Creates the first draft, or returns the one already open. Separate from GET so that starting a document is a deliberate act rather than a side effect of navigating to a page.
+         */
+        post: operations["postApiV1AdminProjectsByIdPdd"];
         delete?: never;
         options?: never;
         head?: never;
@@ -7762,6 +7766,185 @@ export interface operations {
         };
     };
     getApiV1AdminProjectsByIdPdd: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The PDD document with its children */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            id: string;
+                            projectId: string;
+                            version: number;
+                            /** @enum {string} */
+                            status: "draft" | "in_review" | "submitted" | "registered";
+                            sectionProgress: {
+                                [key: string]: boolean;
+                            };
+                            content: {
+                                [key: string]: unknown;
+                            };
+                            lastEditedBy: string | null;
+                            /** Format: date-time */
+                            createdAt: string;
+                            /** Format: date-time */
+                            updatedAt: string;
+                            project: {
+                                id: string;
+                                projectCode: string;
+                                nameTh: string;
+                                nameEn: (string | null) | null;
+                                status: string;
+                                implementationMode: string;
+                                projectScale: string;
+                                scaleOverriddenBy: (string | null) | null;
+                                creditingPeriodYears: (number | null) | null;
+                                creditingStartDate: (string | null) | null;
+                                creditingEndDate: (string | null) | null;
+                                expectedReductionTco2eYr: (number | null) | null;
+                                totalInvestmentMillionThb: (number | null) | null;
+                                declaredBoundary: ({
+                                    type: string;
+                                    coordinates: unknown;
+                                } | null) | null;
+                                declaredAreaRai: (number | null) | null;
+                            };
+                            contacts: {
+                                id: string;
+                                isPrimary: boolean;
+                                orgName: string;
+                                coordinatorName: (string | null) | null;
+                                position: (string | null) | null;
+                                address: (string | null) | null;
+                                phone: (string | null) | null;
+                                fax: (string | null) | null;
+                                email: (string | null) | null;
+                            }[];
+                            samplePlots: {
+                                id: string;
+                                plotName: string;
+                                boundary: ({
+                                    type: string;
+                                    coordinates: unknown;
+                                } | null) | null;
+                                areaRai: (number | null) | null;
+                            }[];
+                            attachments: {
+                                id: string;
+                                slot: string;
+                                fileId: string;
+                                displayName: (string | null) | null;
+                                mimeType: string;
+                                sizeBytes: number;
+                                /** Format: date-time */
+                                createdAt: string;
+                            }[];
+                            reconciliation: {
+                                declaredAreaRai: (number | null) | null;
+                                effectiveAreaRai: (number | null) | null;
+                                farmsOutside: {
+                                    id: string;
+                                    farmName: string;
+                                }[];
+                                farmsUnknown: {
+                                    id: string;
+                                    farmName: string;
+                                }[];
+                            };
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized — missing or invalid session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden — the requester lacks the required permission. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Not found — the project or document does not exist. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    postApiV1AdminProjectsByIdPdd: {
         parameters: {
             query?: never;
             header?: never;

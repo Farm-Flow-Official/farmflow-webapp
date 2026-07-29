@@ -35,9 +35,16 @@ export async function createProject(input: ProjectInput): Promise<Result<Project
   }
 }
 
+/**
+ * `revalidate: false` is for autosave callers. The PDD wizard's step 1 fires
+ * this on every debounce tick and holds the fresh project in React state
+ * already, so invalidating two route caches per keystroke buys nothing and
+ * makes the server re-render the whole page behind the user's cursor.
+ */
 export async function updateProject(
   id: string,
   input: Partial<ProjectInput>,
+  { revalidate = true }: { revalidate?: boolean } = {},
 ): Promise<Result<ProjectDetail>> {
   try {
     const { data, error, response } = await api.PATCH('/api/v1/admin/projects/{id}', {
@@ -50,8 +57,10 @@ export async function updateProject(
       }
       return { ok: false, error: error?.error?.message ?? 'แก้ไขโครงการไม่สำเร็จ' }
     }
-    revalidatePath(LIST_PATH)
-    revalidatePath(`${LIST_PATH}/${id}`)
+    if (revalidate) {
+      revalidatePath(LIST_PATH)
+      revalidatePath(`${LIST_PATH}/${id}`)
+    }
     return { ok: true, data: data.data }
   } catch {
     return { ok: false, error: 'เชื่อมต่อเซิร์ฟเวอร์ไม่ได้' }

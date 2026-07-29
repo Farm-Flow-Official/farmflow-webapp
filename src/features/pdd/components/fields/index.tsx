@@ -179,9 +179,16 @@ export function RadioField<T extends FieldValues>({
   const error = useFieldError<T>(name)
   const current = watch(name)
 
+  // A `<fieldset>` names the group for assistive tech through its `<legend>`.
+  // The previous `aria-labelledby={name}` pointed at an id no element carried,
+  // leaving every radio group in the wizard unnamed.
   return (
-    <FieldShell name={name} label={label} required={required} hint={hint} error={error}>
-      <div role="radiogroup" aria-labelledby={name} className="flex flex-col gap-2 sm:flex-row">
+    <fieldset>
+      <legend className="mb-1.5 block text-sm font-medium text-ink">
+        {label}
+        {required && <span className="ml-0.5 text-error">*</span>}
+      </legend>
+      <div className="flex flex-col gap-2 sm:flex-row">
         {options.map((o) => {
           const active = String(current) === o.value
           return (
@@ -207,7 +214,12 @@ export function RadioField<T extends FieldValues>({
           )
         })}
       </div>
-    </FieldShell>
+      {error ? (
+        <p className="mt-1 text-xs text-error">{error}</p>
+      ) : (
+        hint && <p className="mt-1 text-xs text-ink-muted">{hint}</p>
+      )}
+    </fieldset>
   )
 }
 

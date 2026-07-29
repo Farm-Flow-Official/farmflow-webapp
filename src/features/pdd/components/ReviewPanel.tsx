@@ -13,7 +13,7 @@ import {
   Lock,
 } from 'lucide-react'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
-import { WIZARD_STEPS, type PddDetail, type StepId } from '@/features/pdd/types'
+import { WIZARD_STEPS, pddFingerprint, type PddDetail, type StepId } from '@/features/pdd/types'
 import {
   fetchReadiness,
   revisePdd,
@@ -55,7 +55,7 @@ export function ReviewPanel({
 
   const isDraft = pdd.status === 'draft'
 
-  const revision = `${pdd.id}:${pdd.updatedAt}`
+  const revision = pddFingerprint(pdd)
   const loading = checked.key !== revision
   const readiness = checked.data
 

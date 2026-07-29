@@ -274,7 +274,7 @@ function ProjectForm({
 }: {
   initial: ProjectListItem | null
   verifierOrgs: VerifierOrg[]
-  onSave: (input: ProjectInput) => void
+  onSave: (input: ProjectInput) => Promise<void>
   onClose: () => void
 }) {
   const titleId = useId()
@@ -287,15 +287,18 @@ function ProjectForm({
   const [startDate, setStartDate] = useState(initial?.creditingStartDate ?? '')
   const [orgId, setOrgId] = useState(initial?.verifierOrgId ?? '')
   const [touched, setTouched] = useState(false)
+  const [saving, setSaving] = useState(false)
 
   const codeError = touched && projectCode.trim() === ''
   const nameError = touched && nameTh.trim() === ''
 
-  function submit() {
+  // Creating a project is not idempotent — `projectCode` is unique, so a double
+  // click produced one project and one 409 toast. Await, and lock the buttons.
+  async function submit() {
     setTouched(true)
-    if (projectCode.trim() === '' || nameTh.trim() === '') return
-
-    onSave({
+    if (projectCode.trim() === '' || nameTh.trim() === '' || saving) return
+    setSaving(true)
+    await onSave({
       projectCode: projectCode.trim(),
       nameTh: nameTh.trim(),
       // Omit rather than send empty strings — the API treats absent as "unchanged".
@@ -306,6 +309,7 @@ function ProjectForm({
       ...(startDate ? { creditingStartDate: startDate } : {}),
       verifierOrgId: orgId || null,
     })
+    setSaving(false)
   }
 
   return (
@@ -467,16 +471,18 @@ function ProjectForm({
         <button
           type="button"
           onClick={onClose}
-          className="rounded-lg border border-line bg-panel px-4 py-2 text-sm font-medium text-ink-secondary transition-colors hover:bg-surface hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          disabled={saving}
+          className="rounded-lg border border-line bg-panel px-4 py-2 text-sm font-medium text-ink-secondary transition-colors hover:bg-surface hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:opacity-60"
         >
           ยกเลิก
         </button>
         <button
           type="button"
           onClick={submit}
-          className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+          disabled={saving}
+          className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-60"
         >
-          {initial ? 'บันทึกการแก้ไข' : 'สร้างโครงการ'}
+          {saving ? 'กำลังบันทึก…' : initial ? 'บันทึกการแก้ไข' : 'สร้างโครงการ'}
         </button>
       </div>
     </Modal>

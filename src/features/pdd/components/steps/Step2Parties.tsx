@@ -237,7 +237,7 @@ function ContactForm({
   onClose,
 }: {
   initial: PddContact | null
-  onSave: (input: Record<string, unknown>) => void
+  onSave: (input: Record<string, unknown>) => Promise<void>
   onClose: () => void
 }) {
   const [orgName, setOrgName] = useState(initial?.orgName ?? '')
@@ -249,16 +249,20 @@ function ContactForm({
   const [email, setEmail] = useState(initial?.email ?? '')
   const [isPrimary, setIsPrimary] = useState(initial?.isPrimary ?? false)
   const [touched, setTouched] = useState(false)
+  const [saving, setSaving] = useState(false)
 
   const orgError = touched && orgName.trim() === ''
   const field = 'h-10 w-full rounded-lg border bg-panel px-3 text-sm text-ink placeholder:text-ink-muted focus:outline-none focus:ring-2'
   const ok = 'border-line focus:border-primary focus:ring-primary/15'
   const bad = 'border-error-border focus:border-error focus:ring-error/15'
 
-  function submit() {
+  // Awaited, with the buttons disabled meanwhile: the save is a round trip, and
+  // a second click on `เพิ่มผู้ติดต่อ` used to create a duplicate contact.
+  async function submit() {
     setTouched(true)
-    if (orgName.trim() === '') return
-    onSave({
+    if (orgName.trim() === '' || saving) return
+    setSaving(true)
+    await onSave({
       orgName: orgName.trim(),
       coordinatorName: coordinatorName.trim() || null,
       position: position.trim() || null,
@@ -268,6 +272,7 @@ function ContactForm({
       email: email.trim() || null,
       isPrimary,
     })
+    setSaving(false)
   }
 
   return (
@@ -372,16 +377,18 @@ function ContactForm({
         <button
           type="button"
           onClick={onClose}
-          className="rounded-lg border border-line bg-panel px-4 py-2 text-sm font-medium text-ink-secondary transition-colors hover:bg-surface hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          disabled={saving}
+          className="rounded-lg border border-line bg-panel px-4 py-2 text-sm font-medium text-ink-secondary transition-colors hover:bg-surface hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:opacity-60"
         >
           ยกเลิก
         </button>
         <button
           type="button"
           onClick={submit}
-          className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+          disabled={saving}
+          className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-60"
         >
-          {initial ? 'บันทึกการแก้ไข' : 'เพิ่มผู้ติดต่อ'}
+          {saving ? 'กำลังบันทึก…' : initial ? 'บันทึกการแก้ไข' : 'เพิ่มผู้ติดต่อ'}
         </button>
       </div>
     </Modal>

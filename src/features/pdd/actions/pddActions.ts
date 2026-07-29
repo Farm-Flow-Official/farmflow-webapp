@@ -18,6 +18,25 @@ function editError(status: number, fallback: string): string {
   return fallback
 }
 
+/** Start the project's first PDD draft. Deliberate, never a side effect of a read. */
+export async function startPdd(projectId: string): Promise<Result<PddDetail>> {
+  try {
+    const { data: res, error, response } = await api.POST('/api/v1/admin/projects/{id}/pdd', {
+      params: { path: { id: projectId } },
+    })
+    if (!res?.success) {
+      return {
+        ok: false,
+        error: editError(response.status, error?.error?.message ?? 'เริ่มเอกสารไม่สำเร็จ'),
+      }
+    }
+    revalidatePath(pddPath(projectId))
+    return { ok: true, data: res.data }
+  } catch {
+    return { ok: false, error: 'เชื่อมต่อเซิร์ฟเวอร์ไม่ได้' }
+  }
+}
+
 /**
  * Autosave one wizard step.
  *
@@ -63,7 +82,7 @@ export async function saveStep1(
   input: Partial<ProjectInput>,
   complete?: boolean,
 ): Promise<Result<PddDetail>> {
-  const projectRes = await updateProject(projectId, input)
+  const projectRes = await updateProject(projectId, input, { revalidate: false })
   if (!projectRes.ok) return { ok: false, error: projectRes.error }
 
   return saveSection(pddId, 'step1', {}, complete)

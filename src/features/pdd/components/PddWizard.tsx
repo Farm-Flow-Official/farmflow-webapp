@@ -4,7 +4,13 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Check, CircleDot, Lock, Loader2, CloudCheck, TriangleAlert } from 'lucide-react'
 import { Toast, useToast } from '@/components/ui/toast'
-import { WIZARD_STEPS, isEditable, type PddDetail, type StepId } from '@/features/pdd/types'
+import {
+  WIZARD_STEPS,
+  isEditable,
+  pddFingerprint,
+  type PddDetail,
+  type StepId,
+} from '@/features/pdd/types'
 import { Step1Project } from '@/features/pdd/components/steps/Step1Project'
 import { Step2Parties } from '@/features/pdd/components/steps/Step2Parties'
 import { Step3Details } from '@/features/pdd/components/steps/Step3Details'
@@ -61,6 +67,21 @@ export function PddWizard({
   const [dirty, setDirty] = useState(false)
   const [saveState, setSaveState] = useState<SaveState>('idle')
   const { message, showToast } = useToast()
+
+  // `router.refresh()` re-renders the server page with a fresh `initial`, but
+  // `useState` only ever reads its initializer once — without this the boundary
+  // import, the sample-plot editor and a new revision would all write to the
+  // server and leave the screen showing the old document.
+  // Adjusted during render rather than in an effect — React's documented way to
+  // reset state when a prop changes, and it avoids painting the stale document
+  // for one frame. The fingerprint is the comparison key because `initial` is a
+  // fresh object on every render.
+  const incoming = pddFingerprint(initial)
+  const [seen, setSeen] = useState(incoming)
+  if (incoming !== seen) {
+    setSeen(incoming)
+    setPdd(initial)
+  }
 
   const editable = canWrite && isEditable(pdd)
   const progress = (pdd.sectionProgress ?? {}) as Record<string, boolean>

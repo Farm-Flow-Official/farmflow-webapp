@@ -38,7 +38,10 @@ export const step1Submit = z.object({
   implementationMode: z.enum(['standalone', 'bundled'], {
     message: 'กรุณาเลือกรูปแบบการดำเนินโครงการ',
   }),
-  creditingPeriodYears: z
+  // Coerced, not plain `z.number()`: a radio input hands back the string "7",
+  // which a bare number check rejects — so selecting "7 ปี" would raise
+  // "กรุณาเลือกระยะเวลาคิดเครดิต" under the field the user just answered.
+  creditingPeriodYears: z.coerce
     .number({ message: 'กรุณาเลือกระยะเวลาคิดเครดิต' })
     .refine((v) => v === 7 || v === 10, 'ระยะเวลาคิดเครดิตต้องเป็น 7 หรือ 10 ปี'),
   creditingStartDate: requiredText('กรุณาระบุวันเริ่มคิดเครดิต'),
@@ -165,7 +168,6 @@ export const step5Submit = z.object({
     { message: 'กรุณาเลือกสิทธิการใช้ประโยชน์ที่ดิน' },
   ),
   landTenureNote: text,
-  hasPowerOfAttorney: z.boolean().optional(),
 })
 
 export const step5Draft = step5Submit.partial()
