@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Check, CircleDot, Lock, Loader2, CloudCheck, TriangleAlert } from 'lucide-react'
 import { Toast, useToast } from '@/components/ui/toast'
 import { WIZARD_STEPS, isEditable, type PddDetail, type StepId } from '@/features/pdd/types'
@@ -12,6 +13,7 @@ import { Step5Area } from '@/features/pdd/components/steps/Step5Area'
 import { Step6Methodology } from '@/features/pdd/components/steps/Step6Methodology'
 import { Step7Calculation } from '@/features/pdd/components/steps/Step7Calculation'
 import { Step8Monitoring } from '@/features/pdd/components/steps/Step8Monitoring'
+import { ReviewPanel } from '@/features/pdd/components/ReviewPanel'
 
 /** What the wizard shell hands every step. */
 export type StepProps = {
@@ -44,7 +46,16 @@ const STEP_COMPONENTS: Record<StepId, (props: StepProps) => React.ReactNode> = {
  * step gates another. Completeness is shown, never enforced — the form is
  * checked at submit, not while it is being written.
  */
-export function PddWizard({ initial, canWrite }: { initial: PddDetail; canWrite: boolean }) {
+export function PddWizard({
+  initial,
+  canWrite,
+  canSubmit,
+}: {
+  initial: PddDetail
+  canWrite: boolean
+  canSubmit: boolean
+}) {
+  const router = useRouter()
   const [pdd, setPdd] = useState(initial)
   const [active, setActive] = useState<StepId>('step1')
   const [dirty, setDirty] = useState(false)
@@ -193,6 +204,18 @@ export function PddWizard({ initial, canWrite }: { initial: PddDetail; canWrite:
         )}
 
         <ActiveStep {...stepProps} />
+
+        <div className="mt-6">
+          <ReviewPanel
+            pdd={pdd}
+            canWrite={canWrite}
+            canSubmit={canSubmit}
+            onGoToStep={setActive}
+            // Submitting or revising changes which document the page is for, so
+            // the server data is refetched rather than patched in place.
+            onSubmitted={() => router.refresh()}
+          />
+        </div>
       </div>
 
       <Toast message={message} />

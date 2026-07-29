@@ -17,3 +17,11 @@ export function canWriteProjects(admin: AdminProfile): boolean {
 export function canDeleteProjects(admin: AdminProfile): boolean {
   return admin.permissions.includes('projects:delete')
 }
+
+/**
+ * Filing the PDD is its own permission: writing the document and being
+ * authorised to send it to the authority are different acts.
+ */
+export function canSubmitPdd(admin: AdminProfile): boolean {
+  return admin.permissions.includes('pdd:submit')
+}

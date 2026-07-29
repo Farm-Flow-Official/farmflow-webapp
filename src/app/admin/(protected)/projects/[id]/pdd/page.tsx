@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation'
 import { ChevronLeft, FileText } from 'lucide-react'
 import { getAdminSession } from '@/features/auth/services/adminSession'
 import { fetchPdd } from '@/features/pdd/services/fetchPdd'
-import { canWriteProjects } from '@/features/projects/permissions'
+import { canSubmitPdd, canWriteProjects } from '@/features/projects/permissions'
 import { PddWizard } from '@/features/pdd/components/PddWizard'
 import { Badge } from '@/components/ui/badge'
 
@@ -28,6 +28,7 @@ export default async function PddWizardPage({ params }: { params: Promise<{ id: 
   // The wizard writes to the project as well as the document (step 1 lives on
   // `projects`), so it is the project write permission that gates editing.
   const canWrite = admin ? canWriteProjects(admin) : false
+  const canSubmit = admin ? canSubmitPdd(admin) : false
 
   return (
     <div className="mx-auto max-w-[1440px] px-4 py-8 sm:px-8">
@@ -55,7 +56,7 @@ export default async function PddWizardPage({ params }: { params: Promise<{ id: 
         </p>
       </header>
 
-      <PddWizard initial={pdd} canWrite={canWrite} />
+      <PddWizard initial={pdd} canWrite={canWrite} canSubmit={canSubmit} />
     </div>
   )
 }
