@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { FieldGroup, SelectField, TextField } from '@/features/pdd/components/fields'
 import { FileField } from '@/features/pdd/components/fields/FileField'
 import { BoundaryPanel } from '@/features/pdd/components/BoundaryPanel'
+import { SamplePlotEditor } from '@/features/pdd/components/SamplePlotEditor'
 import { StepFrame } from '@/features/pdd/components/steps/StepFrame'
 import { useStepAutosave } from '@/features/pdd/hooks/useStepAutosave'
 import { useAttachmentSlot } from '@/features/pdd/hooks/useAttachmentSlot'
@@ -122,31 +123,7 @@ export function Step5Area({ pdd, editable, onDirtyChange, onSaved, onError }: St
           />
         </FieldGroup>
 
-        {/* Sample plots need a map to draw on, which the wizard does not have
-            yet — declaring that plainly beats a control that cannot work. */}
-        <section className="rounded-xl border border-dashed border-line bg-surface p-5">
-          <h3 className="text-sm font-semibold text-ink">แปลงตัวอย่าง (Sample Plots)</h3>
-          <p className="mt-1 text-xs text-ink-muted">
-            {pdd.samplePlots.length > 0
-              ? `บันทึกไว้แล้ว ${pdd.samplePlots.length} แปลง`
-              : 'ยังไม่มีแปลงตัวอย่าง — จะเปิดให้วาดขอบเขตบนแผนที่พร้อมแผนติดตามผล (ขั้นตอนที่ 8)'}
-          </p>
-          {pdd.samplePlots.length > 0 && (
-            <ul className="mt-3 flex flex-col gap-1.5">
-              {pdd.samplePlots.map((plot) => (
-                <li
-                  key={plot.id}
-                  className="flex items-center justify-between rounded-lg border border-line bg-panel px-3 py-2 text-sm"
-                >
-                  <span className="text-ink">{plot.plotName}</span>
-                  <span className="text-xs text-ink-secondary">
-                    {plot.areaRai != null ? `${plot.areaRai.toFixed(2)} ไร่` : '—'}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
+        <SamplePlotEditor pdd={pdd} editable={editable} onError={onError} />
       </StepFrame>
     </FormProvider>
   )
