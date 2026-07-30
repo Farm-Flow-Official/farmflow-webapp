@@ -31,19 +31,27 @@ export type StepSchemas = { submit: z.ZodTypeAny; draft: z.ZodTypeAny }
 
 // ── Step 1 — project cover sheet (stored on `projects`) ─────────────────────
 
-export const step1Submit = z.object({
+const step1Base = z.object({
   projectCode: requiredText('กรุณากรอกรหัสโครงการ'),
   nameTh: requiredText('กรุณากรอกชื่อโครงการภาษาไทย'),
   nameEn: requiredText('กรุณากรอกชื่อโครงการภาษาอังกฤษ'),
   implementationMode: z.enum(['standalone', 'bundled'], {
     message: 'กรุณาเลือกรูปแบบการดำเนินโครงการ',
   }),
-  // Coerced, not plain `z.number()`: a radio input hands back the string "7",
-  // which a bare number check rejects — so selecting "7 ปี" would raise
-  // "กรุณาเลือกระยะเวลาคิดเครดิต" under the field the user just answered.
+  // Coerced, not plain `z.number()`: the radio hands back the string "7", which
+  // a bare number check rejects — so choosing "7 ปี" would raise
+  // "กรุณาเลือกระยะเวลาคิดเครดิต" under the field just answered.
+  //
+  // 7 and 10 are the T-VER forestry defaults, not a hard limit: the source spec
+  // marks them "ตรวจสอบกับ methodology ป่าไม้ล่าสุด", the API already accepts
+  // 1–100, and the forecast builds a row per year whatever the number. Locking
+  // the form to two values would be the UI inventing a rule the standard does
+  // not state — so any whole number in range is allowed.
   creditingPeriodYears: z.coerce
-    .number({ message: 'กรุณาเลือกระยะเวลาคิดเครดิต' })
-    .refine((v) => v === 7 || v === 10, 'ระยะเวลาคิดเครดิตต้องเป็น 7 หรือ 10 ปี'),
+    .number({ message: 'กรุณาเลือกหรือระบุระยะเวลาคิดเครดิต' })
+    .int('ระยะเวลาคิดเครดิตต้องเป็นจำนวนปีเต็ม')
+    .min(1, 'ระยะเวลาคิดเครดิตต้องมีอย่างน้อย 1 ปี')
+    .max(100, 'ระยะเวลาคิดเครดิตต้องไม่เกิน 100 ปี'),
   creditingStartDate: requiredText('กรุณาระบุวันเริ่มคิดเครดิต'),
   creditingEndDate: requiredText('กรุณาระบุวันสิ้นสุดคิดเครดิต'),
   totalInvestmentMillionThb: z.number({ message: 'กรุณากรอกเงินลงทุน' }).nonnegative('ต้องไม่ติดลบ'),
@@ -52,7 +60,23 @@ export const step1Submit = z.object({
     .nonnegative('ต้องไม่ติดลบ'),
 })
 
-export const step1Draft = step1Submit.partial()
+// A crediting period that does not match its own dates is the kind of mistake a
+// reviewer at อบก. finds, not the author — so the form checks it. Only the
+// ordering is enforced; which exact end date a 7-year period implies is still an
+// open question, so `Step1Project` suggests rather than overwrites.
+export const step1Submit = step1Base.superRefine((v, ctx) => {
+  if (v.creditingStartDate && v.creditingEndDate && v.creditingEndDate <= v.creditingStartDate) {
+    ctx.addIssue({
+      code: 'custom',
+      path: ['creditingEndDate'],
+      message: 'วันสิ้นสุดต้องอยู่หลังวันเริ่มคิดเครดิต',
+    })
+  }
+})
+
+// `.superRefine` wraps the object, so the draft variant comes from the unwrapped
+// shape — a half-filled step must not trip a cross-field rule.
+export const step1Draft = step1Base.partial()
 export type Step1Values = z.input<typeof step1Draft>
 
 // ── Step 2 — parties and document preparer ──────────────────────────────────

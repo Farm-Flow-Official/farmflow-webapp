@@ -1,7 +1,7 @@
 'use client'
 
 import { useId, useRef, useState } from 'react'
-import { UploadCloud, FileText, ImageIcon, Trash2, Loader2, Map } from 'lucide-react'
+import { UploadCloud, FileText, ImageIcon, Trash2, Loader2, Map, ExternalLink } from 'lucide-react'
 
 /**
  * Upload control for the PDD's attachment slots.
@@ -41,6 +41,14 @@ function iconFor(mimeType: string) {
   if (mimeType.includes('google-earth') || mimeType.includes('kml')) return Map
   return FileText
 }
+
+/**
+ * Where the browser can fetch a stored file's bytes.
+ *
+ * A same-origin proxy, not the API directly: these are private files and the
+ * session cookie is httpOnly and scoped to this origin.
+ */
+const contentUrl = (fileId: string) => `/admin/files/${fileId}`
 
 function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`
@@ -106,12 +114,41 @@ export function FileField({
                 key={f.id}
                 className="flex items-center gap-3 rounded-lg border border-line bg-surface px-3 py-2"
               >
-                <Icon className="h-4 w-4 shrink-0 text-ink-secondary" strokeWidth={1.75} />
+                {/* A preview, not just a filename: the point of looking at an
+                    attachment is to catch the wrong page of the wrong document,
+                    which a name and a byte count cannot tell you. */}
+                {f.mimeType.startsWith('image/') ? (
+                  <a
+                    href={contentUrl(f.id)}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                    aria-label={`เปิดดู ${f.displayName ?? 'ไฟล์แนบ'} ขนาดเต็ม`}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={contentUrl(f.id)}
+                      alt=""
+                      className="h-12 w-12 rounded border border-line object-cover"
+                    />
+                  </a>
+                ) : (
+                  <Icon className="h-4 w-4 shrink-0 text-ink-secondary" strokeWidth={1.75} />
+                )}
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-sm text-ink">
                     {f.displayName ?? 'ไฟล์แนบ'}
                   </span>
                   <span className="block text-xs text-ink-muted">{formatBytes(f.sizeBytes)}</span>
+                  <a
+                    href={contentUrl(f.id)}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-0.5 inline-flex items-center gap-1 text-xs font-medium text-primary underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                  >
+                    <ExternalLink className="h-3 w-3" strokeWidth={2} />
+                    เปิดดูไฟล์
+                  </a>
                 </span>
                 {!disabled && (
                   <button
