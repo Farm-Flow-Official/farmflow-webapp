@@ -10,8 +10,6 @@ export type PddReconciliation = PddDetail['reconciliation']
 /** Attachment slots the wizard renders, keyed to the form's requirements. */
 export type AttachmentSlot =
   | 'boundary_image'
-  | 'land_right'
-  | 'power_of_attorney'
   | 'boundary_kmz'
   | 'area_photo'
   | 'qa_diagram'

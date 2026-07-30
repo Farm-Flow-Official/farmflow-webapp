@@ -254,8 +254,12 @@ export default async function PddPrintPage({ params }: { params: Promise<{ id: s
             )}
 
             <Attachments pdd={pdd} slot="boundary_kmz" label="ไฟล์ขอบเขต KMZ/KML" />
-            <Attachments pdd={pdd} slot="land_right" label="หลักฐานสิทธิที่ดิน" />
-            <Attachments pdd={pdd} slot="power_of_attorney" label="หนังสือมอบอำนาจ" />
+            {/* The land deed and the power of attorney are deliberately absent:
+                FarmFlow does not hold them (PDPA). They go to อบก. directly. */}
+            <p style={{ fontSize: 10, color: '#555' }}>
+              *หลักฐานสิทธิที่ดิน และหนังสือมอบอำนาจใช้ประโยชน์ที่ดิน ยื่นต่อ อบก. โดยตรง
+              ไม่จัดเก็บในระบบ
+            </p>
             <Attachments pdd={pdd} slot="area_photo" label="รูปภาพพื้นที่" />
           </Section>
 

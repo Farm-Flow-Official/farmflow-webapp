@@ -27,8 +27,6 @@ export function Step5Area({ pdd, editable, onDirtyChange, onSaved, onError }: St
   const router = useRouter()
   const saved = (pdd.content?.step5 ?? {}) as Partial<Step5Values>
 
-  const landRights = useAttachmentSlot(pdd, 'land_right', { onSaved, onError })
-  const powerOfAttorney = useAttachmentSlot(pdd, 'power_of_attorney', { onSaved, onError })
   const areaPhotos = useAttachmentSlot(pdd, 'area_photo', { onSaved, onError })
 
   const form = useForm<Step5Values>({
@@ -74,7 +72,10 @@ export function Step5Area({ pdd, editable, onDirtyChange, onSaved, onError }: St
           onError={onError}
         />
 
-        <FieldGroup title="สิทธิการใช้ประโยชน์ที่ดิน">
+        <FieldGroup
+          title="สิทธิการใช้ประโยชน์ที่ดิน"
+          description="*ต้องเก็บหลักฐานสิทธิที่ดิน และหนังสือมอบอำนาจใช้ประโยชน์ที่ดิน ในอนาคต แต่ไม่เก็บในระบบตอนนี้ — ระบบไม่รับไฟล์เอกสารสิทธิที่ดินตามนโยบายเก็บข้อมูลส่วนบุคคลให้น้อยที่สุด (PDPA) ให้เก็บไว้นอกระบบและยื่นต่อ อบก. โดยตรง"
+        >
           <SelectField<Step5Values>
             name="landTenureType"
             label="ประเภทสิทธิที่ดิน"
@@ -84,28 +85,8 @@ export function Step5Area({ pdd, editable, onDirtyChange, onSaved, onError }: St
           <TextField<Step5Values>
             name="landTenureNote"
             label="รายละเอียดเพิ่มเติม"
-            placeholder="เช่น เลขที่เอกสารสิทธิ์ หรือเงื่อนไขการเช่า"
-          />
-
-          <FileField
-            label="หลักฐานสิทธิที่ดิน"
-            required
-            hint="โฉนด น.ส.3 ส.ป.ก. หรือหนังสืออนุญาตใช้พื้นที่ (PDF หรือรูปภาพ)"
-            accept={DOC_ACCEPT}
-            files={landRights.files}
-            onUpload={landRights.upload}
-            onRemove={landRights.remove}
-            disabled={!editable}
-          />
-
-          <FileField
-            label="หนังสือมอบอำนาจใช้ประโยชน์ที่ดิน"
-            hint="แนบเฉพาะกรณีที่เจ้าของที่ดินมอบอำนาจให้ผู้พัฒนาโครงการ"
-            accept={DOC_ACCEPT}
-            files={powerOfAttorney.files}
-            onUpload={powerOfAttorney.upload}
-            onRemove={powerOfAttorney.remove}
-            disabled={!editable}
+            placeholder="เช่น เงื่อนไขการเช่า หรือช่วงเวลาที่ได้รับอนุญาต"
+            hint="อย่าใส่เลขที่เอกสารสิทธิ์ ชื่อเจ้าของที่ดิน หรือข้อมูลที่ระบุตัวบุคคล"
           />
         </FieldGroup>
 
