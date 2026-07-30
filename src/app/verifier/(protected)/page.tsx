@@ -6,6 +6,8 @@ import {
   fetchVerifierProjects,
   type VerifierProject,
 } from '@/features/verifier/services/fetchVerifierProjects'
+import { ApiFailurePanel } from '@/components/ui/api-failure'
+import { describeApiFailure } from '@/lib/api/describe-failure'
 
 export const metadata: Metadata = {
   title: 'เลือกโครงการ — FarmFlow Verifier',
@@ -19,7 +21,25 @@ export const metadata: Metadata = {
  * batch while unsure which project it belongs to.
  */
 export default async function VerifierProjectPickerPage() {
-  const projects = await fetchVerifierProjects()
+  // The portal's front door. It used to throw straight through, which made a
+  // failure here indistinguishable from "you have no work" — and against an API
+  // without this endpoint it took the whole portal down with it.
+  let projects: VerifierProject[]
+  try {
+    projects = await fetchVerifierProjects()
+  } catch (err) {
+    return (
+      <div className="mx-auto max-w-[1440px] px-4 py-8 sm:px-8">
+        <header className="mb-6">
+          <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-ink">
+            เลือกโครงการที่จะตรวจสอบ
+          </h1>
+        </header>
+        <ApiFailurePanel {...describeApiFailure(err, 'รายการโครงการที่ต้องตรวจ')} />
+      </div>
+    )
+  }
+
   const totalPending = projects.reduce((sum, p) => sum + p.pendingCount, 0)
 
   return (
