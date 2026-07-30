@@ -19,11 +19,13 @@ const STATUS_META: Record<BatchStatus, { variant: BadgeVariant; label: string }>
 
 type Props = {
   batchId: string
+  /** Project the batch belongs to; null for an unenrolled farm. */
+  projectId: string | null
   initialStatus: BatchStatus
   verifierName: string
 }
 
-export function BatchReviewActions({ batchId, initialStatus, verifierName }: Props) {
+export function BatchReviewActions({ batchId, projectId, initialStatus, verifierName }: Props) {
   const [status, setStatus] = useState<BatchStatus>(initialStatus)
   const [approving, setApproving] = useState(false)
   const [rejecting, setRejecting] = useState(false)
@@ -32,7 +34,7 @@ export function BatchReviewActions({ batchId, initialStatus, verifierName }: Pro
 
   async function handleApprove() {
     setPending(true)
-    const res = await approveBatch(batchId)
+    const res = await approveBatch(batchId, projectId)
     setPending(false)
     setApproving(false)
     if (res.ok) {
@@ -45,7 +47,7 @@ export function BatchReviewActions({ batchId, initialStatus, verifierName }: Pro
 
   async function handleReject(reason: string) {
     setPending(true)
-    const res = await rejectBatch(batchId, reason)
+    const res = await rejectBatch(batchId, reason, projectId)
     setPending(false)
     if (res.ok) {
       setStatus('Rejected')

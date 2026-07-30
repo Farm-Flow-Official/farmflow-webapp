@@ -41,6 +41,9 @@ export type BatchStatus = 'Pending' | 'Approved' | 'Rejected'
 export type VerificationBatch = {
   id: string
   farmName: string
+  /** The T-VER project this batch belongs to; null for an unenrolled farm. */
+  projectId: string | null
+  projectName: string | null
   /** Personal name, or a non-PII fallback (ADR 0013). */
   ownerName: string
   submittedAt: string

@@ -5,6 +5,7 @@ import type { VerifierProfile } from '@/features/verifier/auth/types'
 import { VerifierTopbar } from '@/features/verifier/components/VerifierTopbar'
 import { VerifierSidebar } from '@/features/verifier/components/VerifierSidebar'
 import { VerifierGuideProvider } from '@/features/verifier/guide/GuideBook'
+import type { VerifierProject } from '@/features/verifier/services/fetchVerifierProjects'
 
 /**
  * Client shell for the verifier portal — mirrors AdminShell. Owns the mobile
@@ -12,9 +13,12 @@ import { VerifierGuideProvider } from '@/features/verifier/guide/GuideBook'
  */
 export function VerifierShell({
   verifier,
+  projects,
   children,
 }: {
   verifier: VerifierProfile
+  /** Projects this verifier may review — the topbar resolves the active one. */
+  projects: VerifierProject[]
   children: React.ReactNode
 }) {
   const [open, setOpen] = useState(false)
@@ -33,7 +37,7 @@ export function VerifierShell({
     // The guide provider wraps the chrome too — topbar and sidebar both open it.
     <VerifierGuideProvider>
       <div className="min-h-screen bg-surface">
-        <VerifierTopbar verifier={verifier} menuOpen={open} onMenuClick={() => setOpen((v) => !v)} />
+        <VerifierTopbar verifier={verifier} projects={projects} menuOpen={open} onMenuClick={() => setOpen((v) => !v)} />
         <VerifierSidebar open={open} onNavigate={close} />
 
         {open && (

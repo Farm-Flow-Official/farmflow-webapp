@@ -65,6 +65,8 @@ export async function fetchBatchById(id: string): Promise<BatchDetail | null> {
   return {
     id: s.id,
     farmName: s.farm.name,
+    projectId: s.projectId,
+    projectName: s.projectName,
     coverPhotoFileId: s.farm.coverPhotoFileId,
     ownerName: s.farmerName,
     submittedAt: s.submittedAt,

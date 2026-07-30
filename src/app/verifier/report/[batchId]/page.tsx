@@ -7,6 +7,7 @@ import { ArrowLeft } from 'lucide-react'
 import { Logo } from '@/components/ui/logo'
 import { getVerifierSession } from '@/features/verifier/auth/session'
 import { fetchBatchById } from '@/features/verifier/services/fetchBatchById'
+import { batchHref } from '@/features/verifier/lib/routes'
 import { batchSessionId, centroidTileUrl } from '@/features/verifier/lib/report'
 import { PrintButton } from '@/features/verifier/components/PrintButton'
 import { formatDate, formatNumber, formatDateTime } from '@/lib/utils/format'
@@ -43,7 +44,7 @@ export default async function BatchReportPage({
       {/* Toolbar (screen only) */}
       <div className="mx-auto mb-6 flex max-w-[800px] items-center justify-between px-4 print:hidden">
         <Link
-          href={`/verifier/batches/${batch.id}`}
+          href={batchHref(batch.projectId, batch.id)}
           className="inline-flex items-center gap-1.5 text-sm text-ink-muted transition-colors hover:text-ink"
         >
           <ArrowLeft className="h-4 w-4" strokeWidth={1.75} />

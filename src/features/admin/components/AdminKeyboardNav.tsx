@@ -9,6 +9,7 @@ import { useLeaderHotkeys } from '@/lib/hooks/useLeaderHotkeys'
 /** `g` + letter → destination. Letters follow the page name, not the URL. */
 const DESTINATIONS: [key: string, href: string, label: string][] = [
   ['d', '/admin', 'Dashboard'],
+  ['p', '/admin/projects', 'Projects'],
   ['f', '/admin/farmers', 'Farmers'],
   ['m', '/admin/gis', 'GIS Map'],
   ['a', '/admin/announcements', 'Announcements'],
@@ -71,7 +72,7 @@ export function AdminKeyboardNav() {
     >
       <Kbd>G</Kbd>
       <span className="text-[12px] text-ink-secondary">
-        กดตัวอักษรปลายทาง · <span className="text-ink-muted">D F M A S L U T</span>
+        กดตัวอักษรปลายทาง · <span className="text-ink-muted">D P F M A S L U T</span>
       </span>
     </div>
   )

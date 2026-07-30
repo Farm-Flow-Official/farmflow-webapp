@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard,
   Users,
+  FolderTree,
   Map,
   Megaphone,
   Settings,
@@ -28,6 +29,10 @@ const NAV: NavSection[] = [
   {
     heading: 'Overview',
     items: [{ href: '/admin', label: 'Dashboard', icon: LayoutDashboard, key: 'D' }],
+  },
+  {
+    heading: 'Projects',
+    items: [{ href: '/admin/projects', label: 'Projects', icon: FolderTree, key: 'P' }],
   },
   {
     heading: 'Farmers',

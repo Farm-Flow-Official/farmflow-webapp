@@ -18,6 +18,7 @@ import { fetchBatchById } from '@/features/verifier/services/fetchBatchById'
 import { BatchReviewActions } from '@/features/verifier/components/BatchReviewActions'
 import { BatchMiniMap } from '@/features/verifier/components/BatchMiniMap'
 import { TreeSnapshotGrid } from '@/features/verifier/components/TreeSnapshotGrid'
+import { queueHref } from '@/features/verifier/lib/routes'
 import { CultivationInfo } from '@/features/verifier/components/CultivationInfo'
 import { ImageWithSkeleton } from '@/components/ui/image-with-skeleton'
 import { BackShortcut } from '@/features/verifier/components/BackShortcut'
@@ -29,7 +30,7 @@ import { confidenceHex, confidenceToneLabel } from '@/features/verifier/lib/conf
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ batchId: string }>
+  params: Promise<{ projectId: string; batchId: string }>
 }): Promise<Metadata> {
   const { batchId } = await params
   return { title: `${batchId} — FarmFlow Verifier` }
@@ -38,9 +39,9 @@ export async function generateMetadata({
 export default async function BatchDetailPage({
   params,
 }: {
-  params: Promise<{ batchId: string }>
+  params: Promise<{ projectId: string; batchId: string }>
 }) {
-  const { batchId } = await params
+  const { projectId, batchId } = await params
   const [batch, verifier] = await Promise.all([
     fetchBatchById(batchId),
     getVerifierSession(),
@@ -60,10 +61,10 @@ export default async function BatchDetailPage({
 
   return (
     <div className="mx-auto max-w-[1440px] px-4 py-8 sm:px-8">
-      <BackShortcut href="/verifier/batches" />
+      <BackShortcut href={queueHref(projectId)} />
 
       <Link
-        href="/verifier/batches"
+        href={queueHref(projectId)}
         className="mb-6 inline-flex items-center gap-1.5 text-sm text-ink-muted transition-colors hover:text-ink"
       >
         <ArrowLeft className="h-4 w-4" strokeWidth={1.75} />
@@ -104,6 +105,7 @@ export default async function BatchDetailPage({
             </div>
           </div>
           <BatchReviewActions
+            projectId={batch.projectId}
             batchId={batch.id}
             initialStatus={batch.status}
             verifierName={verifier?.username ?? 'Verifier'}
@@ -271,7 +273,7 @@ export default async function BatchDetailPage({
             {batch.trees.length} ภาพ
           </span>
         </div>
-        <TreeSnapshotGrid batchId={batch.id} trees={batch.trees} />
+        <TreeSnapshotGrid projectId={batch.projectId} batchId={batch.id} trees={batch.trees} />
       </section>
     </div>
   )
