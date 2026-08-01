@@ -8,6 +8,16 @@ function num(v: number | null | undefined, dp = 2): string {
   return v.toLocaleString('en-US', { minimumFractionDigits: dp, maximumFractionDigits: dp })
 }
 
+/**
+ * The engine stores tonnes; kilograms is tonnes × 1000, and in binary that
+ * turns 0.0123456 into 12.345599999999999. Round-tripping through 15
+ * significant digits drops the noise without touching a real digit, so the
+ * "full stored value" line reads as the number actually recorded.
+ */
+function exactKg(tco2e: number): number {
+  return Number((tco2e * 1000).toPrecision(15))
+}
+
 /** `[a, b]` → "a·(D²H)^b"; falls back to symbolic when coefficients are absent. */
 function powLaw(coeff: unknown, symbol = 'D²H'): string {
   if (Array.isArray(coeff) && coeff.length >= 2) return `${coeff[0]}·(${symbol})^${coeff[1]}`
@@ -103,13 +113,26 @@ export function CarbonCalculationPanel({ carbon }: { carbon: CarbonBreakdown }) 
           ))}
         </ol>
 
-        {/* Final result */}
-        <div className="mt-3 flex items-center justify-between rounded-xl bg-primary-subtle px-4 py-3">
-          <span className="text-sm font-semibold text-primary">คาร์บอนรายต้น</span>
-          <span className="font-mono text-lg font-bold tabular-nums text-primary">
-            {num(finalKg, 0)}{' '}
-            <span className="text-xs font-medium text-ink-muted">kgCO₂e</span>
-          </span>
+        {/* Final result. This panel exists to be audited, so the stored value is
+            printed outright underneath rather than hidden behind a tooltip —
+            an auditor reading the worked steps should not have to hover to
+            check that the rounded headline matches what the engine recorded. */}
+        <div className="mt-3 rounded-xl bg-primary-subtle px-4 py-3">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-semibold text-primary">คาร์บอนรายต้น</span>
+            <span className="font-mono text-lg font-bold tabular-nums text-primary">
+              {num(finalKg, 2)}{' '}
+              <span className="text-xs font-medium text-ink-muted">kgCO₂e</span>
+            </span>
+          </div>
+          {carbon.carbonTco2e != null && (
+            <p className="mt-2 border-t border-line/60 pt-2 text-right text-[11px] leading-relaxed text-ink-muted">
+              ค่าเต็มในระบบ:{' '}
+              <span className="break-all font-mono text-ink-secondary">
+                {exactKg(carbon.carbonTco2e)} kgCO₂e · {carbon.carbonTco2e} tCO₂e
+              </span>
+            </p>
+          )}
         </div>
 
         <p className="mt-3 border-t border-line pt-2 text-[11px] leading-relaxed text-ink-muted">
