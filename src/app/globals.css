@@ -128,6 +128,27 @@ h3 {
   .animate-soft-glow { animation: none; }
 }
 
+/**
+ * Keep Leaflet's z-index scale inside the map.
+ *
+ * Leaflet numbers its own panes 400–700 and its controls 800–1000. Those
+ * numbers were only ever meant to order the map's *internals*, but the
+ * container declares no stacking context, so they leak into the page and
+ * outrank ordinary app chrome: the (i) tooltip on the MRV card — z-50, sitting
+ * in a panel beside the farm mini-map — rendered underneath the map tiles.
+ * Every popover, dropdown and fixed header on a page with a map has the same
+ * problem.
+ *
+ * `z-index: 0` on the container scopes the whole 400–1000 scale to the map, so
+ * page-level z-index means what it says again. Anything the app wants above a
+ * map now only has to clear 0, and the app's own overlays (the map's own expand
+ * button, dialogs) keep working because they sit outside this element.
+ */
+.leaflet-container {
+  position: relative;
+  z-index: 0;
+}
+
 /* Right-docked Modal (the verifier Guide Book) slides in from the edge. */
 @keyframes drawer-in {
   from { transform: translateX(100%); }

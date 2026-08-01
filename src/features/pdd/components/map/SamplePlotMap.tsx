@@ -46,6 +46,21 @@ function FitContext({ rings }: { rings: Position[][] }) {
   return null
 }
 
+/**
+ * Leaflet measures its container once, at init. When the map mounts inside a
+ * dialog that is still being laid out, that measurement can be a frame early —
+ * the tiles come out clipped and `fitBounds` frames the wrong rectangle. One
+ * re-measure after paint costs nothing and removes the whole class of bug.
+ */
+function InvalidateOnMount() {
+  const map = useMap()
+  useEffect(() => {
+    const id = requestAnimationFrame(() => map.invalidateSize())
+    return () => cancelAnimationFrame(id)
+  }, [map])
+  return null
+}
+
 /** Turns map clicks into vertices while drawing is armed. */
 function DrawCapture({
   drawing,
@@ -97,6 +112,7 @@ export default function SamplePlotMap({
   onCloseRing,
   selectedPlotId,
   onSelectPlot,
+  locked = false,
 }: {
   /** The project's declared boundary, drawn as context. */
   declaredBoundary: Position[] | null
@@ -109,6 +125,15 @@ export default function SamplePlotMap({
   onCloseRing: () => void
   selectedPlotId: string | null
   onSelectPlot: (id: string) => void
+  /**
+   * Turn every pan/zoom gesture off. On a tablet the map is a trap: the finger
+   * that meant to scroll the form lands on it, the page stops moving and the
+   * viewport jumps somewhere else instead. Locked, Leaflet stops swallowing
+   * touchmove and the page scrolls the way the reader expected. Tapping a plot
+   * still selects it — that is a tap, not a swipe, and nobody does it by
+   * accident.
+   */
+  locked?: boolean
 }) {
   const context = useMemo(
     () => [...(declaredBoundary ? [declaredBoundary] : []), ...plots.map((p) => p.ring)],
@@ -122,8 +147,13 @@ export default function SamplePlotMap({
       className="h-full w-full"
       center={[15.87, 100.99]}
       zoom={6}
-      scrollWheelZoom
-      doubleClickZoom={!drawing}
+      dragging={!locked}
+      touchZoom={!locked}
+      scrollWheelZoom={!locked}
+      boxZoom={!locked}
+      keyboard={!locked}
+      zoomControl={!locked}
+      doubleClickZoom={!locked && !drawing}
     >
       <TileLayer
         url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
@@ -131,18 +161,37 @@ export default function SamplePlotMap({
         maxZoom={19}
       />
 
-      {/* Context: the declared project boundary. */}
+      {/* Context: the declared project boundary.
+
+          Drawn as a white dashed line over a dark casing rather than in a
+          single colour. Satellite imagery is every colour at once — the old
+          navy line vanished into tree canopy and shadow, which is precisely
+          where a plantation boundary runs. A light line with a dark outline
+          keeps its edge against both bright soil and dark cover, the same
+          trick road labels use on aerial basemaps. */}
       {declaredBoundary && (
-        <Polygon
-          positions={toLatLng(declaredBoundary)}
-          pathOptions={{
-            color: '#1E40AF',
-            weight: 2,
-            fill: false,
-            dashArray: '8 6',
-            interactive: false,
-          }}
-        />
+        <>
+          <Polygon
+            positions={toLatLng(declaredBoundary)}
+            pathOptions={{
+              color: '#0F172A',
+              weight: 6,
+              opacity: 0.55,
+              fill: false,
+              interactive: false,
+            }}
+          />
+          <Polygon
+            positions={toLatLng(declaredBoundary)}
+            pathOptions={{
+              color: '#FFFFFF',
+              weight: 2.5,
+              fill: false,
+              dashArray: '10 7',
+              interactive: false,
+            }}
+          />
+        </>
       )}
 
       {/* Saved sample plots. */}
@@ -202,6 +251,7 @@ export default function SamplePlotMap({
 
       <DrawCapture drawing={drawing} onPoint={onPoint} />
       <FitContext rings={context} />
+      <InvalidateOnMount />
     </MapContainer>
   )
 }
