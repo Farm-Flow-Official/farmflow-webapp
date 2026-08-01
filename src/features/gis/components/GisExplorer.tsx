@@ -2,8 +2,10 @@
 
 import { useMemo, useState } from 'react'
 import dynamic from 'next/dynamic'
-import { TriangleAlert, Map as MapIcon, Search } from 'lucide-react'
+import { TriangleAlert, Map as MapIcon, Search, Layers } from 'lucide-react'
 import { FarmGisPanel } from '@/features/gis/components/FarmGisPanel'
+import { OverlapPanel } from '@/features/gis/components/OverlapPanel'
+import type { OverlapPair, OverlapSummary } from '@/features/gis/types/overlap'
 import type { FarmGeo } from '@/features/gis/types'
 
 const GisMap = dynamic(() => import('@/features/gis/components/GisMap'), {
@@ -22,12 +24,25 @@ const LEGEND: { label: string; color: string }[] = [
   { label: 'ทับซ้อน', color: '#EF4444' },
 ]
 
-export function GisExplorer({ farms }: { farms: FarmGeo[] }) {
+export function GisExplorer({
+  farms,
+  overlapSummary,
+  overlaps,
+  overlapTotal,
+}: {
+  farms: FarmGeo[]
+  overlapSummary: OverlapSummary
+  overlaps: OverlapPair[]
+  overlapTotal: number
+}) {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [flaggedOnly, setFlaggedOnly] = useState(false)
   const [province, setProvince] = useState<string>('all')
   const [focusId, setFocusId] = useState<string | null>(null)
   const [focusNonce, setFocusNonce] = useState(0)
+  // Opens automatically when there is something to resolve: the panel exists
+  // because overlaps were invisible, so hiding it by default would repeat that.
+  const [overlapOpen, setOverlapOpen] = useState(overlapSummary.pairs > 0)
 
   const flaggedCount = useMemo(
     () => farms.filter((f) => f.overlapFlag).length,
@@ -72,6 +87,16 @@ export function GisExplorer({ farms }: { farms: FarmGeo[] }) {
               <TriangleAlert className="h-3.5 w-3.5" strokeWidth={1.75} />
               {flaggedCount} แปลงทับซ้อน
             </span>
+          )}
+          {!overlapOpen && overlapSummary.pairs > 0 && (
+            <button
+              type="button"
+              onClick={() => setOverlapOpen(true)}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-line px-2.5 py-1 text-xs font-medium text-ink-secondary transition-colors hover:bg-surface hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            >
+              <Layers className="h-3.5 w-3.5" strokeWidth={1.9} />
+              ดูรายการทับซ้อน ({overlapSummary.pairs})
+            </button>
           )}
         </div>
 
@@ -164,10 +189,23 @@ export function GisExplorer({ farms }: { farms: FarmGeo[] }) {
           )}
         </div>
 
-        {/* Desktop side panel */}
-        <aside className="hidden w-80 shrink-0 overflow-y-auto border-l border-line bg-panel lg:block">
-          <FarmGisPanel farm={selected} onClose={() => setSelectedId(null)} />
-        </aside>
+        {/* Desktop side panel — the overlap worklist takes precedence over the
+            single-farm inspector: it is the reason this screen exists. */}
+        {overlapOpen ? (
+          <div className="hidden lg:flex">
+            <OverlapPanel
+              summary={overlapSummary}
+              initial={overlaps}
+              initialTotal={overlapTotal}
+              onFocusFarm={pickFarm}
+              onClose={() => setOverlapOpen(false)}
+            />
+          </div>
+        ) : (
+          <aside className="hidden w-80 shrink-0 overflow-y-auto border-l border-line bg-panel lg:block">
+            <FarmGisPanel farm={selected} onClose={() => setSelectedId(null)} />
+          </aside>
+        )}
       </div>
     </div>
   )
@@ -214,6 +252,7 @@ function FarmSearch({
         onFocus={() => setOpen(true)}
         onBlur={() => setTimeout(() => setOpen(false), 120)}
         placeholder="ค้นหาแปลง / เกษตรกร"
+            data-search-input
         aria-label="ค้นหาแปลง"
         className="h-9 w-full rounded-lg border border-line bg-panel pl-9 pr-3 text-sm text-ink placeholder:text-ink-muted transition-shadow focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15"
       />

@@ -2,30 +2,74 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Boxes, QrCode, ExternalLink } from 'lucide-react'
+import {
+  LayoutDashboard,
+  Boxes,
+  QrCode,
+  ExternalLink,
+  BookOpen,
+  FolderTree,
+  LifeBuoy,
+} from 'lucide-react'
 import type { ComponentType, SVGProps } from 'react'
+import { LINE_OA_URL } from '@/lib/constants/contact'
+import { Kbd } from '@/components/ui/kbd'
+import { useGuide } from '@/components/ui/guide-book'
+import { LinkNavProgress } from '@/components/ui/nav-progress'
 
 type IconType = ComponentType<SVGProps<SVGSVGElement>>
 type NavItem = { href: string; label: string; icon: IconType; newTab?: boolean }
 type NavSection = { heading: string; items: NavItem[] }
 
-const NAV: NavSection[] = [
-  {
-    heading: 'Overview',
-    items: [{ href: '/verifier', label: 'Dashboard', icon: LayoutDashboard }],
-  },
-  {
-    heading: 'Verification',
-    items: [{ href: '/verifier/batches', label: 'Batch Queue', icon: Boxes }],
-  },
-  {
-    heading: 'Tools',
-    // Public, shell-less page → open in a new tab so the portal stays put.
-    items: [
-      { href: '/verifier/verify/qr-check', label: 'QR Verify', icon: QrCode, newTab: true },
-    ],
-  },
-]
+/**
+ * Review links hang off the project the verifier is currently inside, so the
+ * sidebar reads the active project out of the URL rather than holding it in
+ * state — a stale switcher must never point the queue at another project.
+ */
+function navFor(projectId: string | null): NavSection[] {
+  const projectSections: NavSection[] = projectId
+    ? [
+        {
+          heading: 'Overview',
+          items: [
+            {
+              href: `/verifier/projects/${projectId}`,
+              label: 'Dashboard',
+              icon: LayoutDashboard,
+            },
+          ],
+        },
+        {
+          heading: 'Verification',
+          items: [
+            {
+              href: `/verifier/projects/${projectId}/sessions`,
+              label: 'Session Queue',
+              icon: Boxes,
+            },
+          ],
+        },
+      ]
+    : []
+
+  return [
+    {
+      heading: 'Projects',
+      items: [{ href: '/verifier', label: 'เลือกโครงการ', icon: FolderTree }],
+    },
+    ...projectSections,
+    {
+      heading: 'Tools',
+      // Public, shell-less page → open in a new tab so the portal stays put.
+      items: [
+        { href: '/verifier/verify/qr-check', label: 'QR Verify', icon: QrCode, newTab: true },
+        // VERIFIER-NAV-01 — external verifiers had no way to reach a human from
+        // inside the portal, unlike Admin. Same LINE OA both portals use.
+        { href: LINE_OA_URL, label: 'Help Desk', icon: LifeBuoy, newTab: true },
+      ],
+    },
+  ]
+}
 
 type Props = {
   open?: boolean
@@ -34,9 +78,18 @@ type Props = {
 
 export function VerifierSidebar({ open = false, onNavigate }: Props) {
   const pathname = usePathname()
+  const guide = useGuide()
 
-  const isActive = (href: string) =>
-    href === '/verifier' ? pathname === '/verifier' : pathname.startsWith(href)
+  // /verifier/projects/<id>[/...] — the segment after "projects".
+  const projectId = pathname.match(/^\/verifier\/projects\/([^/]+)/)?.[1] ?? null
+  const NAV = navFor(projectId)
+
+  const isActive = (href: string) => {
+    if (href === '/verifier') return pathname === '/verifier'
+    // The project overview would otherwise stay lit while inside its own queue.
+    if (projectId && href === `/verifier/projects/${projectId}`) return pathname === href
+    return pathname.startsWith(href)
+  }
 
   return (
     <aside
@@ -72,8 +125,10 @@ export function VerifierSidebar({ open = false, onNavigate }: Props) {
                     strokeWidth={1.75}
                   />
                   {item.label}
-                  {item.newTab && (
+                  {item.newTab ? (
                     <ExternalLink className="ml-auto h-3.5 w-3.5 text-ink-muted" strokeWidth={1.75} />
+                  ) : (
+                    <LinkNavProgress />
                   )}
                 </Link>
               )
@@ -82,8 +137,22 @@ export function VerifierSidebar({ open = false, onNavigate }: Props) {
         ))}
       </nav>
 
-      <div className="border-t border-line px-4 py-4">
-        <p className="text-[11px] text-ink-muted">FarmFlow Verifier v1.0</p>
+      {/* Help sits at the foot of the nav — out of the daily path, but in the
+          place users have learned to look for it. */}
+      <div className="border-t border-line px-3 py-3">
+        <button
+          type="button"
+          onClick={() => {
+            guide.open()
+            onNavigate?.()
+          }}
+          className="flex h-10 w-full items-center gap-3 rounded-lg px-3 text-sm font-medium text-ink-secondary transition-colors hover:bg-surface hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1"
+        >
+          <BookOpen className="h-[18px] w-[18px] shrink-0 text-ink-muted" strokeWidth={1.75} />
+          คู่มือผู้ตรวจสอบ
+          <Kbd className="ml-auto">?</Kbd>
+        </button>
+        <p className="px-3 pt-2 text-[11px] text-ink-muted">FarmFlow Verifier v1.0</p>
       </div>
     </aside>
   )

@@ -9,6 +9,7 @@ import {
   ShieldCheck,
   Users,
   Search,
+  KeyRound,
 } from 'lucide-react'
 import { DataTable, type Column } from '@/components/ui/data-table'
 import { Badge } from '@/components/ui/badge'
@@ -16,17 +17,22 @@ import { Modal } from '@/components/ui/modal'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { Pagination } from '@/components/ui/pagination'
 import { Toast, useToast } from '@/components/ui/toast'
+import { PasswordInput } from '@/components/ui/password-input'
+import { GeneratedPasswordDialog } from '@/features/admin-users/components/GeneratedPasswordDialog'
 import { formatDate, formatRelativeTime } from '@/lib/utils/format'
 import {
   ADMIN_ROLES,
   ROLE_INFO,
   type AdminUser,
+  ROLES_NEEDING_ORG,
+  ROLE_USERNAME_PREFIX,
   type AdminRole,
   type AdminStatus,
   type AdminInvite,
 } from '@/features/admin-users/types'
 import {
-  inviteAdmin,
+  createAdmin,
+  resetAdminPassword,
   updateAdminRole,
   setAdminStatus,
   deleteAdmin,
@@ -34,6 +40,8 @@ import {
 
 type Props = {
   initialAdmins: AdminUser[]
+  /** Accrediting bodies a verifier account can belong to (ADMIN-USERS-04). */
+  verifierOrgs: { id: string; code: string; nameTh: string }[]
 }
 
 const PAGE_SIZE = 8
@@ -46,6 +54,7 @@ const PAGE_SIZE = 8
 const ROLE_STYLE: Record<AdminRole, { dot: string; avatar: string }> = {
   MASTER: { dot: 'bg-info', avatar: 'bg-info-bg text-info' },
   VERIFIER: { dot: 'bg-pink-600', avatar: 'bg-pink-100 text-pink-700' },
+  PROJECT_DEV: { dot: 'bg-amber-600', avatar: 'bg-amber-100 text-amber-700' },
   FINANCE: { dot: 'bg-ink', avatar: 'bg-ink text-white' },
   GENERAL: { dot: 'bg-ink-muted', avatar: 'bg-surface text-ink-secondary' },
 }
@@ -61,12 +70,16 @@ const STATUS_FILTERS: { value: 'all' | AdminStatus; label: string }[] = [
   { value: 'Inactive', label: 'ปิดใช้งาน' },
 ]
 
-export function AdminUserManager({ initialAdmins }: Props) {
+export function AdminUserManager({ initialAdmins, verifierOrgs }: Props) {
   const [admins, setAdmins] = useState<AdminUser[]>(initialAdmins)
   const [inviting, setInviting] = useState(false)
   const [editing, setEditing] = useState<AdminUser | null>(null)
   const [statusTarget, setStatusTarget] = useState<AdminUser | null>(null)
   const [deleting, setDeleting] = useState<AdminUser | null>(null)
+  /** A just-generated password, shown once (ADMIN-USERS-04). */
+  const [newPassword, setNewPassword] = useState<{ username: string; password: string } | null>(
+    null,
+  )
   const { message, showToast } = useToast()
 
   const [query, setQuery] = useState('')
@@ -89,9 +102,9 @@ export function AdminUserManager({ initialAdmins }: Props) {
   const pageRows = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE)
 
   async function handleInvite(invite: AdminInvite) {
-    const res = await inviteAdmin(invite)
+    const res = await createAdmin(invite)
     if (!res.ok || !res.admin) {
-      showToast(res.error ?? 'เชิญผู้ดูแลไม่สำเร็จ')
+      showToast(res.error ?? 'สร้างบัญชีผู้ดูแลไม่สำเร็จ')
       return
     }
     const created = res.admin
@@ -102,7 +115,25 @@ export function AdminUserManager({ initialAdmins }: Props) {
     setRoleFilter('all')
     setStatusFilter('all')
     setPage(1)
-    showToast(`เชิญ ${invite.username} เข้าระบบแล้ว`)
+
+    // A generated password exists only in this response — show it before
+    // anything else can navigate away from it.
+    if (res.generatedPassword) {
+      setNewPassword({ username: created.username, password: res.generatedPassword })
+    } else {
+      showToast(`สร้างบัญชี ${created.username} แล้ว`)
+    }
+  }
+
+  async function handleResetPassword(admin: AdminUser) {
+    const res = await resetAdminPassword(admin.id)
+    if (!res.ok) {
+      showToast(res.error ?? 'ตั้งรหัสผ่านใหม่ไม่สำเร็จ')
+      return
+    }
+    if (res.generatedPassword) {
+      setNewPassword({ username: admin.username, password: res.generatedPassword })
+    }
   }
 
   async function handleEditRole(role: AdminRole) {
@@ -208,6 +239,9 @@ export function AdminUserManager({ initialAdmins }: Props) {
           <IconButton label="แก้ไขบทบาท" onClick={() => setEditing(a)}>
             <Pencil className="h-4 w-4" strokeWidth={1.75} />
           </IconButton>
+          <IconButton label="ตั้งรหัสผ่านใหม่" onClick={() => handleResetPassword(a)}>
+            <KeyRound className="h-4 w-4" strokeWidth={1.75} />
+          </IconButton>
           <IconButton
             label={a.status === 'Active' ? 'ระงับบัญชี' : 'เปิดใช้งาน'}
             onClick={() => setStatusTarget(a)}
@@ -259,6 +293,7 @@ export function AdminUserManager({ initialAdmins }: Props) {
                 setPage(1)
               }}
               placeholder="ค้นหา username"
+            data-search-input
               className="h-10 w-full rounded-lg border border-line bg-panel pl-9 pr-3 text-sm text-ink placeholder:text-ink-muted transition-shadow focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15"
             />
           </div>
@@ -307,8 +342,17 @@ export function AdminUserManager({ initialAdmins }: Props) {
       {inviting && (
         <InviteForm
           existingUsernames={admins.map((a) => a.username)}
+          verifierOrgs={verifierOrgs}
           onInvite={handleInvite}
           onClose={() => setInviting(false)}
+        />
+      )}
+
+      {newPassword && (
+        <GeneratedPasswordDialog
+          username={newPassword.username}
+          password={newPassword.password}
+          onClose={() => setNewPassword(null)}
         />
       )}
 
@@ -473,34 +517,51 @@ function RoleSelector({
 
 function InviteForm({
   existingUsernames,
+  verifierOrgs,
   onInvite,
   onClose,
 }: {
   existingUsernames: string[]
+  verifierOrgs: { id: string; code: string; nameTh: string }[]
   onInvite: (invite: AdminInvite) => void
   onClose: () => void
 }) {
   const titleId = useId()
   const [username, setUsername] = useState('')
   const [role, setRole] = useState<AdminRole>('VERIFIER')
+  const [orgId, setOrgId] = useState('')
+  const [password, setPassword] = useState('')
   const [touched, setTouched] = useState(false)
 
-  const trimmed = username.trim()
-  const taken = existingUsernames.some(
-    (u) => u.toLowerCase() === trimmed.toLowerCase(),
-  )
+  const trimmed = username.trim().toLowerCase()
+  const prefix = ROLE_USERNAME_PREFIX[role]
+  // Mirror the server's rule so the admin sees the real username as they type,
+  // rather than discovering the prefix after the account exists.
+  const finalUsername = prefix ? `${prefix}.${trimmed}` : trimmed
+  const taken = existingUsernames.some((u) => u.toLowerCase() === finalUsername)
+  const needsOrg = ROLES_NEEDING_ORG.includes(role)
+
   const errorMessage =
     trimmed.length < 3
       ? 'ชื่อผู้ใช้ต้องมีอย่างน้อย 3 ตัวอักษร'
       : taken
-        ? 'ชื่อผู้ใช้นี้มีอยู่แล้ว'
-        : null
+        ? `"${finalUsername}" ถูกใช้แล้ว`
+        : needsOrg && !orgId
+          ? 'ผู้ตรวจรับรองต้องระบุสังกัด'
+          : password && password.length < 8
+            ? 'รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร'
+            : null
   const showError = touched && errorMessage !== null
 
   function submit() {
     setTouched(true)
     if (errorMessage !== null) return
-    onInvite({ username: trimmed, role })
+    onInvite({
+      username: trimmed,
+      role,
+      orgId: needsOrg ? orgId : undefined,
+      password: password || undefined,
+    })
   }
 
   return (
@@ -512,35 +573,87 @@ function InviteForm({
     >
       <div className="border-b border-line px-6 py-4">
         <h2 id={titleId} className="text-base font-semibold text-ink">
-          เชิญผู้ดูแลใหม่
+          เพิ่มผู้ดูแลใหม่
         </h2>
       </div>
 
       <div className="flex flex-col gap-4 overflow-y-auto px-6 py-5">
         <div>
-          <label htmlFor="admin-username" className="mb-1.5 block text-sm font-medium text-ink">
-            ชื่อผู้ใช้ (username) <span className="text-error">*</span>
-          </label>
-          <input
-            id="admin-username"
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            placeholder="เช่น verify.somchai"
-            autoComplete="off"
-            aria-invalid={showError}
-            className={`h-10 w-full rounded-lg border bg-panel px-3 font-mono text-sm text-ink placeholder:font-sans placeholder:text-ink-muted transition-shadow focus:outline-none focus:ring-2 ${
-              showError
-                ? 'border-error-border focus:border-error focus:ring-error/15'
-                : 'border-line focus:border-primary focus:ring-primary/15'
-            }`}
-          />
-          {showError && <p className="mt-1 text-xs text-error">{errorMessage}</p>}
+          <p className="mb-1.5 text-sm font-medium text-ink">บทบาท</p>
+          <RoleSelector value={role} onChange={setRole} name="invite-role" />
         </div>
 
         <div>
-          <p className="mb-1.5 text-sm font-medium text-ink">บทบาท</p>
-          <RoleSelector value={role} onChange={setRole} name="invite-role" />
+          <label htmlFor="admin-username" className="mb-1.5 block text-sm font-medium text-ink">
+            ชื่อผู้ใช้ (username) <span className="text-error">*</span>
+          </label>
+          <div className="flex items-center rounded-lg border border-line bg-panel focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/15">
+            {prefix && (
+              // The prefix is fixed by the role, so it is shown as part of the
+              // field rather than something to type or delete.
+              <span className="select-none border-r border-line px-3 py-2 font-mono text-sm text-ink-muted">
+                {prefix}.
+              </span>
+            )}
+            <input
+              id="admin-username"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="somchai"
+              autoComplete="off"
+              aria-invalid={showError}
+              className="h-10 flex-1 rounded-lg bg-transparent px-3 font-mono text-sm text-ink placeholder:font-sans placeholder:text-ink-disabled focus:outline-none"
+            />
+          </div>
+          {trimmed.length >= 3 && !taken && (
+            <p className="mt-1 text-xs text-ink-muted">
+              จะได้ชื่อผู้ใช้ <span className="font-mono text-ink">{finalUsername}</span>
+            </p>
+          )}
+          {showError && <p className="mt-1 text-xs text-error">{errorMessage}</p>}
+        </div>
+
+        {needsOrg && (
+          <div>
+            <label htmlFor="admin-org" className="mb-1.5 block text-sm font-medium text-ink">
+              สังกัด <span className="text-error">*</span>
+            </label>
+            <select
+              id="admin-org"
+              value={orgId}
+              onChange={(e) => setOrgId(e.target.value)}
+              className="h-10 w-full rounded-lg border border-line bg-panel px-3 text-sm text-ink focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15"
+            >
+              <option value="">เลือกสังกัด…</option>
+              {verifierOrgs.map((o) => (
+                <option key={o.id} value={o.id}>
+                  {o.nameTh} ({o.code})
+                </option>
+              ))}
+            </select>
+            <p className="mt-1 text-xs text-ink-muted">
+              สังกัดนี้จะปรากฏบน PDF รายงานการตรวจรับรองคาร์บอน คู่กับชื่อผู้ตรวจ
+            </p>
+          </div>
+        )}
+
+        <div>
+          <label htmlFor="admin-password" className="mb-1.5 block text-sm font-medium text-ink">
+            รหัสผ่าน
+          </label>
+          <PasswordInput
+            id="admin-password"
+            name="admin-password"
+            autoComplete="new-password"
+            placeholder="เว้นว่างเพื่อให้ระบบสุ่มให้"
+            value={password}
+            onChange={setPassword}
+          />
+          <p className="mt-1 text-xs text-ink-muted">
+            เว้นว่างไว้ ระบบจะสุ่มรหัสผ่านให้และแสดงเพียงครั้งเดียว ·
+            ทุกกรณีผู้ใช้ต้องเปลี่ยนรหัสผ่านเองตอนเข้าระบบครั้งแรก
+          </p>
         </div>
       </div>
 
@@ -557,7 +670,7 @@ function InviteForm({
           onClick={submit}
           className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
         >
-          ส่งคำเชิญ
+          บันทึก
         </button>
       </div>
     </Modal>

@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { TreePine, TriangleAlert, Sun, Cloud, CloudRain } from 'lucide-react'
+import { TreePine, TriangleAlert, ImageOff, ShieldCheck, Sun, Cloud, CloudRain } from 'lucide-react'
 import type { ComponentType, SVGProps } from 'react'
 import type { TreeSnapshot } from '@/features/verifier/types'
 
@@ -7,6 +7,8 @@ type WeatherCondition = 'sunny' | 'cloudy' | 'rainy'
 import { treePlaceholderStyle } from '@/features/verifier/lib/treePlaceholder'
 import { snapshotPhotoUrl } from '@/features/verifier/lib/files'
 import { confidenceBadgeClass } from '@/features/verifier/lib/confidence'
+import { ImageWithSkeleton } from '@/components/ui/image-with-skeleton'
+import { treeHref } from '@/features/verifier/lib/routes'
 
 const WEATHER_ICON: Record<WeatherCondition, ComponentType<SVGProps<SVGSVGElement>>> = {
   sunny: Sun,
@@ -15,10 +17,13 @@ const WEATHER_ICON: Record<WeatherCondition, ComponentType<SVGProps<SVGSVGElemen
 }
 
 export function TreeSnapshotGrid({
-  batchId,
+  projectId,
+  sessionId,
   trees,
 }: {
-  batchId: string
+  /** Project the session belongs to; null for an unenrolled farm. */
+  projectId: string | null
+  sessionId: string
   trees: TreeSnapshot[]
 }) {
   return (
@@ -30,9 +35,15 @@ export function TreeSnapshotGrid({
         return (
           <Link
             key={t.id}
-            href={`/verifier/batches/${batchId}/tree/${t.id}`}
-            className={`group flex flex-col overflow-hidden rounded-xl border bg-panel shadow-sm transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
-              t.anomaly ? 'border-error/60 ring-1 ring-error/30' : 'border-line'
+            href={treeHref(projectId, sessionId, t.id)}
+            className={`group flex flex-col overflow-hidden rounded-xl border bg-panel shadow-sm transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md motion-reduce:transform-none motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
+              t.rejectedByVerifier
+                ? 'border-error ring-1 ring-error/40 opacity-70'
+                : t.confirmedByVerifier
+                  ? 'border-success/50 ring-1 ring-success/25'
+                  : t.anomaly
+                    ? 'border-error/60 ring-1 ring-error/30'
+                    : 'border-line'
             }`}
           >
             {/* Snapshot photo over an earthy gradient that doubles as the
@@ -42,27 +53,58 @@ export function TreeSnapshotGrid({
               style={treePlaceholderStyle(t.id)}
             >
               {t.photoFileId ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
+                <ImageWithSkeleton
                   src={snapshotPhotoUrl(t.photoFileId)}
                   alt=""
                   loading="lazy"
-                  className="absolute inset-0 h-full w-full object-cover"
+                  skeleton={false}
+                  className="absolute inset-0 h-full w-full object-cover transition duration-300 ease-out group-hover:scale-[1.02] motion-reduce:transform-none"
                 />
               ) : (
                 <TreePine className="h-8 w-8 text-white/40" strokeWidth={1.5} />
               )}
-              <span
-                className={`absolute right-1.5 top-1.5 rounded px-1.5 py-0.5 font-mono text-[11px] font-bold ${confidenceBadgeClass(conf)}`}
-              >
-                {pct}%
-              </span>
-              {t.anomaly && (
-                <span className="absolute left-1.5 top-1.5 flex h-5 w-5 items-center justify-center rounded bg-error text-white">
-                  <TriangleAlert className="h-3 w-3" strokeWidth={2} />
-                  <span className="sr-only">ผิดปกติ</span>
+              {t.aiStatus === 'failed' ? (
+                <span className="absolute right-1.5 top-1.5 rounded bg-ink/50 px-1.5 py-0.5 text-[10px] font-semibold text-white/90 backdrop-blur">
+                  ตรวจมือ
                 </span>
-              )}
+              ) : t.aiConfidenceScore != null ? (
+                <span
+                  className={`absolute right-1.5 top-1.5 rounded px-1.5 py-0.5 font-mono text-[11px] font-bold ${confidenceBadgeClass(conf)}`}
+                >
+                  {pct}%
+                </span>
+              ) : null}
+              {/*
+                A verifier working a long session needs to see at a glance which
+                photos they have already ruled on — otherwise, coming back after
+                a break, the only way to tell "not looked at" from "looked at and
+                fine" is to open every tile again (VERIFIER-DETAIL-04).
+              */}
+              {t.rejectedByVerifier ? (
+                <span
+                  title="ปฏิเสธแล้ว — รอเกษตรกรถ่ายใหม่"
+                  className="absolute left-1.5 top-1.5 flex h-5 w-5 items-center justify-center rounded bg-error text-white"
+                >
+                  <ImageOff className="h-3 w-3" strokeWidth={2} />
+                  <span className="sr-only">ปฏิเสธแล้ว</span>
+                </span>
+              ) : t.confirmedByVerifier ? (
+                <span
+                  title="ผู้ตรวจรับรองยืนยันแล้วว่าใช้ได้"
+                  className="absolute left-1.5 top-1.5 flex h-5 w-5 items-center justify-center rounded bg-success text-white"
+                >
+                  <ShieldCheck className="h-3 w-3" strokeWidth={2} />
+                  <span className="sr-only">ยืนยันแล้ว</span>
+                </span>
+              ) : t.anomaly ? (
+                <span
+                  title="AI ติดธงไว้ — ยังไม่ได้ตรวจ"
+                  className="absolute left-1.5 top-1.5 flex h-5 w-5 items-center justify-center rounded bg-error text-white"
+                >
+                  <TriangleAlert className="h-3 w-3" strokeWidth={2} />
+                  <span className="sr-only">ผิดปกติ ยังไม่ได้ตรวจ</span>
+                </span>
+              ) : null}
             </div>
             <div className="flex items-center justify-between gap-1 px-2 py-1.5">
               <span className="truncate font-mono text-[10px] text-ink-muted">

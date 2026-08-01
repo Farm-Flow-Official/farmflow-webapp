@@ -15,5 +15,5 @@ export type Ok<
   : never
 
 export type FarmerListItem = Ok<'/api/v1/admin/farmers/', 'get'>[number]
-export type VerifierBatch = Ok<'/api/v1/verifier/batches', 'get'>[number]
+export type VerifierSession = Ok<'/api/v1/verifier/batches', 'get'>[number]
 export type SystemSettings = Ok<'/api/v1/admin/system/settings', 'get'>

@@ -1,4 +1,4 @@
-import type { BatchDetail, TreeSnapshot } from '@/features/verifier/types'
+import type { SessionDetail, TreeSnapshot } from '@/features/verifier/types'
 import { CONFIDENCE_MIN } from '@/features/verifier/lib/confidence'
 
 export type CrossCheck = {
@@ -31,13 +31,13 @@ export function pointInPolygon(lng: number, lat: number, ring: [number, number][
  * omitted because there's no real weather history/metadata to compare against —
  * mocking it would imply a check that isn't actually happening.
  */
-export function crossCheckTree(tree: TreeSnapshot, batch: BatchDetail): CrossCheck[] {
+export function crossCheckTree(tree: TreeSnapshot, session: SessionDetail): CrossCheck[] {
   const conf = tree.aiConfidenceScore ?? 0
   const confOk = conf >= CONFIDENCE_MIN
   const hasGps = tree.captureLat != null && tree.captureLng != null
   const inBoundary =
-    hasGps && batch.polygon.length > 0
-      ? pointInPolygon(tree.captureLng!, tree.captureLat!, batch.polygon)
+    hasGps && session.polygon.length > 0
+      ? pointInPolygon(tree.captureLng!, tree.captureLat!, session.polygon)
       : false
 
   return [

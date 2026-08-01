@@ -1,7 +1,10 @@
 'use client'
 
 import { useActionState } from 'react'
+import { ExternalLink } from 'lucide-react'
 import { loginVerifier } from '@/features/verifier/auth/actions'
+import { PasswordInput } from '@/components/ui/password-input'
+import { LINE_OA_URL } from '@/lib/constants/contact'
 import type { VerifierLoginState } from '@/features/verifier/auth/types'
 
 export function VerifierLoginForm() {
@@ -45,10 +48,9 @@ export function VerifierLoginForm() {
           <label htmlFor="password" className="mb-1.5 block text-[13px] font-medium text-ink-secondary">
             รหัสผ่าน
           </label>
-          <input
+          <PasswordInput
             id="password"
             name="password"
-            type="password"
             autoComplete="current-password"
             required
             placeholder="••••••••"
@@ -67,6 +69,20 @@ export function VerifierLoginForm() {
 
       <p className="mt-4 text-center text-xs text-ink-muted">
         ใช้บัญชีผู้ตรวจสอบที่ได้รับสิทธิ์ (Verifier)
+      </p>
+
+      <p className="mt-3 text-center text-[13px] text-ink-muted">
+        เข้าสู่ระบบไม่ได้?{' '}
+        <a
+          href={LINE_OA_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1 font-medium text-primary underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+        >
+          ติดต่อผู้ดูแลระบบ
+          <ExternalLink className="h-3 w-3" strokeWidth={2} aria-hidden />
+          <span className="sr-only">(เปิดแท็บใหม่ไปยัง LINE Official Account)</span>
+        </a>
       </p>
     </form>
   )

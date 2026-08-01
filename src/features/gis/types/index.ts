@@ -27,6 +27,8 @@ export type FarmGeo = {
   /** farm_id. */
   id: string
   farmName: string
+  /** Farm cover photo file id (public); null when the farmer set none. */
+  coverPhotoFileId: string | null
   /** owner_user_id — links to the farmer detail page. */
   ownerUserId: string
   /** Enriched farmer name via JOIN to USERS — null if unavailable. */

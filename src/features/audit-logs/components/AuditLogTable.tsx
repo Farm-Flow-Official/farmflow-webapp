@@ -1,13 +1,17 @@
 'use client'
 
-import { useMemo, useState, useId } from 'react'
-import { Search, Eye, ScrollText, ArrowRight } from 'lucide-react'
+import { useState, useId } from 'react'
+import { useSearchParams } from 'next/navigation'
+import { Eye, ScrollText, ArrowRight } from 'lucide-react'
 import { DataTable, type Column } from '@/components/ui/data-table'
 import { Badge, type BadgeVariant } from '@/components/ui/badge'
-import { FilterPills } from '@/components/ui/filter-pills'
+import { ListToolbar } from '@/components/ui/list-toolbar'
+import { AUDIT_PAGE_SIZE as PAGE_SIZE } from '@/features/audit-logs/types/page-size'
 import { Pagination } from '@/components/ui/pagination'
 import { Modal } from '@/components/ui/modal'
 import { formatDateTime } from '@/lib/utils/format'
+import { useListQuery } from '@/lib/hooks/useListQuery'
+import type { AuditFilterOptions, AuditLogPage } from '@/features/audit-logs/types/page'
 import {
   AUDIT_ACTIONS,
   type AuditLog,
@@ -15,7 +19,7 @@ import {
   type AuditActorType,
 } from '@/features/audit-logs/types'
 
-const PAGE_SIZE = 10
+
 
 const ACTION_VARIANT: Record<AuditAction, BadgeVariant> = {
   CREATE: 'info',
@@ -31,56 +35,46 @@ const ACTOR_CHIP: Record<AuditActorType, string> = {
   SYSTEM: 'bg-sunken text-ink-secondary',
 }
 
-const ACTION_FILTERS: { value: 'all' | AuditAction; label: string }[] = [
+const ACTION_FILTERS = [
   { value: 'all', label: 'ทุกการกระทำ' },
-  ...AUDIT_ACTIONS.map((a) => ({ value: a, label: a })),
+  ...AUDIT_ACTIONS.map((a) => ({ value: a as string, label: a })),
 ]
 
-const RANGE_FILTERS: { value: 'all' | '1' | '7' | '30'; label: string }[] = [
-  { value: 'all', label: 'ทั้งหมด' },
-  { value: '1', label: '24 ชม.' },
-  { value: '7', label: '7 วัน' },
-  { value: '30', label: '30 วัน' },
+const SORTS = [
+  { value: 'createdAt', label: 'เวลา' },
+  { value: 'action', label: 'การกระทำ' },
+  { value: 'tableName', label: 'ตาราง' },
 ]
 
-export function AuditLogTable({ logs }: { logs: AuditLog[] }) {
-  const [query, setQuery] = useState('')
-  const [action, setAction] = useState<'all' | AuditAction>('all')
-  const [range, setRange] = useState<'all' | '1' | '7' | '30'>('all')
-  const [page, setPage] = useState(1)
+/** `days` ago as YYYY-MM-DD, for the relative range shortcuts. */
+function daysAgo(days: number): string {
+  const d = new Date()
+  d.setDate(d.getDate() - days)
+  return d.toISOString().slice(0, 10)
+}
+
+/**
+ * The audit log, filtered on the server (ADMIN-AUDIT-01).
+ *
+ * Every control writes to the URL, so a filtered view can be linked to in a
+ * ticket — which is most of what this screen is used for. It also means the
+ * table only ever holds one page of an append-only log that never shrinks.
+ */
+export function AuditLogTable({
+  page: logPage,
+  filters,
+}: {
+  page: AuditLogPage
+  filters: AuditFilterOptions
+}) {
+  const { q, sort, dir, page: pageNum, update, pending } = useListQuery({ sort: 'createdAt' })
+  const params = useSearchParams()
   const [viewing, setViewing] = useState<AuditLog | null>(null)
-  // Capture "now" once at mount (lazy initializer keeps render pure) so the
-  // relative-range filter has a stable reference point across re-renders.
-  const [nowMs] = useState(() => Date.now())
 
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase()
-    const cutoff =
-      range === 'all' ? 0 : nowMs - Number(range) * 86_400_000
-    return logs.filter((l) => {
-      const matchesQuery =
-        q === '' ||
-        (l.actorId?.toLowerCase().includes(q) ?? false) ||
-        l.actorType.toLowerCase().includes(q) ||
-        (l.actorLabel?.toLowerCase().includes(q) ?? false) ||
-        l.recordId.toLowerCase().includes(q) ||
-        l.tableName.toLowerCase().includes(q)
-      const matchesAction = action === 'all' || l.action === action
-      const matchesRange = range === 'all' || new Date(l.createdAt).getTime() >= cutoff
-      return matchesQuery && matchesAction && matchesRange
-    })
-  }, [logs, query, action, range, nowMs])
-
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
-  const safePage = Math.min(page, totalPages)
-  const pageRows = filtered.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE)
-
-  function resetPage<T>(setter: (v: T) => void) {
-    return (v: T) => {
-      setter(v)
-      setPage(1)
-    }
-  }
+  const action = params.get('action') ?? 'all'
+  const actorId = params.get('actorId') ?? ''
+  const from = params.get('from') ?? ''
+  const to = params.get('to') ?? ''
 
   const columns: Column<AuditLog>[] = [
     {
@@ -149,52 +143,110 @@ export function AuditLogTable({ logs }: { logs: AuditLog[] }) {
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Controls */}
-      <div className="flex flex-col gap-3 lg:flex-row lg:flex-wrap lg:items-center">
-        <div className="relative w-full lg:max-w-xs">
-          <Search
-            className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-muted"
-            strokeWidth={1.75}
-          />
+      <ListToolbar
+        q={q}
+        onQueryChange={(v) => update({ q: v })}
+        placeholder="ค้นหา actor / record / ตาราง / การกระทำ"
+        filters={ACTION_FILTERS}
+        filterValue={action}
+        onFilterChange={(v) => update({ action: v } as never)}
+        filterLabel="การกระทำ"
+        sorts={SORTS}
+        sortValue={sort}
+        dir={dir}
+        onSortChange={(s, d) => update({ sort: s, dir: d })}
+        pending={pending}
+      />
+
+      {/* Actor and date range: the two questions an investigation actually
+          starts from — "what did this admin do", "what happened that week". */}
+      <div className="flex flex-wrap items-end gap-3 rounded-xl border border-line bg-panel px-4 py-3">
+        <label className="flex flex-col gap-1 text-[12px] font-medium text-ink-muted">
+          ผู้ทำรายการ
+          <select
+            value={actorId}
+            onChange={(e) => update({ actorId: e.target.value } as never)}
+            className="h-9 min-w-[160px] rounded-lg border border-line bg-panel px-2.5 text-sm text-ink focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15"
+          >
+            <option value="">ทุกคน</option>
+            {filters.actors.map((a) => (
+              <option key={a.id} value={a.id}>
+                {a.username}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className="flex flex-col gap-1 text-[12px] font-medium text-ink-muted">
+          ตั้งแต่
           <input
-            type="text"
-            value={query}
-            onChange={(e) => resetPage(setQuery)(e.target.value)}
-            placeholder="ค้นหา actor / record / ตาราง / ประเภท"
-            className="h-10 w-full rounded-lg border border-line bg-panel pl-9 pr-3 text-sm text-ink placeholder:text-ink-muted transition-shadow focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15"
+            type="date"
+            value={from}
+            max={to || undefined}
+            onChange={(e) => update({ from: e.target.value } as never)}
+            className="h-9 rounded-lg border border-line bg-panel px-2.5 text-sm text-ink focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15"
           />
+        </label>
+
+        <label className="flex flex-col gap-1 text-[12px] font-medium text-ink-muted">
+          ถึง
+          <input
+            type="date"
+            value={to}
+            min={from || undefined}
+            onChange={(e) => update({ to: e.target.value } as never)}
+            className="h-9 rounded-lg border border-line bg-panel px-2.5 text-sm text-ink focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15"
+          />
+        </label>
+
+        <div className="flex items-center gap-1.5">
+          {[
+            { days: 1, label: '24 ชม.' },
+            { days: 7, label: '7 วัน' },
+            { days: 30, label: '30 วัน' },
+          ].map((r) => (
+            <button
+              key={r.days}
+              type="button"
+              onClick={() => update({ from: daysAgo(r.days), to: '' } as never)}
+              className="h-9 rounded-lg border border-line px-2.5 text-[13px] font-medium text-ink-secondary transition-colors hover:bg-surface hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            >
+              {r.label}
+            </button>
+          ))}
+          {(actorId || from || to) && (
+            <button
+              type="button"
+              onClick={() => update({ actorId: '', from: '', to: '' } as never)}
+              className="h-9 rounded-lg px-2.5 text-[13px] font-medium text-ink-muted transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            >
+              ล้างตัวกรอง
+            </button>
+          )}
         </div>
-        <FilterPills
-          ariaLabel="ช่วงเวลา"
-          options={RANGE_FILTERS}
-          value={range}
-          onChange={resetPage(setRange)}
-        />
-        <FilterPills
-          ariaLabel="การกระทำ"
-          options={ACTION_FILTERS}
-          value={action}
-          onChange={resetPage(setAction)}
+      </div>
+
+      <div className={pending ? 'opacity-60 transition-opacity' : 'transition-opacity'}>
+        <DataTable
+          columns={columns}
+          rows={logPage.rows}
+          getRowKey={(l) => l.id}
+          empty={{
+            icon: <ScrollText className="mb-2 h-8 w-8 text-ink-disabled" strokeWidth={1.5} />,
+            title: 'ไม่พบบันทึกกิจกรรม',
+            description: 'ลองปรับคำค้นหาหรือตัวกรอง',
+          }}
         />
       </div>
 
-      <DataTable
-        columns={columns}
-        rows={pageRows}
-        getRowKey={(l) => l.id}
-        empty={{
-          icon: <ScrollText className="mb-2 h-8 w-8 text-ink-disabled" strokeWidth={1.5} />,
-          title: 'ไม่พบบันทึกกิจกรรม',
-          description: 'ลองปรับคำค้นหาหรือตัวกรอง',
-        }}
-      />
-
-      <Pagination
-        page={safePage}
-        pageSize={PAGE_SIZE}
-        total={filtered.length}
-        onPageChange={setPage}
-      />
+      {logPage.total > PAGE_SIZE && (
+        <Pagination
+          page={pageNum}
+          pageSize={PAGE_SIZE}
+          total={logPage.total}
+          onPageChange={(p) => update({ page: p })}
+        />
+      )}
 
       {viewing && <ChangeViewer log={viewing} onClose={() => setViewing(null)} />}
     </div>

@@ -1,15 +1,13 @@
 import type { AdminProfile } from '@/features/auth/types'
 
 /**
- * RBAC seam. Spec A-10 says System Settings is **MASTER (SuperAdmin) only** —
- * only the Master Admin configures `market_price_thb`. The exact `roleId` /
- * permission key contract from the API isn't finalized yet; this is the single
- * place to enforce it later, e.g.:
+ * Can this admin change system settings — the carbon market price, and which
+ * dashboards are open?
  *
- *   return admin.roleId === 'SuperAdmin' ||
- *     admin.permissions.includes('settings:write')
+ * `settings:read` gets you the page; changing anything on it needs
+ * `settings:write`, which the seed grants to MASTER alone. The API enforces the
+ * same split, so this only governs whether the controls are offered.
  */
 export function canManageSettings(admin: AdminProfile): boolean {
-  void admin
-  return true
+  return admin.permissions.includes('settings:write')
 }

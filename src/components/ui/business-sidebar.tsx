@@ -17,6 +17,7 @@ import {
   Settings,
 } from 'lucide-react'
 import type { ComponentType, SVGProps } from 'react'
+import { LinkNavProgress } from '@/components/ui/nav-progress'
 
 type IconType = ComponentType<SVGProps<SVGSVGElement>>
 
@@ -135,6 +136,7 @@ export function BusinessSidebar({ open = false, onNavigate }: Props) {
                     strokeWidth={1.75}
                   />
                   {item.label}
+                  <LinkNavProgress />
                 </Link>
               )
             })}

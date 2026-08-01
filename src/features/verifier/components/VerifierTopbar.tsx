@@ -1,18 +1,41 @@
 'use client'
 
-import { LogOut, Menu, X } from 'lucide-react'
+import { BookOpen, LogOut, Menu, X, FolderTree } from 'lucide-react'
+import { usePathname } from 'next/navigation'
 import { Logo } from '@/components/ui/logo'
+import { Kbd } from '@/components/ui/kbd'
 import type { VerifierProfile } from '@/features/verifier/auth/types'
 import { signOutVerifier } from '@/features/verifier/auth/actions'
+import { useGuide } from '@/components/ui/guide-book'
+import { AnnouncementBell } from '@/components/ui/announcement-bell'
+import type { LiveAnnouncement } from '@/features/announcements/types/targets'
+import type { VerifierProject } from '@/features/verifier/services/fetchVerifierProjects'
 
 type Props = {
   verifier: VerifierProfile
+  /** Projects this verifier may review; the active one is read from the URL. */
+  projects: VerifierProject[]
   menuOpen?: boolean
   onMenuClick?: () => void
+  /** Live announcements for the bell (ADMIN-ANN-02); empty hides it. */
+  announcements?: LiveAnnouncement[]
 }
 
-export function VerifierTopbar({ verifier, menuOpen = false, onMenuClick }: Props) {
+export function VerifierTopbar({
+  verifier,
+  projects,
+  menuOpen = false,
+  onMenuClick,
+  announcements = [],
+}: Props) {
   const initial = verifier.username?.charAt(0).toUpperCase() || 'V'
+  const guide = useGuide()
+  const pathname = usePathname()
+
+  // Approving a session is irreversible, so the project under review is named in
+  // the chrome on every screen rather than only on the page that fetched it.
+  const activeId = pathname.match(/^\/verifier\/projects\/([^/]+)/)?.[1] ?? null
+  const activeProject = activeId ? projects.find((p) => p.id === activeId) : undefined
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 flex h-16 items-center justify-between border-b border-line bg-panel/90 px-4 backdrop-blur sm:px-6">
@@ -34,12 +57,44 @@ export function VerifierTopbar({ verifier, menuOpen = false, onMenuClick }: Prop
             <p className="mt-1 text-[10px] text-ink-muted">Verifier Portal</p>
           </div>
         </div>
+
+        {activeProject && (
+          <div
+            className="ml-2 hidden items-center gap-2 rounded-lg border border-line bg-surface px-3 py-1.5 md:flex"
+            title={`กำลังตรวจสอบโครงการ ${activeProject.projectName}`}
+          >
+            <FolderTree className="h-4 w-4 shrink-0 text-info" strokeWidth={1.75} />
+            <span className="leading-none">
+              <span className="block text-[10px] uppercase tracking-wide text-ink-muted">
+                กำลังตรวจสอบ
+              </span>
+              <span className="mt-0.5 block max-w-[22ch] truncate text-[13px] font-semibold text-ink">
+                {activeProject.projectName}
+              </span>
+            </span>
+          </div>
+        )}
       </div>
 
       <div className="flex items-center gap-3">
+        <AnnouncementBell announcements={announcements} />
+
         <span className="hidden rounded-full border border-primary-muted bg-primary-subtle px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-success sm:inline">
           {verifier.org}
         </span>
+
+        {/* Help lives in the top-right, where users look for it — and stays put
+            on every screen so it can be relied on mid-review. */}
+        <button
+          type="button"
+          onClick={() => guide.open()}
+          title="คู่มือผู้ตรวจสอบ (กด ? เพื่อดูคีย์ลัด)"
+          className="flex h-9 items-center gap-1.5 rounded-lg border border-line bg-panel px-2.5 text-sm font-medium text-ink-secondary transition-colors hover:bg-surface hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+        >
+          <BookOpen className="h-4 w-4" strokeWidth={1.75} />
+          <span className="hidden md:inline">คู่มือ</span>
+          <Kbd className="hidden md:inline-flex">?</Kbd>
+        </button>
 
         <div className="flex items-center gap-2">
           <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-semibold text-white">

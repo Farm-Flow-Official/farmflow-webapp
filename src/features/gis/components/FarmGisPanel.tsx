@@ -7,6 +7,7 @@ import {
   type FarmStatus,
   type GeeStatus,
 } from '@/features/gis/types'
+import { coverPhotoUrl } from '@/lib/farm-cover'
 
 const GEE_META: Record<GeeStatus, { label: string; text: string; dot: string }> = {
   verified: { label: 'ผ่าน', text: 'text-success', dot: 'bg-gis-verified' },
@@ -56,9 +57,28 @@ export function FarmGisPanel({
 
   const state = farmMapState(farm)
   const meta = STATE_META[state]
+  const coverUrl = coverPhotoUrl(farm.coverPhotoFileId)
 
   return (
     <div className="flex flex-col">
+      {coverUrl && (
+        <div className="relative h-36 w-full shrink-0 bg-surface">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={coverUrl}
+            alt={`ภาพหน้าปกแปลง ${farm.farmName}`}
+            className="h-full w-full object-cover"
+          />
+          <button
+            type="button"
+            aria-label="ปิด"
+            onClick={onClose}
+            className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-lg bg-black/45 text-white/95 backdrop-blur transition-colors hover:bg-black/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+          >
+            <X className="h-4 w-4" strokeWidth={1.75} />
+          </button>
+        </div>
+      )}
       <div className="flex items-start justify-between gap-2 border-b border-line px-5 py-4">
         <div>
           <h2 className="text-base font-semibold text-ink">{farm.farmName}</h2>
@@ -69,14 +89,16 @@ export function FarmGisPanel({
             {meta.label}
           </span>
         </div>
-        <button
-          type="button"
-          aria-label="ปิด"
-          onClick={onClose}
-          className="flex h-8 w-8 items-center justify-center rounded-lg text-ink-muted transition-colors hover:bg-surface hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-        >
-          <X className="h-4 w-4" strokeWidth={1.75} />
-        </button>
+        {!coverUrl && (
+          <button
+            type="button"
+            aria-label="ปิด"
+            onClick={onClose}
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-ink-muted transition-colors hover:bg-surface hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          >
+            <X className="h-4 w-4" strokeWidth={1.75} />
+          </button>
+        )}
       </div>
 
       {farm.gee && farm.gee.status !== 'verified' && (

@@ -7,7 +7,13 @@ export function ImpactStrip({ impact }: { impact: ImpactMetrics }) {
   const items = [
     {
       icon: Leaf,
-      value: `${formatNumber(impact.carbonInSystemTco2e)}`,
+      // Two decimals like every other carbon figure on the platform — the same
+      // quantity must not read differently depending on which dashboard you are
+      // standing in.
+      value: impact.carbonInSystemTco2e.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }),
       unit: 'tCO₂e',
       label: 'คาร์บอนในระบบ',
     },
