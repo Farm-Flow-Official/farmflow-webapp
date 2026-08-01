@@ -1,15 +1,13 @@
 import type { Metadata } from 'next'
 import QRCode from 'qrcode'
 import { MessageCircle, ExternalLink, Info } from 'lucide-react'
+// The LINE Official Account is the primary support/complaint channel for the
+// pilot (business req: ticketing via LINE OA, no in-app ticket system).
+import { LINE_OA_ID, LINE_OA_URL } from '@/lib/constants/contact'
 
 export const metadata: Metadata = {
   title: 'Support — FarmFlow Admin',
 }
-
-// FarmFlow LINE Official Account — the primary support/complaint channel for the
-// prototype (business req: ticketing via LINE OA, no in-app ticket system).
-const LINE_OA_URL = 'https://line.me/R/ti/p/@334uvoak'
-const LINE_OA_ID = '@334uvoak'
 
 export default async function SupportPage() {
   const qr = await QRCode.toDataURL(LINE_OA_URL, { width: 240, margin: 1 })

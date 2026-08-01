@@ -1,12 +1,27 @@
 import type { Metadata } from 'next'
 import { VerifierLoginForm } from '@/features/verifier/components/VerifierLoginForm'
 import { Logo } from '@/components/ui/logo'
+import { MaintenanceScreen } from '@/components/ui/maintenance-screen'
+import { checkDashboard } from '@/features/settings/services/fetchAvailability'
 
 export const metadata: Metadata = {
   title: 'เข้าสู่ระบบ — FarmFlow Verifier',
 }
 
-export default function VerifierLoginPage() {
+export default async function VerifierLoginPage() {
+  // Signing in to a closed portal only leads to the maintenance screen anyway —
+  // say so here instead of taking a password first (ADMIN-SYS-01).
+  const closed = await checkDashboard('verifier')
+  if (closed) {
+    return (
+      <MaintenanceScreen
+        title="ระบบผู้ตรวจรับรอง"
+        reason={closed.reason}
+        expectedBackAt={closed.expectedBackAt}
+      />
+    )
+  }
+
   return (
     <main className="flex min-h-screen items-center justify-center bg-surface p-6">
       <div className="w-full max-w-[440px] rounded-xl border border-line bg-panel px-12 py-12 shadow-[0_4px_12px_rgba(0,0,0,0.06)]">

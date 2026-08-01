@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react'
 import type { VerifierProfile } from '@/features/verifier/auth/types'
 import { VerifierTopbar } from '@/features/verifier/components/VerifierTopbar'
+import { AnnouncementBanner } from '@/components/ui/announcement-banner'
+import type { LiveAnnouncement } from '@/features/announcements/types/targets'
 import { VerifierSidebar } from '@/features/verifier/components/VerifierSidebar'
 import { VerifierGuideProvider } from '@/features/verifier/guide/GuideBook'
 import type { VerifierProject } from '@/features/verifier/services/fetchVerifierProjects'
@@ -14,11 +16,14 @@ import type { VerifierProject } from '@/features/verifier/services/fetchVerifier
 export function VerifierShell({
   verifier,
   projects,
+  announcements = { banner: [], bell: [] },
   children,
 }: {
   verifier: VerifierProfile
   /** Projects this verifier may review — the topbar resolves the active one. */
   projects: VerifierProject[]
+  /** Live announcements targeted at this portal, split by channel. */
+  announcements?: { banner: LiveAnnouncement[]; bell: LiveAnnouncement[] }
   children: React.ReactNode
 }) {
   const [open, setOpen] = useState(false)
@@ -37,7 +42,13 @@ export function VerifierShell({
     // The guide provider wraps the chrome too — topbar and sidebar both open it.
     <VerifierGuideProvider>
       <div className="min-h-screen bg-surface">
-        <VerifierTopbar verifier={verifier} projects={projects} menuOpen={open} onMenuClick={() => setOpen((v) => !v)} />
+        <VerifierTopbar
+          verifier={verifier}
+          projects={projects}
+          menuOpen={open}
+          onMenuClick={() => setOpen((v) => !v)}
+          announcements={announcements.bell}
+        />
         <VerifierSidebar open={open} onNavigate={close} />
 
         {open && (
@@ -49,7 +60,10 @@ export function VerifierShell({
           />
         )}
 
-        <main className="min-h-screen pt-16 lg:ml-60">{children}</main>
+        <main className="min-h-screen pt-16 lg:ml-60">
+          <AnnouncementBanner announcements={announcements.banner} />
+          {children}
+        </main>
       </div>
     </VerifierGuideProvider>
   )

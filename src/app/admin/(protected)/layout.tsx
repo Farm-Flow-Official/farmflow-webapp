@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { getAdminSession } from '@/features/auth/services/adminSession'
 import { VERIFIER_ROLE } from '@/features/auth/roles'
 import { AdminShell } from '@/components/ui/admin-shell'
+import { fetchLiveAnnouncements } from '@/features/announcements/services/fetchLiveAnnouncements'
 
 export default async function ProtectedAdminLayout({
   children,
@@ -16,5 +17,16 @@ export default async function ProtectedAdminLayout({
     redirect('/admin/login')
   }
 
-  return <AdminShell admin={admin}>{children}</AdminShell>
+  // Fetched here so every admin screen carries the same notices without each
+  // page having to ask. Both calls fail soft to [] — see the service.
+  const [banner, bell] = await Promise.all([
+    fetchLiveAnnouncements('admin', 'banner'),
+    fetchLiveAnnouncements('admin', 'bell'),
+  ])
+
+  return (
+    <AdminShell admin={admin} announcements={{ banner, bell }}>
+      {children}
+    </AdminShell>
+  )
 }

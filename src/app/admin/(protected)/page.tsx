@@ -13,41 +13,75 @@ import {
   Megaphone,
   Settings,
   Headphones,
+  FolderTree,
+  ScrollText,
+  UserCog,
 } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'Dashboard — FarmFlow Admin',
 }
 
+/**
+ * Quick Access mirrors the sidebar's daily-use menus (ADMIN-DASH-04).
+ *
+ * Projects, Audit Log and Admin Users were missing, which made the panel look
+ * like a partial list rather than a shortcut set — and Projects in particular is
+ * where most admin work now starts.
+ */
 const QUICK_LINKS = [
+  {
+    href: '/admin/projects',
+    label: 'Projects',
+    desc: 'จัดการโครงการ T-VER และเอกสาร PDD',
+    Icon: FolderTree,
+  },
   {
     href: '/admin/farmers',
     label: 'Farmer Management',
-    desc: 'View and manage all farmer accounts',
+    desc: 'ดูและจัดการบัญชีเกษตรกรทั้งหมด',
     Icon: Users,
+  },
+  {
+    href: '/admin/farms',
+    label: 'คิวอนุมัติแปลง',
+    desc: 'อนุมัติ / ไม่อนุมัติแปลงที่ขึ้นทะเบียนใหม่',
+    Icon: Sprout,
   },
   {
     href: '/admin/gis',
     label: 'GIS Map',
-    desc: 'Inspect farm polygons and overlap flags',
+    desc: 'ตรวจขอบเขตแปลงและพื้นที่ทับซ้อน',
     Icon: Map,
   },
   {
     href: '/admin/announcements',
     label: 'Announcements',
-    desc: 'Create and publish news banners',
+    desc: 'สร้างและเผยแพร่ประกาศถึงผู้ใช้',
     Icon: Megaphone,
   },
   {
     href: '/admin/settings',
     label: 'System Settings',
-    desc: 'Update market price and configuration',
+    desc: 'ตั้งราคาคาร์บอนและเปิด/ปิดแดชบอร์ด',
     Icon: Settings,
+  },
+  {
+    href: '/admin/audit-log',
+    label: 'Audit Log',
+    desc: 'ประวัติการกระทำของผู้ดูแลทุกคน',
+    Icon: ScrollText,
+  },
+  {
+    href: '/admin/admin-users',
+    label: 'Admin Users',
+    desc: 'จัดการบัญชีผู้ดูแลและสิทธิ์การเข้าถึง',
+    Icon: UserCog,
   },
   {
     href: '/admin/support',
     label: 'Support Tickets',
-    desc: 'Handle farmer support requests',
+    desc: 'ช่องทางรับเรื่องจากเกษตรกรผ่าน LINE OA',
     Icon: Headphones,
   },
 ]
@@ -90,10 +124,10 @@ export default async function AdminDashboardPage() {
       accentClass: 'bg-primary-subtle text-primary',
     },
     {
-      label: 'Pending Batches',
-      value: String(summary.pendingBatchCount),
+      label: 'Pending Sessions',
+      value: String(summary.pendingSessionCount),
       sublabel: 'sessions awaiting processing',
-      alert: summary.pendingBatchCount > 0,
+      alert: summary.pendingSessionCount > 0,
       Icon: Boxes,
       accentClass: 'bg-warning-bg text-warning',
     },
@@ -145,11 +179,14 @@ export default async function AdminDashboardPage() {
         <h2 className="mb-4 text-xs font-semibold uppercase tracking-wider text-ink-muted">
           Overview
         </h2>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {/* `items-stretch` + `h-full` on the wrapper: the animation div was
+            shrink-wrapping each card, so the grid's equal-height rows never
+            reached the card itself (ADMIN-DASH-01). */}
+        <div className="grid grid-cols-1 items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {kpiCards.map((card, i) => (
             <div
               key={card.label}
-              className="animate-fade-up"
+              className="h-full animate-fade-up"
               style={{ animationDelay: `${(i + 1) * 60}ms` }}
             >
               <KpiCard {...card} />

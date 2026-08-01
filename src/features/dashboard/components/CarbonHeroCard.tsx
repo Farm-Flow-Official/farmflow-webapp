@@ -1,10 +1,13 @@
 import { Leaf, TrendingUp } from 'lucide-react'
-import { formatNumber } from '@/lib/utils/format'
+import { formatCarbonKg, formatNumber } from '@/lib/utils/format'
 
 /**
  * Hero panel for the headline metric — total carbon issued — on a deep brand-green
  * gradient. Shows the proud number plus a *derived* estimated market value
  * (carbon × market price); no fabricated trend, just the real figures made big.
+ *
+ * Leads in tonnes because that is the unit the number is *for*: the market price
+ * beneath it is quoted per tonne, so the two used to disagree on the same card.
  */
 export function CarbonHeroCard({
   totalCarbonKgco2e,
@@ -43,9 +46,15 @@ export function CarbonHeroCard({
 
         <p className="mt-4 flex items-baseline gap-2">
           <span className="font-mono text-4xl font-bold tracking-tight tabular-nums text-white sm:text-5xl">
-            {formatNumber(totalCarbonKgco2e)}
+            {(totalCarbonKgco2e / 1000).toLocaleString('en-US', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
           </span>
-          <span className="text-sm font-medium text-primary-muted">kgCO₂e</span>
+          <span className="text-sm font-medium text-primary-muted">tCO₂e</span>
+        </p>
+        <p className="mt-1 font-mono text-sm tabular-nums text-white/50">
+          {formatCarbonKg(totalCarbonKgco2e)}
         </p>
 
         <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2">

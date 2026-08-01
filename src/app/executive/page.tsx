@@ -14,6 +14,14 @@ export const metadata: Metadata = {
 
 const vals = (series: { value: number }[]) => series.map((p) => p.value)
 
+/**
+ * Tonnes to two decimals — the platform-wide rule for carbon figures, applied
+ * here too so the boardroom view agrees with the operational screens.
+ */
+function formatTonnes(tonnes: number): string {
+  return tonnes.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+}
+
 export default async function ExecutivePage() {
   const { headline, funnel, trends, opportunity, assumptions } =
     await fetchExecutiveOverview()
@@ -58,10 +66,10 @@ export default async function ExecutivePage() {
           />
           <ExecutiveKpiCard
             label="คาร์บอนพร้อมขาย"
-            value={formatNumber(headline.availableCreditsTco2e.value)}
+            value={formatTonnes(headline.availableCreditsTco2e.value)}
             kpi={headline.availableCreditsTco2e}
             unit="ตัน"
-            sub={`≈ ${formatNumber(headline.availableCreditsTco2e.value)} เครดิต`}
+            sub={`≈ ${formatTonnes(headline.availableCreditsTco2e.value)} เครดิต`}
             icon={Leaf}
             accentClass="bg-primary-subtle text-primary"
             trend={vals(trends.availableCreditsByMonth)}
@@ -69,7 +77,7 @@ export default async function ExecutivePage() {
           />
           <ExecutiveKpiCard
             label="คาร์บอนขายแล้วสะสม"
-            value={formatNumber(headline.soldCreditsTco2e.value)}
+            value={formatTonnes(headline.soldCreditsTco2e.value)}
             kpi={headline.soldCreditsTco2e}
             unit="ตัน"
             sub="สะสมทั้งหมด"

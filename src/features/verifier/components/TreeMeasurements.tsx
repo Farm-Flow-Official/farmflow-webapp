@@ -1,7 +1,7 @@
 import type { ComponentType, ReactNode, SVGProps } from 'react'
 import { Ruler, Circle, ArrowUpFromLine, Leaf } from 'lucide-react'
 import { InfoTooltip } from '@/components/ui/info-tooltip'
-import { formatNumber } from '@/lib/utils/format'
+import { formatCarbonExact } from '@/lib/utils/format'
 
 type IconType = ComponentType<SVGProps<SVGSVGElement>>
 
@@ -18,6 +18,11 @@ const oneDp = (n: number) =>
  * derivation (C = π·D); the field crew actually measures girth and the backend
  * converts it to DBH, so this recovers ~that reading (labelled "จาก DBH").
  */
+/** Bare two-decimal number — the tile renders the unit separately. */
+function formatCarbonKgValue(kgCo2e: number): string {
+  return kgCo2e.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+}
+
 export function TreeMeasurements({
   dbhCm,
   heightM,
@@ -54,11 +59,19 @@ export function TreeMeasurements({
       <Tile
         icon={Leaf}
         label="คาร์บอนรายต้น"
-        value={carbonKgco2e != null ? formatNumber(Math.round(carbonKgco2e)) : null}
+        // Two decimals, not whole kilograms: this is the figure the farmer is
+        // paid on, and the same number is shown to two places everywhere else.
+        // The tooltip below carries the stored value in full.
+        value={carbonKgco2e != null ? formatCarbonKgValue(carbonKgco2e) : null}
         unit="kgCO₂e"
         emphasized
         tooltip={
           <>
+            {carbonKgco2e != null && Math.round(carbonKgco2e * 100) / 100 !== carbonKgco2e && (
+              <p className="mb-2 rounded bg-surface px-2 py-1.5 font-mono text-[11px] leading-relaxed text-ink-secondary">
+                ค่าเต็มที่ระบบเก็บ: {formatCarbonExact(carbonKgco2e)}
+              </p>
+            )}
             <p className="mb-1 font-semibold text-ink">วิธีคำนวณคาร์บอน</p>
             คำนวณโดย carbon engine ตามมาตรฐาน{' '}
             <span className="font-medium text-ink">TGO (อบก.) T‑VER‑S‑TOOL‑01‑01 v.02</span> —

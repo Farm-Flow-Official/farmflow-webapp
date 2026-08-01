@@ -2,8 +2,17 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Boxes, QrCode, ExternalLink, BookOpen, FolderTree } from 'lucide-react'
+import {
+  LayoutDashboard,
+  Boxes,
+  QrCode,
+  ExternalLink,
+  BookOpen,
+  FolderTree,
+  LifeBuoy,
+} from 'lucide-react'
 import type { ComponentType, SVGProps } from 'react'
+import { LINE_OA_URL } from '@/lib/constants/contact'
 import { Kbd } from '@/components/ui/kbd'
 import { useGuide } from '@/components/ui/guide-book'
 import { LinkNavProgress } from '@/components/ui/nav-progress'
@@ -34,8 +43,8 @@ function navFor(projectId: string | null): NavSection[] {
           heading: 'Verification',
           items: [
             {
-              href: `/verifier/projects/${projectId}/batches`,
-              label: 'Batch Queue',
+              href: `/verifier/projects/${projectId}/sessions`,
+              label: 'Session Queue',
               icon: Boxes,
             },
           ],
@@ -54,6 +63,9 @@ function navFor(projectId: string | null): NavSection[] {
       // Public, shell-less page → open in a new tab so the portal stays put.
       items: [
         { href: '/verifier/verify/qr-check', label: 'QR Verify', icon: QrCode, newTab: true },
+        // VERIFIER-NAV-01 — external verifiers had no way to reach a human from
+        // inside the portal, unlike Admin. Same LINE OA both portals use.
+        { href: LINE_OA_URL, label: 'Help Desk', icon: LifeBuoy, newTab: true },
       ],
     },
   ]

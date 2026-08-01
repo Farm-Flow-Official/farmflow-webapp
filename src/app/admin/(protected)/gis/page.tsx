@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { ShieldAlert } from 'lucide-react'
 import { getAdminSession } from '@/features/auth/services/adminSession'
 import { fetchFarmGeo } from '@/features/gis/services/fetchFarmGeo'
+import { fetchOverlaps, fetchOverlapSummary } from '@/features/gis/services/fetchOverlaps'
 import { canViewGis } from '@/features/gis/permissions'
 import { GisExplorer } from '@/features/gis/components/GisExplorer'
 
@@ -9,8 +10,15 @@ export const metadata: Metadata = {
   title: 'GIS Map — FarmFlow Admin',
 }
 
+const OVERLAP_PAGE_SIZE = 10
+
 export default async function GisPage() {
-  const [farms, admin] = await Promise.all([fetchFarmGeo(), getAdminSession()])
+  const [farms, admin, overlapSummary, overlapPage] = await Promise.all([
+    fetchFarmGeo(),
+    getAdminSession(),
+    fetchOverlapSummary(),
+    fetchOverlaps({ limit: OVERLAP_PAGE_SIZE }),
+  ])
   const canView = admin ? canViewGis(admin) : false
 
   if (!canView) {
@@ -28,5 +36,12 @@ export default async function GisPage() {
   }
 
   // Full-bleed: GisExplorer owns its own full-height layout (map + panel).
-  return <GisExplorer farms={farms} />
+  return (
+    <GisExplorer
+      farms={farms}
+      overlapSummary={overlapSummary}
+      overlaps={overlapPage.rows}
+      overlapTotal={overlapPage.total}
+    />
+  )
 }
