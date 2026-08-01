@@ -24,18 +24,12 @@ export function formatNumber(n: number): string {
   return n.toLocaleString('en-US')
 }
 
-/**
- * Carbon in tonnes first, kilograms second — `"12.35 tCO2e (12,350 kgCO2e)"`.
- *
- * Carbon is *stored* in kg because that is the finest unit the calculator
- * produces, but nobody trades in kilograms: quotes, contracts and T-VER
- * paperwork are all in tonnes. Leading with kg made every screen read like a
- * lab result rather than an asset. The kg figure stays because it is the exact
- * one, and dropping it would hide rounding from the people checking the maths.
+/*
+ * `formatCarbon()` used to live here and rounded kilograms to whole numbers.
+ * The `<Carbon />` component replaced it — carbon reads to two decimals
+ * everywhere now, and a helper that quietly rounds differently is exactly how
+ * two screens end up disagreeing about the same tree.
  */
-export function formatCarbon(kgCo2e: number): string {
-  return `${formatCarbonTonnes(kgCo2e)} (${formatNumber(Math.round(kgCo2e))} kgCO2e)`
-}
 
 /** Just the tonnes — `"12.35 tCO2e"`. For stat cards and table cells. */
 export function formatCarbonTonnes(kgCo2e: number): string {
