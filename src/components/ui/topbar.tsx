@@ -4,6 +4,8 @@ import { BookOpen, LogOut, Menu, X } from 'lucide-react'
 import { Logo } from '@/components/ui/logo'
 import { Kbd } from '@/components/ui/kbd'
 import { useGuide } from '@/components/ui/guide-book'
+import { AnnouncementBell } from '@/components/ui/announcement-bell'
+import type { LiveAnnouncement } from '@/features/announcements/types/targets'
 import type { AdminProfile } from '@/features/auth/types'
 import { signOutAdmin } from '@/features/auth/actions/signOutAdmin'
 
@@ -11,9 +13,16 @@ type Props = {
   admin: AdminProfile
   menuOpen?: boolean
   onMenuClick?: () => void
+  /** Live announcements for the bell (ADMIN-ANN-02); empty hides it. */
+  announcements?: LiveAnnouncement[]
 }
 
-export function AdminTopbar({ admin, menuOpen = false, onMenuClick }: Props) {
+export function AdminTopbar({
+  admin,
+  menuOpen = false,
+  onMenuClick,
+  announcements = [],
+}: Props) {
   const initial = admin.username?.charAt(0).toUpperCase() || 'A'
   const guide = useGuide()
 
@@ -49,6 +58,8 @@ export function AdminTopbar({ admin, menuOpen = false, onMenuClick }: Props) {
         <span className="hidden rounded-full border border-primary-muted bg-primary-subtle px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-success sm:inline">
           Admin
         </span>
+
+        <AnnouncementBell announcements={announcements} />
 
         {/* Help lives in the top-right, where users look for it — and stays put
             on every screen so it can be relied on mid-task. */}

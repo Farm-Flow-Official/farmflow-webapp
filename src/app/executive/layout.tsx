@@ -1,5 +1,7 @@
 import { redirect } from 'next/navigation'
 import { getAdminSession } from '@/features/auth/services/adminSession'
+import { MaintenanceScreen } from '@/components/ui/maintenance-screen'
+import { checkDashboard } from '@/features/settings/services/fetchAvailability'
 
 /**
  * Executive dashboard is C-level and internal — gated by the same real admin
@@ -11,6 +13,18 @@ export default async function ExecutiveLayout({
 }: {
   children: React.ReactNode
 }) {
+  // ADMIN-SYS-01 — see the note in the verifier layout.
+  const closed = await checkDashboard('executive')
+  if (closed) {
+    return (
+      <MaintenanceScreen
+        title="Executive Dashboard "
+        reason={closed.reason}
+        expectedBackAt={closed.expectedBackAt}
+      />
+    )
+  }
+
   const admin = await getAdminSession()
   if (!admin) {
     redirect('/admin/login')

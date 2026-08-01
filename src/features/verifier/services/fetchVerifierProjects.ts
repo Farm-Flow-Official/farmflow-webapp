@@ -19,7 +19,7 @@ export async function fetchVerifierProjects(): Promise<VerifierProject[]> {
  * The protected layout used the strict version, which made the project list a
  * hard dependency of every verifier screen: against an API that lacks the
  * endpoint (one deployed behind the webapp), the whole portal went down,
- * including the batch and tree pages that predate projects entirely. The names
+ * including the session and tree pages that predate projects entirely. The names
  * are a label. A label must not be able to take the portal offline.
  */
 export async function fetchVerifierProjectsSafe(): Promise<VerifierProject[]> {

@@ -8,11 +8,11 @@ export async function fetchVerifierOverview(projectId: string): Promise<Verifier
   )
 
   // The overview exposes only sessionId/farmName/reason per alert; richer
-  // per-alert fields aren't available here (they live on the batch detail), so
+  // per-alert fields aren't available here (they live on the session detail), so
   // we map exactly those three rather than padding with zeros.
   const alerts: AnomalyAlert[] = o.anomalyAlerts.map((a) => ({
     id: a.sessionId,
-    batchId: a.sessionId,
+    sessionId: a.sessionId,
     farmName: a.farmName,
     reason: a.reason,
   }))

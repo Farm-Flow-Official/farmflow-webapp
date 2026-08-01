@@ -1,17 +1,14 @@
 import type { AdminProfile } from '@/features/auth/types'
 
 /**
- * RBAC seam. Spec A-12 says Admin User Management is **MASTER (SuperAdmin) only**,
- * but the exact `roleId` value / permission key contract from the API isn't
- * finalized yet. This is the single place to enforce it later.
+ * Can this admin manage other admin accounts?
  *
- * For now it returns `true` so the prototype is fully usable in a demo. When the
- * API contract is known, swap the body for the real check, e.g.:
- *
- *   return admin.roleId === 'SuperAdmin' ||
- *     admin.permissions.includes('admin:manage')
+ * The permission catalogue is seeded server-side and `/admin/auth/me` returns
+ * the caller's codes, so this is a real check now rather than the `return true`
+ * placeholder it started as. The API enforces the same code through
+ * `requirePermission`; this only decides whether the console *offers* the
+ * action, so a role is never shown a button that answers 403.
  */
 export function canManageAdmins(admin: AdminProfile): boolean {
-  void admin
-  return true
+  return admin.permissions.includes('admins:manage')
 }

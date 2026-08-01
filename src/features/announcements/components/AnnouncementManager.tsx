@@ -5,6 +5,8 @@ import { Plus, Pencil, Trash2, Megaphone } from 'lucide-react'
 import { DataTable, type Column } from '@/components/ui/data-table'
 import { Badge } from '@/components/ui/badge'
 import { Modal } from '@/components/ui/modal'
+import { TargetPicker } from '@/features/announcements/components/TargetPicker'
+import type { AnnouncementTarget } from '@/features/announcements/types/targets'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { Toast, useToast } from '@/components/ui/toast'
 import { formatDate } from '@/lib/utils/format'
@@ -203,6 +205,14 @@ function RowAction({
 
 /* ── Create / Edit form (modal) ─────────────────────────────────────────── */
 
+/** ISO → the `YYYY-MM-DDTHH:mm` a `datetime-local` input expects, in local time. */
+function toLocalInput(iso: string | null | undefined): string {
+  if (!iso) return ''
+  const d = new Date(iso)
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
+}
+
 function AnnouncementForm({
   initial,
   onSave,
@@ -216,14 +226,35 @@ function AnnouncementForm({
   const [title, setTitle] = useState(initial?.title ?? '')
   const [body, setBody] = useState(initial?.body ?? '')
   const [status, setStatus] = useState<AnnouncementStatus>(initial?.status ?? 'Draft')
+  const [targets, setTargets] = useState<AnnouncementTarget[]>(initial?.targets ?? [])
+  // `datetime-local` wants `YYYY-MM-DDTHH:mm`; the API speaks ISO.
+  const [startAt, setStartAt] = useState(toLocalInput(initial?.startAt))
+  const [endAt, setEndAt] = useState(toLocalInput(initial?.endAt))
   const [touched, setTouched] = useState(false)
 
   const titleError = touched && title.trim() === ''
+  const windowError =
+    startAt !== '' && endAt !== '' && new Date(startAt) >= new Date(endAt)
+      ? 'วันที่เริ่มแสดงต้องมาก่อนวันที่สิ้นสุด'
+      : null
+  // Publishing with no destination is the one combination that silently does
+  // nothing, so it is blocked rather than warned about.
+  const targetError =
+    status === 'Active' && targets.length === 0
+      ? 'ประกาศที่เผยแพร่ต้องเลือกอย่างน้อย 1 ปลายทาง'
+      : null
 
   function submit() {
     setTouched(true)
-    if (title.trim() === '') return
-    onSave({ title: title.trim(), body: body.trim(), status })
+    if (title.trim() === '' || windowError || targetError) return
+    onSave({
+      title: title.trim(),
+      body: body.trim(),
+      status,
+      targets,
+      startAt: startAt ? new Date(startAt).toISOString() : null,
+      endAt: endAt ? new Date(endAt).toISOString() : null,
+    })
   }
 
   return (
@@ -272,6 +303,42 @@ function AnnouncementForm({
             placeholder="รายละเอียดประกาศ…"
             className="w-full resize-y rounded-lg border border-line bg-panel px-3 py-2 text-sm text-ink placeholder:text-ink-muted transition-shadow focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15"
           />
+        </div>
+
+        <div>
+          <p className="mb-1.5 text-sm font-medium text-ink">แสดงที่ไหน</p>
+          <TargetPicker value={targets} onChange={setTargets} />
+          {touched && targetError && <p className="mt-1 text-xs text-error">{targetError}</p>}
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div>
+            <label htmlFor="ann-start" className="mb-1.5 block text-sm font-medium text-ink">
+              เริ่มแสดง
+            </label>
+            <input
+              id="ann-start"
+              type="datetime-local"
+              value={startAt}
+              onChange={(e) => setStartAt(e.target.value)}
+              className="h-10 w-full rounded-lg border border-line bg-panel px-3 text-sm text-ink focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15"
+            />
+            <p className="mt-1 text-[11px] text-ink-muted">เว้นว่าง = แสดงทันทีที่เผยแพร่</p>
+          </div>
+          <div>
+            <label htmlFor="ann-end" className="mb-1.5 block text-sm font-medium text-ink">
+              สิ้นสุด
+            </label>
+            <input
+              id="ann-end"
+              type="datetime-local"
+              value={endAt}
+              onChange={(e) => setEndAt(e.target.value)}
+              className="h-10 w-full rounded-lg border border-line bg-panel px-3 text-sm text-ink focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15"
+            />
+            <p className="mt-1 text-[11px] text-ink-muted">เว้นว่าง = แสดงจนกว่าจะปิดเอง</p>
+          </div>
+          {windowError && <p className="text-xs text-error sm:col-span-2">{windowError}</p>}
         </div>
 
         {/* Publish toggle */}

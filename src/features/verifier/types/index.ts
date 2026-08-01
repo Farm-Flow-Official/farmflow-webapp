@@ -17,14 +17,14 @@ export type VerifierOverview = {
 /**
  * Anomaly alert as exposed by `GET /verifier/overview`. The endpoint only
  * provides the session id, farm name, and a human-readable reason — richer
- * per-alert fields (owner, tree count, confidence, timestamp) live on the batch
+ * per-alert fields (owner, tree count, confidence, timestamp) live on the session
  * detail, not here. We model exactly what the API returns rather than padding
  * missing fields with zeros (which rendered as "0%", "0 ต้น", "Invalid Date").
  */
 export type AnomalyAlert = {
-  /** Assessment session id — row key and batch link target. */
+  /** Assessment session id — row key and session link target. */
   id: string
-  batchId: string
+  sessionId: string
   farmName: string
   reason: string
 }
@@ -34,14 +34,14 @@ export type VerifierOverviewData = {
   alerts: AnomalyAlert[]
 }
 
-/* ── V-03 Farm Batch Queue ──────────────────────────────────────────────── */
+/* ── V-03 Session Queue ──────────────────────────────────────────────── */
 
-export type BatchStatus = 'Pending' | 'Approved' | 'Rejected'
+export type SessionStatus = 'Pending' | 'Approved' | 'Rejected'
 
-export type VerificationBatch = {
+export type VerificationSession = {
   id: string
   farmName: string
-  /** The T-VER project this batch belongs to; null for an unenrolled farm. */
+  /** The T-VER project this session belongs to; null for an unenrolled farm. */
   projectId: string | null
   projectName: string | null
   /** Personal name, or a non-PII fallback (ADR 0013). */
@@ -50,11 +50,13 @@ export type VerificationBatch = {
   treeCount: number
   avgConfidence: number
   anomalyFlag: boolean
-  status: BatchStatus
+  status: SessionStatus
   totalCarbonKgCo2e: number
+  /** This session set the farm's reference carbon stock — shows the green TAG. */
+  isBaseline: boolean
 }
 
-/* ── V-04 Batch Detail / V-05 Tree Inspect ──────────────────────────────── */
+/* ── V-04 Session Detail / V-05 Tree Inspect ──────────────────────────────── */
 
 export type WeatherCondition = 'sunny' | 'cloudy' | 'rainy'
 
@@ -107,12 +109,23 @@ export type TreeSnapshot = {
   aiConfidenceScore: number | null
   /** Estimated carbon for this tree in kgCO₂e; null when no AI assessment yet. */
   estimatedCarbonKgco2e: number | null
-  /** AI assessment status: 'waiting' | 'completed' | 'rejected' | 'failed'; null when none. */
+  /**
+   * The **model's** verdict: 'waiting' | 'completed' | 'rejected' | 'failed'.
+   * Never overwritten by a human decision — see `rejectedByVerifier`.
+   */
   aiStatus: string | null
+  /** The latest verdict overall: the model's, or a verifier's if they ruled. */
+  status: string | null
   /** Anomaly flags the vision model raised (ADR 0022); empty when none. */
   aiFlags: string[]
   /** Vision model's Thai rationale, or a failure reason; null when not assessed. */
   aiRationale: string | null
+  /** Why this tree was rejected — the farmer sees this text. */
+  rejectionReason: string | null
+  /** A person rejected this tree, not the model (VERIFIER-DETAIL-04). */
+  rejectedByVerifier: boolean
+  /** A person checked the flagged tree and accepted it — clears the anomaly. */
+  confirmedByVerifier: boolean
   /** Diameter at Breast Height (1.3 m) in cm. */
   dbhCm: number | null
   /** Tree height in metres. */
@@ -123,7 +136,7 @@ export type TreeSnapshot = {
 }
 
 /**
- * Allometric equation provenance for the batch's species — read straight from
+ * Allometric equation provenance for the session's species — read straight from
  * the engine's `species_equations` row (the one that produced the carbon), so
  * the verifier sees the real equation, never a frontend guess.
  */
@@ -156,7 +169,33 @@ export type Cultivation = {
   isDefaultSubplot: boolean
 }
 
-export type BatchDetail = VerificationBatch & {
+/**
+ * The farm's reference carbon stock in this project (VERIFIER-BASELINE-01).
+ * Null when no baseline has been set — the usual state before the first
+ * approval.
+ */
+export type SessionBaseline = {
+  sessionId: string
+  /** This session is the one that established it — drives the green TAG. */
+  isThisSession: boolean
+  carbonTco2e: number
+  creditingPeriodYears: number | null
+  approvedAt: string
+}
+
+/** What the farm is registered to, and when it is next due (VERIFIER-DETAIL-02). */
+export type SessionRegistration = {
+  creditingPeriodYears: number | null
+  creditingStartDate: string | null
+  creditingEndDate: string | null
+  /** Null once the crediting period has ended — there is no next round. */
+  nextCollectionYear: number | null
+}
+
+export type SessionDetail = VerificationSession & {
+  projectCode: string | null
+  registration: SessionRegistration
+  baseline: SessionBaseline | null
   /** Registered species (Thai), e.g. 'ยางพารา'. */
   speciesNameTh: string | null
   /** Cultivation facts of the assessed subplot. */

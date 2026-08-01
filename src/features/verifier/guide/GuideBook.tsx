@@ -8,8 +8,8 @@ import {
 
 /** Section that answers "how do I do the thing on this screen?" per route. */
 function resolveSection(pathname: string): GuideSectionId {
-  if (/\/batches\/[^/]+\/tree\//.test(pathname)) return 'criteria'
-  if (/\/batches\/[^/]+/.test(pathname)) return 'decision'
+  if (/\/sessions\/[^/]+\/tree\//.test(pathname)) return 'criteria'
+  if (/\/sessions\/[^/]+/.test(pathname)) return 'decision'
   return 'workflow'
 }
 

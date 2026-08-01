@@ -1,13 +1,18 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Phone, Mail, Leaf, Wallet, Sprout } from 'lucide-react'
+import { ArrowLeft, Phone, Leaf, Wallet, Sprout } from 'lucide-react'
 import type { Metadata } from 'next'
 import { fetchFarmerById } from '@/features/farmers/services/fetchFarmerById'
-import { DataTable, type Column } from '@/components/ui/data-table'
-import { formatDate, formatPhone, formatNumber } from '@/lib/utils/format'
+import { type Column } from '@/components/ui/data-table'
+import { AreaRai } from '@/components/ui/area-rai'
+import { Carbon } from '@/components/ui/carbon'
+import { Badge } from '@/components/ui/badge'
+import { formatDate, formatNumber } from '@/lib/utils/format'
 import { coverPhotoUrl } from '@/lib/farm-cover'
 import { FarmerProfileHeader } from '@/features/farmers/components/FarmerProfileHeader'
-import type { Farm } from '@/features/farmers/types'
+import { ContactCell } from '@/features/farmers/components/ContactCell'
+import { FARM_STATUS_INFO, type Farm } from '@/features/farmers/types'
+import { FarmerFarmsTable } from '@/features/farmers/components/FarmerFarmsTable'
 
 export async function generateMetadata({
   params,
@@ -67,11 +72,11 @@ const farmColumns: Column<Farm>[] = [
   },
   {
     key: 'area',
-    header: 'พื้นที่ (ไร่)',
+    header: 'พื้นที่',
     align: 'right',
     cell: (f) => (
-      <span className="font-mono tabular-nums text-ink-secondary">
-        {f.areaRai != null ? f.areaRai : <span className="text-ink-disabled">—</span>}
+      <span className="text-ink-secondary">
+        <AreaRai rai={f.areaRai} />
       </span>
     ),
   },
@@ -85,12 +90,33 @@ const farmColumns: Column<Farm>[] = [
     ),
   },
   {
+    key: 'status',
+    header: 'สถานะ',
+    cell: (f) => {
+      const info = FARM_STATUS_INFO[f.farmStatus]
+      return (
+        <Badge variant={info.variant} dot>
+          {info.label}
+        </Badge>
+      )
+    },
+  },
+  {
+    key: 'project',
+    header: 'ขึ้นทะเบียนกับโครงการ',
+    cell: (f) => (
+      <span className="text-[13px] text-ink-secondary">
+        {f.projectName ?? <span className="text-ink-disabled">ยังไม่เข้าร่วม</span>}
+      </span>
+    ),
+  },
+  {
     key: 'carbon',
-    header: 'Carbon (kgCO₂e)',
+    header: 'Carbon',
     align: 'right',
     cell: (f) => (
-      <span className="font-mono tabular-nums font-semibold text-success">
-        {f.carbonKgCo2e != null ? formatNumber(f.carbonKgCo2e) : <span className="font-normal text-ink-disabled">—</span>}
+      <span className="font-semibold text-success">
+        <Carbon kgCo2e={f.carbonKgCo2e} stacked />
       </span>
     ),
   },
@@ -128,28 +154,21 @@ export default async function FarmerDetailPage({
 
       {/* Info grid */}
       <div className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <div className="rounded-xl border border-line bg-panel p-4 shadow-sm">
+        {/* Phone and email arrive masked; `ContactCell` owns the audited reveal
+            (ADMIN-PROJ-03), so both live in one cell rather than two. */}
+        <div className="col-span-2 rounded-xl border border-line bg-panel p-4 shadow-sm">
           <div className="mb-2 flex items-center gap-1.5">
             <Phone className="h-3.5 w-3.5 text-ink-muted" strokeWidth={1.75} />
             <p className="text-[11px] font-semibold uppercase tracking-wide text-ink-muted">
-              เบอร์โทรศัพท์
+              ข้อมูลติดต่อ
             </p>
           </div>
-          <p className="font-mono text-sm font-medium text-ink">
-            {farmer.phone ? formatPhone(farmer.phone) : <span className="text-ink-disabled">—</span>}
-          </p>
-        </div>
-
-        <div className="rounded-xl border border-line bg-panel p-4 shadow-sm">
-          <div className="mb-2 flex items-center gap-1.5">
-            <Mail className="h-3.5 w-3.5 text-ink-muted" strokeWidth={1.75} />
-            <p className="text-[11px] font-semibold uppercase tracking-wide text-ink-muted">
-              อีเมล
-            </p>
-          </div>
-          <p className="truncate text-sm font-medium text-ink">
-            {farmer.email ?? <span className="text-ink-disabled">—</span>}
-          </p>
+          <ContactCell
+            farmerId={farmer.id}
+            phoneMasked={farmer.phone}
+            emailMasked={farmer.email}
+            hasContact={farmer.hasContact}
+          />
         </div>
 
         <div className="rounded-xl border border-line bg-panel p-4 shadow-sm">
@@ -159,10 +178,8 @@ export default async function FarmerDetailPage({
               Carbon รวม
             </p>
           </div>
-          <p className="font-mono text-sm font-semibold text-success">
-            {farmer.totalCarbonKgCo2e != null
-              ? <>{formatNumber(farmer.totalCarbonKgCo2e)} <span className="text-xs font-normal text-ink-muted">kgCO₂e</span></>
-              : <><span className="text-ink-disabled">—</span></>}
+          <p className="text-sm font-semibold text-success">
+            <Carbon kgCo2e={farmer.totalCarbonKgCo2e} stacked />
           </p>
         </div>
 
@@ -191,18 +208,7 @@ export default async function FarmerDetailPage({
             {farmer.farms.length} แปลง
           </span>
         </div>
-        <DataTable
-          columns={farmColumns}
-          rows={farmer.farms}
-          getRowKey={(f) => f.id}
-          empty={{
-            icon: (
-              <Sprout className="mb-2 h-8 w-8 text-ink-disabled" strokeWidth={1.5} />
-            ),
-            title: 'ยังไม่มีแปลงเกษตร',
-            description: 'เกษตรกรรายนี้ยังไม่มีแปลงที่ขึ้นทะเบียน',
-          }}
-        />
+        <FarmerFarmsTable farms={farmer.farms} columns={farmColumns} />
       </section>
     </div>
   )

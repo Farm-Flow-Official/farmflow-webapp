@@ -3,11 +3,12 @@ import {
   ScanSearch,
   Sparkles,
   Gavel,
+  Sprout,
   Keyboard,
   Wrench,
 } from 'lucide-react'
 import { Kbd } from '@/components/ui/kbd'
-import { P, Steps, Note, Key, KeyGroup } from '@/components/ui/guide-parts'
+import { P, Steps, Note, Topic, Key, KeyGroup } from '@/components/ui/guide-parts'
 import type { GuideSection } from '@/components/ui/guide-book'
 import { CONFIDENCE_MIN } from '@/features/verifier/lib/confidence'
 import { AI_FLAG_LABELS } from '@/features/verifier/lib/aiFlags'
@@ -16,6 +17,7 @@ export type GuideSectionId =
   | 'workflow'
   | 'criteria'
   | 'ai'
+  | 'baseline'
   | 'decision'
   | 'shortcuts'
   | 'tools'
@@ -39,8 +41,8 @@ export const VERIFIER_GUIDE_SECTIONS: GuideSection[] = [
         </P>
         <Steps
           items={[
-            ['Dashboard', 'ดูจำนวน batch ที่รอตรวจ และรายการที่ AI แจ้งเตือนว่าผิดปกติ'],
-            ['Batch Queue', 'เลือก batch จากคิว — เริ่มจากรายการที่มีธงเตือนก่อน'],
+            ['Dashboard', 'ดูจำนวน session ที่รอตรวจ และรายการที่ AI แจ้งเตือนว่าผิดปกติ'],
+            ['Session Queue', 'เลือก session จากคิว — เริ่มจากรายการที่มีธงเตือนก่อน'],
             ['ตรวจข้อมูลแปลง', 'เทียบพื้นที่ที่แจ้ง vs ที่คำนวณจากขอบเขต และจุดเช็คอินบนแผนที่'],
             ['ไล่ดูภาพรายต้น', 'เปิดภาพแรกแล้วใช้ ← → ไล่ทีละต้น ดูผลตรวจสอบและเหตุผลของ AI'],
             ['ตัดสิน', 'อนุมัติเมื่อข้อมูลสอดคล้อง หรือปฏิเสธพร้อมระบุเหตุผลถึงเกษตรกร'],
@@ -138,6 +140,39 @@ export const VERIFIER_GUIDE_SECTIONS: GuideSection[] = [
     ),
   },
   {
+    id: 'baseline',
+    title: 'เส้นฐาน (Baseline)',
+    summary: 'จุดอ้างอิงตั้งต้นของฟาร์ม และตั้งได้ครั้งเดียว',
+    icon: Sprout,
+    body: (
+      <div className="flex flex-col gap-4">
+        <P>
+          เส้นฐานคือ<span className="font-medium text-ink">ปริมาณคาร์บอนตั้งต้น (ปีที่ 0)</span>{' '}
+          ของฟาร์มในโครงการหนึ่ง ๆ — รอบถัดไปจะวัดว่าเพิ่มขึ้นจากค่านี้เท่าไร
+        </P>
+        <Topic title="ตั้งเมื่อไร">
+          <P>
+            ระบบจะติ๊กช่อง “บันทึกเป็นเส้นฐาน” ให้อัตโนมัติเมื่อเห็นว่าเป็นการอนุมัติครั้งแรก
+            ของฟาร์มนี้ในโครงการนี้ — แต่<span className="font-medium text-ink">คุณเป็นคนยืนยัน</span>{' '}
+            ถ้ารู้ว่าฟาร์มนี้เคยวัดมาก่อนแล้ว (เช่น ย้ายมาจากโครงการอื่น) ให้ติ๊กออก
+          </P>
+        </Topic>
+        <Topic title="ตั้งได้ครั้งเดียว">
+          <P>
+            ฟาร์มหนึ่งมีเส้นฐานได้<span className="font-medium text-ink">หนึ่งค่าต่อหนึ่งโครงการ</span>{' '}
+            และแก้จากหน้านี้ไม่ได้ — ถ้าตั้งผิด ต้องให้ผู้ดูแลระบบแก้ให้
+            ดูให้แน่ก่อนกดอนุมัติ
+          </P>
+        </Topic>
+        <Note>
+          session ที่เป็นเส้นฐานจะมีป้าย <span className="font-semibold text-success">Baseline</span>{' '}
+          สีเขียวในคิวและบนหน้ารายละเอียด · คำเรียกนี้อยู่ระหว่างยืนยันกับที่ปรึกษา VGREEN
+          ว่าจะใช้ “เส้นฐาน” หรือ “ปริมาณคาร์บอนเริ่มต้น (t=0)” บนเอกสารทางการ
+        </Note>
+      </div>
+    ),
+  },
+  {
     id: 'decision',
     title: 'การอนุมัติและปฏิเสธ',
     summary: 'ผลของการกดปุ่ม และสิ่งที่เกษตรกรจะได้รับ',
@@ -145,23 +180,67 @@ export const VERIFIER_GUIDE_SECTIONS: GuideSection[] = [
     body: (
       <div className="flex flex-col gap-4">
         <div>
+          <p className="mb-1 text-[13px] font-semibold text-warning">
+            ตัดสินรายต้น — ทำก่อนเสมอ
+          </p>
+          <P>
+            ในหน้าต้นไม้ ใต้ภาพถ่าย มีปุ่มสองปุ่มที่มีผลกับ
+            <span className="font-medium text-ink">ต้นนั้นต้นเดียว</span> —
+            ต้นอื่นและ session ไม่กระทบ และ session ยังอยู่ในคิวให้ตรวจต่อได้
+          </P>
+          <div className="mt-2 flex flex-col gap-2">
+            <div className="rounded-lg border border-success/30 bg-success-bg px-3 py-2">
+              <p className="text-[13px] font-semibold text-success">ยืนยันว่าใช้ได้</p>
+              <p className="mt-0.5 text-[12px] leading-relaxed text-ink-secondary">
+                AI ติดธงไว้ แต่ตรวจแล้วปกติ (เงาบัง มุมภาพแปลก) · ธงแดงหาย
+                ต้นนี้กลายเป็นต้นปกติ และ
+                <span className="font-medium text-ink">ยังนับคาร์บอนตามเดิม</span>
+              </p>
+            </div>
+            <div className="rounded-lg border border-error-border bg-error-bg px-3 py-2">
+              <p className="text-[13px] font-semibold text-error">ปฏิเสธต้นนี้</p>
+              <p className="mt-0.5 text-[12px] leading-relaxed text-ink-secondary">
+                ภาพใช้ไม่ได้จริง · เกษตรกรได้รับแจ้งเฉพาะต้นนั้นให้ถ่ายใหม่ และต้นนี้
+                <span className="font-medium text-ink">ไม่ถูกนับคาร์บอน</span>ตอนอนุมัติ
+              </p>
+            </div>
+          </div>
+          <P>
+            ตัดสินไปแล้วยัง<span className="font-medium text-ink">เปลี่ยนใจได้</span>{' '}
+            ตราบใดที่ยังไม่ตัดสินทั้ง session — กดลิงก์ “เปลี่ยนเป็น…” ในกล่องผลการตัดสิน
+          </P>
+          <Note>
+            คำตัดสินและคะแนนของ AI ยัง<span className="font-medium text-ink">แสดงอยู่เหมือนเดิม</span>{' '}
+            หลังคุณตัดสินแล้ว — เก็บไว้เป็นหลักฐานว่าคุณตัดสินโดยเห็นอะไร ·
+            ในหน้ารวมภาพ ต้นที่ตัดสินแล้วจะมีไอคอนเขียว/แดงมุมซ้ายบน และถูกจัดไปท้ายแถว
+            เพื่อให้ต้นที่ยังไม่ได้ตรวจอยู่ข้างหน้าเสมอ
+          </Note>
+        </div>
+        <div>
           <p className="mb-1 text-[13px] font-semibold text-success">อนุมัติ (Approve)</p>
           <P>
-            ระบบจะออกใบรับรองพร้อมลายเซ็นของคุณ บันทึกคาร์บอนของ batch นี้เข้าระบบ
-            และแจ้งผลถึงเกษตรกร
+            ระบบจะออกใบรับรองพร้อมลายเซ็นและสังกัดของคุณ ออกคาร์บอนเครดิตตามจำนวนที่แสดงบนหน้าจอ
+            (หักต้นที่ปฏิเสธไปแล้ว) และแจ้งผลถึงเกษตรกร
+          </P>
+          <P>
+            ถ้าเป็นการอนุมัติ<span className="font-medium text-ink">ครั้งแรกของฟาร์มในโครงการนี้</span>{' '}
+            ระบบจะติ๊ก “บันทึกเป็นเส้นฐาน (Baseline)” ไว้ให้ — ดูหัวข้อ{' '}
+            <span className="font-medium text-ink">เส้นฐาน</span> ก่อนกด
           </P>
         </div>
         <div>
-          <p className="mb-1 text-[13px] font-semibold text-error">ปฏิเสธ (Reject)</p>
+          <p className="mb-1 text-[13px] font-semibold text-error">ปฏิเสธทั้ง session (Reject)</p>
           <P>
+            ใช้เมื่อทั้งชุดใช้ไม่ได้ เช่น ถ่ายผิดแปลงทั้งหมด ·{' '}
             <span className="font-medium text-ink">ต้องระบุเหตุผลเสมอ</span> — ข้อความนี้ถูกส่งถึง
-            เกษตรกรโดยตรง จึงควรเขียนให้แก้ไขต่อได้ เช่น “ภาพต้นที่ 12–15 ถ่ายนอกขอบเขตแปลง
+            เกษตรกรโดยตรง จึงควรเขียนให้แก้ไขต่อได้ เช่น “ภาพทั้งชุดถ่ายนอกขอบเขตแปลง
             กรุณาถ่ายใหม่ในแปลงที่ขึ้นทะเบียน”
           </P>
         </div>
         <Note>
-          ทั้งสองปุ่มมีขั้นยืนยันก่อนเสมอ (คีย์ลัดก็เช่นกัน) และแต่ละ batch ตัดสินได้ครั้งเดียว —
-          ถ้าขึ้นว่า “ชุดนี้ถูกตรวจไปแล้ว” แปลว่ามีผู้ตรวจสอบอีกคนตัดสินไปก่อนหน้า
+          ทั้งสองปุ่มมีขั้นยืนยันก่อนเสมอ (คีย์ลัดก็เช่นกัน) และแต่ละ session ตัดสินได้ครั้งเดียว —
+          ถ้าขึ้นว่า “ชุดนี้ถูกตรวจไปแล้ว” แปลว่ามีผู้ตรวจสอบอีกคนตัดสินไปก่อนหน้า ·
+          ตัดสินไปแล้วจะปฏิเสธต้นไม้รายต้นไม่ได้อีก เพราะเครดิตออกไปแล้ว
         </Note>
       </div>
     ),
@@ -169,12 +248,12 @@ export const VERIFIER_GUIDE_SECTIONS: GuideSection[] = [
   {
     id: 'shortcuts',
     title: 'คีย์ลัด',
-    summary: 'ตรวจทั้ง batch ได้โดยไม่ต้องแตะเมาส์',
+    summary: 'ตรวจทั้ง session ได้โดยไม่ต้องแตะเมาส์',
     icon: Keyboard,
     body: (
       <div className="flex flex-col gap-4">
         <P>
-          batch หนึ่งมีภาพหลายสิบต้น การเอื้อมไปคลิกเมาส์ทุกภาพคือต้นทุนหลักของงานตรวจ —
+          session หนึ่งมีภาพหลายสิบต้น การเอื้อมไปคลิกเมาส์ทุกภาพคือต้นทุนหลักของงานตรวจ —
           คีย์ลัดชุดนี้ออกแบบให้มือซ้ายอยู่กับแป้นพิมพ์ได้ตลอดการตรวจ
         </P>
 
@@ -182,12 +261,12 @@ export const VERIFIER_GUIDE_SECTIONS: GuideSection[] = [
           <Key keys={['←', 'K']}>ภาพก่อนหน้า</Key>
           <Key keys={['→', 'J']}>ภาพถัดไป</Key>
           <Key keys={['F']}>ดูภาพเต็มจอ (กดซ้ำเพื่อปิด)</Key>
-          <Key keys={['B', 'Esc']}>กลับไปหน้า batch</Key>
+          <Key keys={['B', 'Esc']}>กลับไปหน้า session</Key>
         </KeyGroup>
 
-        <KeyGroup title="หน้า batch">
-          <Key keys={['A']}>อนุมัติ batch</Key>
-          <Key keys={['R']}>ปฏิเสธ batch</Key>
+        <KeyGroup title="หน้า session">
+          <Key keys={['A']}>อนุมัติ session</Key>
+          <Key keys={['R']}>ปฏิเสธ session</Key>
           <Key keys={['P']}>เปิดรายงาน PDF</Key>
           <Key keys={['B', 'Esc']}>กลับไปคิวงาน</Key>
         </KeyGroup>
@@ -220,7 +299,7 @@ export const VERIFIER_GUIDE_SECTIONS: GuideSection[] = [
         <div>
           <p className="mb-1 text-[13px] font-semibold text-ink">รายงาน PDF</p>
           <P>
-            ปุ่ม “ดาวน์โหลด PDF” (หรือ <Kbd>P</Kbd>) เปิดรายงานฉบับพิมพ์ของ batch
+            ปุ่ม “ดาวน์โหลด PDF” (หรือ <Kbd>P</Kbd>) เปิดรายงานฉบับพิมพ์ของ session
             พร้อม QR สำหรับตรวจสอบย้อนกลับ — สั่งพิมพ์แล้วเลือก “Save as PDF” จากกล่องพิมพ์ของเบราว์เซอร์
           </P>
         </div>

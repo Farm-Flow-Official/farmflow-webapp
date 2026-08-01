@@ -301,6 +301,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/auth/change-password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Change your own password
+         * @description Clears the forced-change flag set when a Master generated the password (ADMIN-USERS-04). The current password is required even though the caller is already signed in, so an unattended session cannot lock the owner out of their own account.
+         */
+        post: operations["postApiV1AdminAuthChange-password"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/farmers/": {
         parameters: {
             query?: never;
@@ -341,6 +361,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/farmers/{id}/contact": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Reveal a farmer's contact details
+         * @description Returns the unmasked phone and email, and writes a READ_PII audit row naming the admin who asked. Everywhere else these fields are masked.
+         */
+        get: operations["getApiV1AdminFarmersByIdContact"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/farmers/{id}/status": {
         parameters: {
             query?: never;
@@ -354,8 +394,105 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        /** Suspend or activate a farmer */
+        /**
+         * Suspend or reinstate a farmer
+         * @description Suspending requires a reason, which is audited and delivered to the farmer as an in-app notification. A suspended farmer cannot sign in, and their farms cannot enrol in any project.
+         */
         patch: operations["patchApiV1AdminFarmersByIdStatus"];
+        trace?: never;
+    };
+    "/api/v1/admin/farms/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List farms (the approval queue)
+         * @description Farms with owner, project, province and area. Filter with `status=draft,pending` for the approval queue; search matches farm name or farmer name.
+         */
+        get: operations["getApiV1AdminFarms"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/farms/pending-count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Count farms awaiting a decision */
+        get: operations["getApiV1AdminFarmsPending-count"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/farms/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get one farm */
+        get: operations["getApiV1AdminFarmsById"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/farms/{id}/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get the farm's status trail
+         * @description Every approve / reject / suspend, with the reason and who decided it.
+         */
+        get: operations["getApiV1AdminFarmsByIdHistory"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/farms/{id}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Approve, reject, or suspend a farm
+         * @description A reason is mandatory for anything but approval. Rejecting or suspending also withdraws the farm from its project, records a status_histories row, and notifies the farmer. Approval is refused while the owner's account is suspended.
+         */
+        patch: operations["patchApiV1AdminFarmsByIdStatus"];
         trace?: never;
     };
     "/api/v1/admin/announcements/": {
@@ -418,6 +555,46 @@ export interface paths {
         patch: operations["patchApiV1AdminSystemSettings"];
         trace?: never;
     };
+    "/api/v1/admin/system/availability": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Which dashboards are open
+         * @description Every closable dashboard, with the reason and expected return time when one is closed. A dashboard with no stored row reads as open.
+         */
+        get: operations["getApiV1AdminSystemAvailability"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/system/availability/{dashboard}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Open or close a dashboard
+         * @description Closing requires a reason, which is shown on the maintenance screen. Reopening clears the reason and the expected-return time. The admin console itself cannot be closed.
+         */
+        patch: operations["patchApiV1AdminSystemAvailabilityByDashboard"];
+        trace?: never;
+    };
     "/api/v1/admin/audit-logs/": {
         parameters: {
             query?: never;
@@ -427,9 +604,29 @@ export interface paths {
         };
         /**
          * List audit log
-         * @description Returns all audit log entries, newest first.
+         * @description A page of audit entries, newest first. Filter by actor, action, affected table, and date range; `q` matches the admin username, table, record id, or action.
          */
         get: operations["getApiV1AdminAudit-logs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/audit-logs/filters": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Values present in the audit log
+         * @description Populates the filter dropdowns from what the log actually contains, so the options cannot drift from the data.
+         */
+        get: operations["getApiV1AdminAudit-logsFilters"];
         put?: never;
         post?: never;
         delete?: never;
@@ -452,10 +649,50 @@ export interface paths {
         get: operations["getApiV1AdminAdmins"];
         put?: never;
         /**
-         * Invite an admin
-         * @description Creates an admin with a role. A reset/temp-password flow is out of scope; the account cannot sign in until one exists.
+         * Create an admin account
+         * @description Applies the role's username prefix, requires an accrediting body for VERIFIER, and either accepts a password or generates one. The generated password is returned once in this response and never again; the account must change it at first sign-in.
          */
         post: operations["postApiV1AdminAdmins"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/admins/username-preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Preview the username a handle + role would produce
+         * @description Applies the role prefix (somchai + VERIFIER → verify.somchai) and, if that is taken, returns the next free suffix — so the console can show the final username before anything is created.
+         */
+        get: operations["getApiV1AdminAdminsUsername-preview"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/admins/{id}/password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Reset an admin's password
+         * @description Sets or generates a password and forces a change at the account's next sign-in.
+         */
+        post: operations["postApiV1AdminAdminsByIdPassword"];
         delete?: never;
         options?: never;
         head?: never;
@@ -525,6 +762,46 @@ export interface paths {
          * @description Farms with check-in point, boundary outer ring, GEE status, and computed overlap %.
          */
         get: operations["getApiV1AdminGisFarms"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/gis/overlaps": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List overlapping farm pairs
+         * @description Each overlap once (not once per side), worst first, with the intersection's area and centroid so the map can zoom to it. `overlapPercent` is measured against the smaller of the two boundaries.
+         */
+        get: operations["getApiV1AdminGisOverlaps"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/gis/overlaps/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Count overlapping farm pairs
+         * @description Drives the summary panel above the map.
+         */
+        get: operations["getApiV1AdminGisOverlapsSummary"];
         put?: never;
         post?: never;
         delete?: never;
@@ -713,6 +990,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/verifier/batches/{id}/baseline-suggestion": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Would approving this session set the farm's baseline?
+         * @description Drives the pre-ticked 'record as baseline' checkbox on the approve dialog. `suggested` is true when the farm has no live baseline in its project yet. It is a suggestion, not a decision — the verifier confirms.
+         */
+        get: operations["getApiV1VerifierBatchesByIdBaseline-suggestion"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/verifier/batches/{id}/approve": {
         parameters: {
             query?: never;
@@ -724,7 +1021,7 @@ export interface paths {
         put?: never;
         /**
          * Approve a review batch
-         * @description Records an approval (assessment_results), issues a carbon_credit_batch for the approved tonnage, notifies the farmer, and audits. 409 if the session was already reviewed.
+         * @description Records an approval (assessment_results), issues a carbon_credit_batch for the approved tonnage, notifies the farmer, and audits. 409 if the session was already reviewed, if the farm is not yet approved by an admin, or if `recordAsBaseline` is set on a farm that already has one.
          */
         post: operations["postApiV1VerifierBatchesByIdApprove"];
         delete?: never;
@@ -747,6 +1044,46 @@ export interface paths {
          * @description Records a rejection (assessment_results) with the required reason, notifies the farmer, and audits. 422 if the reason is empty; 409 if the session was already reviewed.
          */
         post: operations["postApiV1VerifierBatchesByIdReject"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/verifier/batches/{id}/trees/{snapshotId}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Reject one tree in a session
+         * @description Sends a single tree back to the farmer without rejecting the whole session (VERIFIER-DETAIL-04). Appends a verifier-authored row to tree_snapshot_assessments — the AI's original verdict is preserved — records the status change, and notifies the farmer with a deep link to that tree. 409 if the session has already been decided.
+         */
+        post: operations["postApiV1VerifierBatchesByIdTreesBySnapshotIdReject"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/verifier/batches/{id}/trees/{snapshotId}/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Confirm a flagged tree as acceptable
+         * @description The counterpart to per-tree rejection (VERIFIER-DETAIL-04). A verifier who has checked a flagged photo and found it fine clears the flag here — the tree stops counting towards the session's anomaly state while keeping the model's carbon figure. The AI's original verdict is preserved as an earlier row. 409 once the session is decided.
+         */
+        post: operations["postApiV1VerifierBatchesByIdTreesBySnapshotIdConfirm"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1535,6 +1872,120 @@ export interface paths {
          * @description Headline counts for the signed-in farmer: farms, completed sessions, trees captured, and total area in Rai.
          */
         get: operations["getApiV1Dashboard"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List my notifications
+         * @description Newest first. Pass `unreadOnly=true` for just the unread ones.
+         */
+        get: operations["getApiV1Notifications"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications/unread-count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Count my unread notifications
+         * @description For the bell badge; cheaper than fetching the list to count it.
+         */
+        get: operations["getApiV1NotificationsUnread-count"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications/{id}/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Mark one notification read */
+        patch: operations["patchApiV1NotificationsByIdRead"];
+        trace?: never;
+    };
+    "/api/v1/notifications/read-all": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mark every notification read */
+        post: operations["postApiV1NotificationsRead-all"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/system/availability": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Which dashboards are open (public)
+         * @description Public so a portal can render its maintenance screen before asking anyone to sign in.
+         */
+        get: operations["getApiV1SystemAvailability"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/system/announcements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Live announcements for one dashboard (public)
+         * @description Only `active` announcements targeted at this dashboard and inside their display window (ADMIN-ANN-02). Public because a banner is shown to everyone the dashboard is for, including before sign-in; drafts and scheduling metadata stay in the console.
+         */
+        get: operations["getApiV1SystemAnnouncements"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2658,6 +3109,8 @@ export interface operations {
                                 roleId: string;
                                 /** @description Role name (e.g. MASTER, FINANCE) — verifiers use their own portal */
                                 roleName: string;
+                                /** @description Still using a password someone else set; the console prompts until changed */
+                                mustChangePassword: boolean;
                                 permissions: string[];
                             };
                         };
@@ -2851,6 +3304,8 @@ export interface operations {
                             roleId: string;
                             /** @description Role name (e.g. MASTER, FINANCE) — verifiers use their own portal */
                             roleName: string;
+                            /** @description Still using a password someone else set; the console prompts until changed */
+                            mustChangePassword: boolean;
                             permissions: string[];
                         };
                         meta: {
@@ -2908,6 +3363,123 @@ export interface operations {
             };
         };
     };
+    "postApiV1AdminAuthChange-password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    currentPassword: string;
+                    newPassword: string;
+                };
+                "application/x-www-form-urlencoded": {
+                    currentPassword: string;
+                    newPassword: string;
+                };
+                "multipart/form-data": {
+                    currentPassword: string;
+                    newPassword: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Password changed; the forced-change flag is cleared */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            id: string;
+                            /** @constant */
+                            mustChangePassword: false;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Bad request - the current password is wrong, or the new one repeats it. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized - missing or invalid admin session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Validation error - the request body failed schema validation. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
     getApiV1AdminFarmers: {
         parameters: {
             query?: never;
@@ -2933,6 +3505,8 @@ export interface operations {
                             fullName: string;
                             phone: (string | null) | null;
                             email: (string | null) | null;
+                            /** @description Any contact detail exists, without saying what */
+                            hasContact: boolean;
                             /** @description "Active" | "Suspended" */
                             accountStatus: string;
                             farmsCount: number;
@@ -3020,6 +3594,7 @@ export interface operations {
                             fullName: string;
                             phone: (string | null) | null;
                             email: (string | null) | null;
+                            hasContact: boolean;
                             accountStatus: string;
                             farmsCount: number;
                             /** Format: date-time */
@@ -3031,12 +3606,121 @@ export interface operations {
                                 province: (string | null) | null;
                                 areaRai: (number | null) | null;
                                 cropType: (string | null) | null;
+                                /** @description draft | pending | active | rejected | suspended */
+                                farmStatus: string;
+                                projectId: (string | null) | null;
+                                projectName: (string | null) | null;
                                 carbonKgCo2e: number;
                                 /** Format: date-time */
                                 registeredAt: string;
                             }[];
                             totalCarbonKgCo2e: number;
                             estimatedValueThb: number;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized - missing or invalid admin session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden - missing the required permission. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Not found - the farmer does not exist. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    getApiV1AdminFarmersByIdContact: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A farmer's real contact details (audited) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            id: string;
+                            fullName: string;
+                            phone: (string | null) | null;
+                            email: (string | null) | null;
                         };
                         meta: {
                             requestId: string;
@@ -3130,14 +3814,20 @@ export interface operations {
                 "application/json": {
                     /** @enum {string} */
                     status: "Active" | "Suspended";
+                    /** @description Required when suspending; shown to the farmer as-is */
+                    reason?: string;
                 };
                 "application/x-www-form-urlencoded": {
                     /** @enum {string} */
                     status: "Active" | "Suspended";
+                    /** @description Required when suspending; shown to the farmer as-is */
+                    reason?: string;
                 };
                 "multipart/form-data": {
                     /** @enum {string} */
                     status: "Active" | "Suspended";
+                    /** @description Required when suspending; shown to the farmer as-is */
+                    reason?: string;
                 };
             };
         };
@@ -3158,11 +3848,36 @@ export interface operations {
                             fullName: string;
                             phone: (string | null) | null;
                             email: (string | null) | null;
+                            /** @description Any contact detail exists, without saying what */
+                            hasContact: boolean;
                             /** @description "Active" | "Suspended" */
                             accountStatus: string;
                             farmsCount: number;
                             /** Format: date-time */
                             registeredAt: string;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Validation error - the request failed schema validation. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
                         };
                         meta: {
                             requestId: string;
@@ -3265,6 +3980,605 @@ export interface operations {
             };
         };
     };
+    getApiV1AdminFarms: {
+        parameters: {
+            query?: {
+                limit?: string | number;
+                offset?: string | number;
+                q?: string;
+                sort?: "createdAt" | "farmName" | "farmStatus" | "areaRai";
+                dir?: "asc" | "desc";
+                status?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A page of farms with owner, project and area */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            rows: {
+                                id: string;
+                                farmName: string;
+                                /** @description draft | pending | active | rejected | suspended */
+                                farmStatus: string;
+                                ownerUserId: string;
+                                /** @description Personal Data, or a non-PII fallback (ADR 0013) */
+                                ownerName: string;
+                                /** @description "Active" | "Suspended" */
+                                ownerAccountStatus: string;
+                                projectId: (string | null) | null;
+                                projectName: (string | null) | null;
+                                province: (string | null) | null;
+                                declaredAreaRai: (number | null) | null;
+                                calculatedAreaRai: (number | null) | null;
+                                /** @description Declared vs calculated diverge >15% (ADR 0008) */
+                                areaDiscrepancyFlag: boolean;
+                                /** Format: date-time */
+                                createdAt: string;
+                            }[];
+                            /** @description Total matching rows, ignoring limit/offset */
+                            total: string | number;
+                            limit: string | number;
+                            offset: string | number;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized - missing or invalid admin session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden - missing the required permission. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Validation error - the request failed schema validation. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "getApiV1AdminFarmsPending-count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description How many farms await a decision */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            pending: number;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized - missing or invalid admin session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden - missing the required permission. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    getApiV1AdminFarmsById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description One farm */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            id: string;
+                            farmName: string;
+                            /** @description draft | pending | active | rejected | suspended */
+                            farmStatus: string;
+                            ownerUserId: string;
+                            /** @description Personal Data, or a non-PII fallback (ADR 0013) */
+                            ownerName: string;
+                            /** @description "Active" | "Suspended" */
+                            ownerAccountStatus: string;
+                            projectId: (string | null) | null;
+                            projectName: (string | null) | null;
+                            province: (string | null) | null;
+                            declaredAreaRai: (number | null) | null;
+                            calculatedAreaRai: (number | null) | null;
+                            /** @description Declared vs calculated diverge >15% (ADR 0008) */
+                            areaDiscrepancyFlag: boolean;
+                            /** Format: date-time */
+                            createdAt: string;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized - missing or invalid admin session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden - missing the required permission. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Not found - the farm does not exist. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    getApiV1AdminFarmsByIdHistory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The farm's status trail */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            oldStatus: (string | null) | null;
+                            newStatus: string;
+                            reason: (string | null) | null;
+                            changedBy: (string | null) | null;
+                            /** @description admin | user | system */
+                            changedByType: string;
+                            changedByLabel: (string | null) | null;
+                            /** Format: date-time */
+                            createdAt: string;
+                        }[];
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized - missing or invalid admin session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden - missing the required permission. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    patchApiV1AdminFarmsByIdStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    decision: "active" | "rejected" | "suspended";
+                    /** @description Required unless approving */
+                    reason?: string;
+                };
+                "application/x-www-form-urlencoded": {
+                    /** @enum {string} */
+                    decision: "active" | "rejected" | "suspended";
+                    /** @description Required unless approving */
+                    reason?: string;
+                };
+                "multipart/form-data": {
+                    /** @enum {string} */
+                    decision: "active" | "rejected" | "suspended";
+                    /** @description Required unless approving */
+                    reason?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description One farm */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            id: string;
+                            farmName: string;
+                            /** @description draft | pending | active | rejected | suspended */
+                            farmStatus: string;
+                            ownerUserId: string;
+                            /** @description Personal Data, or a non-PII fallback (ADR 0013) */
+                            ownerName: string;
+                            /** @description "Active" | "Suspended" */
+                            ownerAccountStatus: string;
+                            projectId: (string | null) | null;
+                            projectName: (string | null) | null;
+                            province: (string | null) | null;
+                            declaredAreaRai: (number | null) | null;
+                            calculatedAreaRai: (number | null) | null;
+                            /** @description Declared vs calculated diverge >15% (ADR 0008) */
+                            areaDiscrepancyFlag: boolean;
+                            /** Format: date-time */
+                            createdAt: string;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized - missing or invalid admin session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden - missing the required permission. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Not found - the farm does not exist. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Conflict - the transition is not allowed from the current status. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Validation error - the request failed schema validation. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
     getApiV1AdminAnnouncements: {
         parameters: {
             query?: never;
@@ -3290,6 +4604,15 @@ export interface operations {
                             body: string;
                             /** @description "Active" | "Draft" */
                             status: string;
+                            bannerFileId: (string | null) | null;
+                            startAt: (string | null) | null;
+                            endAt: (string | null) | null;
+                            targets: {
+                                /** @enum {string} */
+                                dashboard: "mobile" | "admin" | "verifier" | "executive" | "business";
+                                /** @enum {string} */
+                                channel: "banner" | "bell";
+                            }[];
                             /** Format: date-time */
                             createdAt: string;
                             /** Format: date-time */
@@ -3364,18 +4687,48 @@ export interface operations {
                     body: string;
                     /** @enum {string} */
                     status: "Active" | "Draft";
+                    bannerFileId?: (string | null) | null;
+                    startAt?: (string | null) | null;
+                    endAt?: (string | null) | null;
+                    /** @description Replaces the existing set wholesale; omit or send [] for none */
+                    targets?: {
+                        /** @enum {string} */
+                        dashboard: "mobile" | "admin" | "verifier" | "executive" | "business";
+                        /** @enum {string} */
+                        channel: "banner" | "bell";
+                    }[];
                 };
                 "application/x-www-form-urlencoded": {
                     title: string;
                     body: string;
                     /** @enum {string} */
                     status: "Active" | "Draft";
+                    bannerFileId?: (string | null) | null;
+                    startAt?: (string | null) | null;
+                    endAt?: (string | null) | null;
+                    /** @description Replaces the existing set wholesale; omit or send [] for none */
+                    targets?: {
+                        /** @enum {string} */
+                        dashboard: "mobile" | "admin" | "verifier" | "executive" | "business";
+                        /** @enum {string} */
+                        channel: "banner" | "bell";
+                    }[];
                 };
                 "multipart/form-data": {
                     title: string;
                     body: string;
                     /** @enum {string} */
                     status: "Active" | "Draft";
+                    bannerFileId?: (string | null) | null;
+                    startAt?: (string | null) | null;
+                    endAt?: (string | null) | null;
+                    /** @description Replaces the existing set wholesale; omit or send [] for none */
+                    targets?: {
+                        /** @enum {string} */
+                        dashboard: "mobile" | "admin" | "verifier" | "executive" | "business";
+                        /** @enum {string} */
+                        channel: "banner" | "bell";
+                    }[];
                 };
             };
         };
@@ -3396,6 +4749,15 @@ export interface operations {
                             body: string;
                             /** @description "Active" | "Draft" */
                             status: string;
+                            bannerFileId: (string | null) | null;
+                            startAt: (string | null) | null;
+                            endAt: (string | null) | null;
+                            targets: {
+                                /** @enum {string} */
+                                dashboard: "mobile" | "admin" | "verifier" | "executive" | "business";
+                                /** @enum {string} */
+                                channel: "banner" | "bell";
+                            }[];
                             /** Format: date-time */
                             createdAt: string;
                             /** Format: date-time */
@@ -3597,18 +4959,48 @@ export interface operations {
                     body: string;
                     /** @enum {string} */
                     status: "Active" | "Draft";
+                    bannerFileId?: (string | null) | null;
+                    startAt?: (string | null) | null;
+                    endAt?: (string | null) | null;
+                    /** @description Replaces the existing set wholesale; omit or send [] for none */
+                    targets?: {
+                        /** @enum {string} */
+                        dashboard: "mobile" | "admin" | "verifier" | "executive" | "business";
+                        /** @enum {string} */
+                        channel: "banner" | "bell";
+                    }[];
                 };
                 "application/x-www-form-urlencoded": {
                     title: string;
                     body: string;
                     /** @enum {string} */
                     status: "Active" | "Draft";
+                    bannerFileId?: (string | null) | null;
+                    startAt?: (string | null) | null;
+                    endAt?: (string | null) | null;
+                    /** @description Replaces the existing set wholesale; omit or send [] for none */
+                    targets?: {
+                        /** @enum {string} */
+                        dashboard: "mobile" | "admin" | "verifier" | "executive" | "business";
+                        /** @enum {string} */
+                        channel: "banner" | "bell";
+                    }[];
                 };
                 "multipart/form-data": {
                     title: string;
                     body: string;
                     /** @enum {string} */
                     status: "Active" | "Draft";
+                    bannerFileId?: (string | null) | null;
+                    startAt?: (string | null) | null;
+                    endAt?: (string | null) | null;
+                    /** @description Replaces the existing set wholesale; omit or send [] for none */
+                    targets?: {
+                        /** @enum {string} */
+                        dashboard: "mobile" | "admin" | "verifier" | "executive" | "business";
+                        /** @enum {string} */
+                        channel: "banner" | "bell";
+                    }[];
                 };
             };
         };
@@ -3629,6 +5021,15 @@ export interface operations {
                             body: string;
                             /** @description "Active" | "Draft" */
                             status: string;
+                            bannerFileId: (string | null) | null;
+                            startAt: (string | null) | null;
+                            endAt: (string | null) | null;
+                            targets: {
+                                /** @enum {string} */
+                                dashboard: "mobile" | "admin" | "verifier" | "executive" | "business";
+                                /** @enum {string} */
+                                channel: "banner" | "bell";
+                            }[];
                             /** Format: date-time */
                             createdAt: string;
                             /** Format: date-time */
@@ -3968,7 +5369,7 @@ export interface operations {
             };
         };
     };
-    "getApiV1AdminAudit-logs": {
+    getApiV1AdminSystemAvailability: {
         parameters: {
             query?: never;
             header?: never;
@@ -3977,7 +5378,7 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Audit log entries, newest first */
+            /** @description Every closable dashboard and whether it is open */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -3988,19 +5389,377 @@ export interface operations {
                         success: true;
                         message: string;
                         data: {
-                            id: string;
-                            actorId: (string | null) | null;
-                            actorLabel: (string | null) | null;
-                            /** @description "USER" | "ADMIN" | "SYSTEM" */
-                            actorType: string;
-                            action: string;
-                            tableName: string;
-                            recordId: string;
-                            oldData: (unknown | null) | null;
-                            newData: (unknown | null) | null;
-                            /** Format: date-time */
-                            createdAt: string;
+                            /** @description verifier | business | executive | mobile */
+                            dashboard: string;
+                            isEnabled: boolean;
+                            reason: (string | null) | null;
+                            expectedBackAt: (string | null) | null;
+                            updatedByLabel: (string | null) | null;
+                            updatedAt: (string | null) | null;
                         }[];
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized - missing or invalid admin session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden - missing the required permission. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    patchApiV1AdminSystemAvailabilityByDashboard: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                dashboard: "verifier" | "business" | "executive" | "mobile";
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    isEnabled: boolean;
+                    reason?: string;
+                    /** @description ISO 8601 — when it should be back */
+                    expectedBackAt?: string;
+                };
+                "application/x-www-form-urlencoded": {
+                    isEnabled: boolean;
+                    reason?: string;
+                    /** @description ISO 8601 — when it should be back */
+                    expectedBackAt?: string;
+                };
+                "multipart/form-data": {
+                    isEnabled: boolean;
+                    reason?: string;
+                    /** @description ISO 8601 — when it should be back */
+                    expectedBackAt?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Every closable dashboard and whether it is open */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            /** @description verifier | business | executive | mobile */
+                            dashboard: string;
+                            isEnabled: boolean;
+                            reason: (string | null) | null;
+                            expectedBackAt: (string | null) | null;
+                            updatedByLabel: (string | null) | null;
+                            updatedAt: (string | null) | null;
+                        }[];
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Bad request - closing a dashboard requires a reason. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized - missing or invalid admin session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden - missing the required permission. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Validation error - e.g. price out of range. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "getApiV1AdminAudit-logs": {
+        parameters: {
+            query?: {
+                limit?: string | number;
+                offset?: string | number;
+                q?: string;
+                sort?: "createdAt" | "action" | "tableName";
+                dir?: "asc" | "desc";
+                actorId?: string;
+                actorType?: "admin" | "user" | "system";
+                action?: string;
+                tableName?: string;
+                from?: string;
+                to?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A page of audit entries, newest first */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            rows: {
+                                id: string;
+                                actorId: (string | null) | null;
+                                actorLabel: (string | null) | null;
+                                /** @description "USER" | "ADMIN" | "SYSTEM" */
+                                actorType: string;
+                                action: string;
+                                tableName: string;
+                                recordId: string;
+                                oldData: (unknown | null) | null;
+                                newData: (unknown | null) | null;
+                                /** Format: date-time */
+                                createdAt: string;
+                            }[];
+                            /** @description Total matching rows, ignoring limit/offset */
+                            total: string | number;
+                            limit: string | number;
+                            offset: string | number;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized - missing or invalid admin session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden - missing the required permission. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Validation error - the request failed schema validation. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "getApiV1AdminAudit-logsFilters": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The values actually present in the log, for the filter dropdowns */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            actions: string[];
+                            tables: string[];
+                            actors: {
+                                id: string;
+                                username: string;
+                            }[];
+                        };
                         meta: {
                             requestId: string;
                             timestamp: string;
@@ -4152,24 +5911,39 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    /** @description Bare handle; the role's prefix is applied server-side (somchai → verify.somchai) */
                     username: string;
                     /** @description Role name (MASTER | VERIFIER | PROJECT_DEV | FINANCE | GENERAL) */
                     role: string;
+                    /** @description Accrediting body — required for VERIFIER */
+                    orgId?: string;
+                    /** @description Omit to have one generated */
+                    password?: string;
                 };
                 "application/x-www-form-urlencoded": {
+                    /** @description Bare handle; the role's prefix is applied server-side (somchai → verify.somchai) */
                     username: string;
                     /** @description Role name (MASTER | VERIFIER | PROJECT_DEV | FINANCE | GENERAL) */
                     role: string;
+                    /** @description Accrediting body — required for VERIFIER */
+                    orgId?: string;
+                    /** @description Omit to have one generated */
+                    password?: string;
                 };
                 "multipart/form-data": {
+                    /** @description Bare handle; the role's prefix is applied server-side (somchai → verify.somchai) */
                     username: string;
                     /** @description Role name (MASTER | VERIFIER | PROJECT_DEV | FINANCE | GENERAL) */
                     role: string;
+                    /** @description Accrediting body — required for VERIFIER */
+                    orgId?: string;
+                    /** @description Omit to have one generated */
+                    password?: string;
                 };
             };
         };
         responses: {
-            /** @description A single admin user */
+            /** @description The new admin, with its one-time password */
             200: {
                 headers: {
                     [name: string]: unknown;
@@ -4190,6 +5964,7 @@ export interface operations {
                             lastLoginAt: (string | null) | null;
                             /** Format: date-time */
                             createdAt: string;
+                            generatedPassword: (string | null) | null;
                         };
                         meta: {
                             requestId: string;
@@ -4269,6 +6044,253 @@ export interface operations {
             };
             /** @description Conflict - the username is already taken. */
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Validation error - e.g. username shorter than 3 characters. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "getApiV1AdminAdminsUsername-preview": {
+        parameters: {
+            query: {
+                username: string;
+                role: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description What the username will be, before creating anything */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            /** @description The username that would be created */
+                            username: string;
+                            /** @description The preferred name was taken, so a suffix was added */
+                            taken: boolean;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Bad request - unknown role, or targeting your own account. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized - missing or invalid admin session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden - missing the required permission. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    postApiV1AdminAdminsByIdPassword: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Omit to have one generated */
+                    password?: string;
+                };
+                "application/x-www-form-urlencoded": {
+                    /** @description Omit to have one generated */
+                    password?: string;
+                };
+                "multipart/form-data": {
+                    /** @description Omit to have one generated */
+                    password?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Password reset; the account must change it at next sign-in */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            id: string;
+                            generatedPassword: (string | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized - missing or invalid admin session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden - missing the required permission. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Not found - the admin does not exist. */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -4824,6 +6846,224 @@ export interface operations {
                             /** @description Boundary outer ring as [lng, lat] pairs */
                             polygon: number[][];
                         }[];
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized - missing or invalid admin session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden - missing the required permission. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    getApiV1AdminGisOverlaps: {
+        parameters: {
+            query?: {
+                limit?: string | number;
+                offset?: string | number;
+                q?: string;
+                sort?: "overlapPercent";
+                dir?: "asc" | "desc";
+                minPercent?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A page of overlapping farm pairs, worst first */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            rows: {
+                                farmA: {
+                                    id: string;
+                                    name: string;
+                                    /** @description Farm lifecycle status */
+                                    status: string;
+                                    /** @description Personal Data, or a non-PII fallback (ADR 0013) */
+                                    ownerName: string;
+                                };
+                                farmB: {
+                                    id: string;
+                                    name: string;
+                                    /** @description Farm lifecycle status */
+                                    status: string;
+                                    /** @description Personal Data, or a non-PII fallback (ADR 0013) */
+                                    ownerName: string;
+                                };
+                                /** @description Intersection as a share of the SMALLER boundary — a fully-swallowed plot reads 100 */
+                                overlapPercent: number;
+                                /** @description Intersection area in rai */
+                                overlapAreaRai: number;
+                                /** @description Where the map should fly to for this overlap */
+                                centroid: {
+                                    lat: number;
+                                    lng: number;
+                                };
+                            }[];
+                            /** @description Total matching rows, ignoring limit/offset */
+                            total: string | number;
+                            limit: string | number;
+                            offset: string | number;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized - missing or invalid admin session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden - missing the required permission. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Validation error - the request failed schema validation. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    getApiV1AdminGisOverlapsSummary: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description How many overlaps exist, and how many are serious */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            /** @description Distinct overlapping pairs */
+                            pairs: number;
+                            /** @description Pairs at or above the flag threshold */
+                            flagged: number;
+                            thresholdPct: number;
+                        };
                         meta: {
                             requestId: string;
                             timestamp: string;
@@ -5491,6 +7731,8 @@ export interface operations {
                             avgConfidence: (number | null) | null;
                             anomalyFlag: boolean;
                             totalCarbonKgCo2e: number;
+                            /** @description This session set the farm's reference carbon stock for its project */
+                            isBaseline: boolean;
                             /** @enum {string} */
                             status: "Pending" | "Approved" | "Rejected";
                             /** @description When the session was completed (ISO 8601) */
@@ -5579,6 +7821,23 @@ export interface operations {
                             farmerName: string;
                             projectId: (string | null) | null;
                             projectName: (string | null) | null;
+                            projectCode: (string | null) | null;
+                            /** @description What the farm is registered to, and when it is next due (VERIFIER-DETAIL-02) */
+                            registration: {
+                                creditingPeriodYears: (number | null) | null;
+                                creditingStartDate: (string | null) | null;
+                                creditingEndDate: (string | null) | null;
+                                nextCollectionYear: (number | null) | null;
+                            };
+                            baseline: ({
+                                sessionId: string;
+                                /** @description This session is the one that set the baseline */
+                                isThisSession: boolean;
+                                carbonTco2e: number;
+                                creditingPeriodYears: (number | null) | null;
+                                /** Format: date-time */
+                                approvedAt: string;
+                            } | null) | null;
                             farm: {
                                 id: string;
                                 name: string;
@@ -5628,11 +7887,18 @@ export interface operations {
                                 heightM: (number | null) | null;
                                 carbonKgCo2e: (number | null) | null;
                                 confidence: (number | null) | null;
-                                /** @description AI verdict: waiting | completed | rejected | failed */
+                                /** @description Latest verdict on this tree — the model's, or a verifier's if they ruled */
                                 status: string;
+                                /** @description The model's own verdict, never overwritten by a human decision */
+                                aiStatus: string;
                                 /** @description Anomaly flags the vision model raised (ADR 0022); empty when none */
                                 aiFlags: string[];
                                 aiRationale: (string | null) | null;
+                                rejectionReason: (string | null) | null;
+                                /** @description A person rejected this tree, not the model (VERIFIER-DETAIL-04) */
+                                rejectedByVerifier: boolean;
+                                /** @description A person checked the flagged tree and accepted it — clears the anomaly */
+                                confirmedByVerifier: boolean;
                                 withinFarmBoundary: (boolean | null) | null;
                                 photoFileId: (string | null) | null;
                                 captureLat: (number | null) | null;
@@ -5733,7 +7999,7 @@ export interface operations {
             };
         };
     };
-    postApiV1VerifierBatchesByIdApprove: {
+    "getApiV1VerifierBatchesByIdBaseline-suggestion": {
         parameters: {
             query?: never;
             header?: never;
@@ -5743,6 +8009,109 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
+        responses: {
+            /** @description Whether approving this session would set the farm's baseline */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            /** @description False when the farm is in no project */
+                            eligible: boolean;
+                            /** @description Pre-tick the checkbox: no live baseline exists yet */
+                            suggested: boolean;
+                            existing: ({
+                                sessionId: string;
+                                baselineCarbonTco2e: number;
+                                /** Format: date-time */
+                                approvedAt: string;
+                            } | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized — missing or invalid verifier session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden — missing the verify:read / verify:approve permission. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    postApiV1VerifierBatchesByIdApprove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Fix this session's carbon as the farm's reference stock for its project (t=0). Refused if the farm already has a live baseline, or is in no project. */
+                    recordAsBaseline?: boolean;
+                };
+                "application/x-www-form-urlencoded": {
+                    /** @description Fix this session's carbon as the farm's reference stock for its project (t=0). Refused if the farm already has a live baseline, or is in no project. */
+                    recordAsBaseline?: boolean;
+                };
+                "multipart/form-data": {
+                    /** @description Fix this session's carbon as the farm's reference stock for its project (t=0). Refused if the farm already has a live baseline, or is in no project. */
+                    recordAsBaseline?: boolean;
+                };
+            };
+        };
         responses: {
             /** @description Batch approved — assessment_results created and a carbon credit batch issued */
             200: {
@@ -5759,7 +8128,11 @@ export interface operations {
                             sessionId: string;
                             /** @constant */
                             status: "Approved";
+                            /** @description Gross standing carbon — the tonnage issued */
                             totalApprovedTco2e: number;
+                            netAboveBaselineTco2e: (number | null) | null;
+                            /** @description This approval established the farm's baseline */
+                            isBaseline: boolean;
                             passedTrees: number;
                             rejectedTrees: number;
                             batchId: string;
@@ -5863,6 +8236,29 @@ export interface operations {
                     };
                 };
             };
+            /** @description Validation error — the request body failed schema validation. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
         };
     };
     postApiV1VerifierBatchesByIdReject: {
@@ -5907,6 +8303,363 @@ export interface operations {
                             /** @constant */
                             status: "Rejected";
                             rejectionReason: string;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized — missing or invalid verifier session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden — missing the verify:read / verify:approve permission. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Not found — no such review batch in the queue. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Conflict — this session has already been reviewed. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Validation error — the request body failed schema validation. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    postApiV1VerifierBatchesByIdTreesBySnapshotIdReject: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                snapshotId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Why the batch was rejected (required, non-blank) */
+                    reason: string;
+                };
+                "application/x-www-form-urlencoded": {
+                    /** @description Why the batch was rejected (required, non-blank) */
+                    reason: string;
+                };
+                "multipart/form-data": {
+                    /** @description Why the batch was rejected (required, non-blank) */
+                    reason: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Tree rejected — a verifier-authored assessment row was appended and the farmer notified */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            snapshotId: string;
+                            /** @constant */
+                            status: "rejected";
+                            rejectionReason: string;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Bad request — the rejection reason is blank. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized — missing or invalid verifier session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden — missing the verify:read / verify:approve permission. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Not found — no such review batch in the queue. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Conflict — this session has already been reviewed. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Validation error — the request body failed schema validation. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    postApiV1VerifierBatchesByIdTreesBySnapshotIdConfirm: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                snapshotId: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Why it is acceptable; kept as the rationale */
+                    note?: string;
+                };
+                "application/x-www-form-urlencoded": {
+                    /** @description Why it is acceptable; kept as the rationale */
+                    note?: string;
+                };
+                "multipart/form-data": {
+                    /** @description Why it is acceptable; kept as the rationale */
+                    note?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Tree confirmed — the anomaly flag is cleared and the model's carbon kept */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            snapshotId: string;
+                            /** @constant */
+                            status: "completed";
+                            treeTagId: (string | null) | null;
                         };
                         meta: {
                             requestId: string;
@@ -6308,7 +9061,7 @@ export interface operations {
                     status?: "draft" | "open" | "active" | "closed" | "archived";
                     /** @enum {string} */
                     implementationMode?: "standalone" | "bundled";
-                    /** @description Crediting period in years (T-VER forestry: 7 or 10) */
+                    /** @description Crediting period in years. 7 and 10 are the T-VER forestry norm and the form's presets, not a limit — the figure is still to be confirmed against the current methodology, and the forecast builds one row per year whatever it is. */
                     creditingPeriodYears?: string | number;
                     /** Format: date */
                     creditingStartDate?: string;
@@ -6343,7 +9096,7 @@ export interface operations {
                     status?: "draft" | "open" | "active" | "closed" | "archived";
                     /** @enum {string} */
                     implementationMode?: "standalone" | "bundled";
-                    /** @description Crediting period in years (T-VER forestry: 7 or 10) */
+                    /** @description Crediting period in years. 7 and 10 are the T-VER forestry norm and the form's presets, not a limit — the figure is still to be confirmed against the current methodology, and the forecast builds one row per year whatever it is. */
                     creditingPeriodYears?: string | number;
                     /** Format: date */
                     creditingStartDate?: string;
@@ -6378,7 +9131,7 @@ export interface operations {
                     status?: "draft" | "open" | "active" | "closed" | "archived";
                     /** @enum {string} */
                     implementationMode?: "standalone" | "bundled";
-                    /** @description Crediting period in years (T-VER forestry: 7 or 10) */
+                    /** @description Crediting period in years. 7 and 10 are the T-VER forestry norm and the form's presets, not a limit — the figure is still to be confirmed against the current methodology, and the forecast builds one row per year whatever it is. */
                     creditingPeriodYears?: string | number;
                     /** Format: date */
                     creditingStartDate?: string;
@@ -6451,8 +9204,14 @@ export interface operations {
                                 id: string;
                                 farmName: string;
                                 farmStatus: string;
+                                ownerUserId: string;
                                 ownerName: (string | null) | null;
+                                ownerPhoneMasked: (string | null) | null;
+                                ownerEmailMasked: (string | null) | null;
+                                /** @description Any contact detail exists, without saying what */
+                                hasContact: boolean;
                                 calculatedAreaRai: (number | null) | null;
+                                declaredAreaRai: (number | null) | null;
                                 withinDeclaredBoundary: (boolean | null) | null;
                             }[];
                             /** Format: date-time */
@@ -6711,8 +9470,14 @@ export interface operations {
                                 id: string;
                                 farmName: string;
                                 farmStatus: string;
+                                ownerUserId: string;
                                 ownerName: (string | null) | null;
+                                ownerPhoneMasked: (string | null) | null;
+                                ownerEmailMasked: (string | null) | null;
+                                /** @description Any contact detail exists, without saying what */
+                                hasContact: boolean;
                                 calculatedAreaRai: (number | null) | null;
+                                declaredAreaRai: (number | null) | null;
                                 withinDeclaredBoundary: (boolean | null) | null;
                             }[];
                             /** Format: date-time */
@@ -6947,7 +9712,7 @@ export interface operations {
                     implementationMode?: "standalone" | "bundled";
                     /** @enum {string} */
                     projectScale?: "undetermined" | "xsmall" | "small" | "large";
-                    /** @description Crediting period in years (T-VER forestry: 7 or 10) */
+                    /** @description Crediting period in years. 7 and 10 are the T-VER forestry norm and the form's presets, not a limit — the figure is still to be confirmed against the current methodology, and the forecast builds one row per year whatever it is. */
                     creditingPeriodYears?: string | number;
                     /** Format: date */
                     creditingStartDate?: string;
@@ -6985,7 +9750,7 @@ export interface operations {
                     implementationMode?: "standalone" | "bundled";
                     /** @enum {string} */
                     projectScale?: "undetermined" | "xsmall" | "small" | "large";
-                    /** @description Crediting period in years (T-VER forestry: 7 or 10) */
+                    /** @description Crediting period in years. 7 and 10 are the T-VER forestry norm and the form's presets, not a limit — the figure is still to be confirmed against the current methodology, and the forecast builds one row per year whatever it is. */
                     creditingPeriodYears?: string | number;
                     /** Format: date */
                     creditingStartDate?: string;
@@ -7023,7 +9788,7 @@ export interface operations {
                     implementationMode?: "standalone" | "bundled";
                     /** @enum {string} */
                     projectScale?: "undetermined" | "xsmall" | "small" | "large";
-                    /** @description Crediting period in years (T-VER forestry: 7 or 10) */
+                    /** @description Crediting period in years. 7 and 10 are the T-VER forestry norm and the form's presets, not a limit — the figure is still to be confirmed against the current methodology, and the forecast builds one row per year whatever it is. */
                     creditingPeriodYears?: string | number;
                     /** Format: date */
                     creditingStartDate?: string;
@@ -7097,8 +9862,14 @@ export interface operations {
                                 id: string;
                                 farmName: string;
                                 farmStatus: string;
+                                ownerUserId: string;
                                 ownerName: (string | null) | null;
+                                ownerPhoneMasked: (string | null) | null;
+                                ownerEmailMasked: (string | null) | null;
+                                /** @description Any contact detail exists, without saying what */
+                                hasContact: boolean;
                                 calculatedAreaRai: (number | null) | null;
+                                declaredAreaRai: (number | null) | null;
                                 withinDeclaredBoundary: (boolean | null) | null;
                             }[];
                             /** Format: date-time */
@@ -7489,8 +10260,14 @@ export interface operations {
                                 id: string;
                                 farmName: string;
                                 farmStatus: string;
+                                ownerUserId: string;
                                 ownerName: (string | null) | null;
+                                ownerPhoneMasked: (string | null) | null;
+                                ownerEmailMasked: (string | null) | null;
+                                /** @description Any contact detail exists, without saying what */
+                                hasContact: boolean;
                                 calculatedAreaRai: (number | null) | null;
+                                declaredAreaRai: (number | null) | null;
                                 withinDeclaredBoundary: (boolean | null) | null;
                             }[];
                             /** Format: date-time */
@@ -7678,8 +10455,14 @@ export interface operations {
                                 id: string;
                                 farmName: string;
                                 farmStatus: string;
+                                ownerUserId: string;
                                 ownerName: (string | null) | null;
+                                ownerPhoneMasked: (string | null) | null;
+                                ownerEmailMasked: (string | null) | null;
+                                /** @description Any contact detail exists, without saying what */
+                                hasContact: boolean;
                                 calculatedAreaRai: (number | null) | null;
+                                declaredAreaRai: (number | null) | null;
                                 withinDeclaredBoundary: (boolean | null) | null;
                             }[];
                             /** Format: date-time */
@@ -9794,7 +12577,7 @@ export interface operations {
             content: {
                 "application/json": {
                     /** @enum {string} */
-                    slot: "boundary_image" | "land_right" | "power_of_attorney" | "area_photo" | "qa_diagram" | "monitoring_map" | "appendix";
+                    slot: "boundary_image" | "area_photo" | "qa_diagram" | "monitoring_map" | "appendix";
                     /**
                      * Format: binary
                      * @description Supporting document or image
@@ -9804,7 +12587,7 @@ export interface operations {
                 };
                 "application/x-www-form-urlencoded": {
                     /** @enum {string} */
-                    slot: "boundary_image" | "land_right" | "power_of_attorney" | "area_photo" | "qa_diagram" | "monitoring_map" | "appendix";
+                    slot: "boundary_image" | "area_photo" | "qa_diagram" | "monitoring_map" | "appendix";
                     /**
                      * Format: binary
                      * @description Supporting document or image
@@ -9814,7 +12597,7 @@ export interface operations {
                 };
                 "multipart/form-data": {
                     /** @enum {string} */
-                    slot: "boundary_image" | "land_right" | "power_of_attorney" | "area_photo" | "qa_diagram" | "monitoring_map" | "appendix";
+                    slot: "boundary_image" | "area_photo" | "qa_diagram" | "monitoring_map" | "appendix";
                     /**
                      * Format: binary
                      * @description Supporting document or image
@@ -12728,6 +15511,391 @@ export interface operations {
             };
             /** @description Unauthorized - missing or invalid access token. */
             401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    getApiV1Notifications: {
+        parameters: {
+            query?: {
+                limit?: string | number;
+                offset?: string | number;
+                q?: string;
+                sort?: "sentAt";
+                dir?: "asc" | "desc";
+                unreadOnly?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description A page of the farmer's notifications */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            rows: {
+                                id: string;
+                                /** @description gamification | operational | market */
+                                notificationType: string;
+                                title: string;
+                                body: (string | null) | null;
+                                isRead: boolean;
+                                relatedEntityType: (string | null) | null;
+                                relatedEntityId: (string | null) | null;
+                                sentAt: (string | null) | null;
+                                readAt: (string | null) | null;
+                            }[];
+                            /** @description Total matching rows, ignoring limit/offset */
+                            total: string | number;
+                            limit: string | number;
+                            offset: string | number;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized - missing or invalid farmer token. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Validation error - the request failed schema validation. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "getApiV1NotificationsUnread-count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Unread notification count */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            unread: number;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized - missing or invalid farmer token. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    patchApiV1NotificationsByIdRead: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The notification, now read */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            id: string;
+                            isRead: boolean;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized - missing or invalid farmer token. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Not found - no such notification for this farmer. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "postApiV1NotificationsRead-all": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description How many notifications were marked read */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            updated: number;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized - missing or invalid farmer token. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    getApiV1SystemAvailability: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Dashboard availability, without operator details */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            dashboard: string;
+                            isEnabled: boolean;
+                            reason: (string | null) | null;
+                            expectedBackAt: (string | null) | null;
+                        }[];
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    getApiV1SystemAnnouncements: {
+        parameters: {
+            query: {
+                dashboard: "mobile" | "admin" | "verifier" | "executive" | "business";
+                channel?: "banner" | "bell";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Announcements this dashboard should show right now */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            id: string;
+                            title: string;
+                            body: string;
+                            bannerFileId: (string | null) | null;
+                            startAt: (string | null) | null;
+                            endAt: (string | null) | null;
+                            /** Format: date-time */
+                            createdAt: string;
+                        }[];
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Validation error - e.g. an empty title. */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };

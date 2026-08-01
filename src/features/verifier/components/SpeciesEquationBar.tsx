@@ -3,10 +3,10 @@ import { InfoTooltip } from '@/components/ui/info-tooltip'
 import type { SpeciesEquation } from '@/features/verifier/types'
 
 /**
- * Species + allometric-equation provenance for the batch, shown under the photo.
+ * Species + allometric-equation provenance for the session, shown under the photo.
  * Every value comes from the engine's `species_equations` row (via the API) — the
  * verifier sees the real equation and whether it is TGO-approved, never a guess.
- * The equation is per registered species, so it changes batch to batch.
+ * The equation is per registered species, so it changes session to session.
  */
 export function SpeciesEquationBar({
   speciesNameTh,

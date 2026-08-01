@@ -7,6 +7,8 @@ import { Kbd } from '@/components/ui/kbd'
 import type { VerifierProfile } from '@/features/verifier/auth/types'
 import { signOutVerifier } from '@/features/verifier/auth/actions'
 import { useGuide } from '@/components/ui/guide-book'
+import { AnnouncementBell } from '@/components/ui/announcement-bell'
+import type { LiveAnnouncement } from '@/features/announcements/types/targets'
 import type { VerifierProject } from '@/features/verifier/services/fetchVerifierProjects'
 
 type Props = {
@@ -15,14 +17,22 @@ type Props = {
   projects: VerifierProject[]
   menuOpen?: boolean
   onMenuClick?: () => void
+  /** Live announcements for the bell (ADMIN-ANN-02); empty hides it. */
+  announcements?: LiveAnnouncement[]
 }
 
-export function VerifierTopbar({ verifier, projects, menuOpen = false, onMenuClick }: Props) {
+export function VerifierTopbar({
+  verifier,
+  projects,
+  menuOpen = false,
+  onMenuClick,
+  announcements = [],
+}: Props) {
   const initial = verifier.username?.charAt(0).toUpperCase() || 'V'
   const guide = useGuide()
   const pathname = usePathname()
 
-  // Approving a batch is irreversible, so the project under review is named in
+  // Approving a session is irreversible, so the project under review is named in
   // the chrome on every screen rather than only on the page that fetched it.
   const activeId = pathname.match(/^\/verifier\/projects\/([^/]+)/)?.[1] ?? null
   const activeProject = activeId ? projects.find((p) => p.id === activeId) : undefined
@@ -67,6 +77,8 @@ export function VerifierTopbar({ verifier, projects, menuOpen = false, onMenuCli
       </div>
 
       <div className="flex items-center gap-3">
+        <AnnouncementBell announcements={announcements} />
+
         <span className="hidden rounded-full border border-primary-muted bg-primary-subtle px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-success sm:inline">
           {verifier.org}
         </span>

@@ -1,43 +1,33 @@
 import type { Metadata } from 'next'
-import { ShieldAlert, ScrollText } from 'lucide-react'
+import { ShieldAlert } from 'lucide-react'
 import { getAdminSession } from '@/features/auth/services/adminSession'
-import { fetchAuditLogs } from '@/features/audit-logs/services/fetchAuditLogs'
+import {
+  fetchAuditFilters,
+  fetchAuditLogs,
+} from '@/features/audit-logs/services/fetchAuditLogs'
 import { canViewAuditLog } from '@/features/audit-logs/permissions'
 import { AuditLogTable } from '@/features/audit-logs/components/AuditLogTable'
-import { EmptyState } from '@/components/ui/empty-state'
+import { AUDIT_PAGE_SIZE } from '@/features/audit-logs/types/page-size'
 
 export const metadata: Metadata = {
   title: 'Audit Log — FarmFlow Admin',
 }
 
-export default async function AuditLogPage() {
-  const [logs, admin] = await Promise.all([fetchAuditLogs(), getAdminSession()])
+type Search = Promise<Record<string, string | string[] | undefined>>
+
+const one = (v: string | string[] | undefined): string | undefined =>
+  Array.isArray(v) ? v[0] : v
+
+export default async function AuditLogPage({ searchParams }: { searchParams: Search }) {
+  const [sp, admin] = await Promise.all([searchParams, getAdminSession()])
 
   // The protected layout already guarantees a session; this is a type guard.
   const canView = admin ? canViewAuditLog(admin) : false
 
-  return (
-    <div className="mx-auto max-w-[1440px] px-4 py-8 sm:px-8">
-      <header className="mb-6">
-        <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-ink">
-          Audit Log
-        </h1>
-        <p className="mt-1.5 text-sm text-ink-secondary">
-          บันทึกกิจกรรมของระบบ · เพิ่มอย่างเดียว แก้ไข/ลบไม่ได้ (append-only)
-        </p>
-      </header>
-
-      {canView ? (
-        logs.length === 0 ? (
-          <EmptyState
-            icon={ScrollText}
-            title="ยังไม่มีบันทึกกิจกรรม"
-            description="การกระทำของผู้ดูแลระบบ (สร้าง/แก้ไข/อนุมัติ) จะถูกบันทึกที่นี่โดยอัตโนมัติ"
-          />
-        ) : (
-          <AuditLogTable logs={logs} />
-        )
-      ) : (
+  if (!canView) {
+    return (
+      <div className="mx-auto max-w-[1440px] px-4 py-8 sm:px-8">
+        <Header />
         <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-line bg-panel py-16 text-center">
           <ShieldAlert className="h-8 w-8 text-ink-disabled" strokeWidth={1.5} />
           <p className="text-sm font-semibold text-ink-secondary">ไม่มีสิทธิ์เข้าถึง</p>
@@ -45,7 +35,46 @@ export default async function AuditLogPage() {
             เฉพาะ Super Admin เท่านั้นที่ดูบันทึกกิจกรรมได้
           </p>
         </div>
-      )}
+      </div>
+    )
+  }
+
+  const page = Math.max(1, Number(one(sp.page) ?? 1))
+  const action = one(sp.action)
+
+  const [logs, filters] = await Promise.all([
+    fetchAuditLogs({
+      q: one(sp.q),
+      // "all" is the absence of a filter, not a value to send.
+      action: action && action !== 'all' ? action : undefined,
+      actorId: one(sp.actorId),
+      from: one(sp.from),
+      to: one(sp.to),
+      sort: (one(sp.sort) as 'createdAt') ?? 'createdAt',
+      dir: (one(sp.dir) as 'asc' | 'desc') ?? 'desc',
+      limit: AUDIT_PAGE_SIZE,
+      offset: (page - 1) * AUDIT_PAGE_SIZE,
+    }),
+    fetchAuditFilters(),
+  ])
+
+  return (
+    <div className="mx-auto max-w-[1440px] px-4 py-8 sm:px-8">
+      <Header />
+      <AuditLogTable page={logs} filters={filters} />
     </div>
+  )
+}
+
+function Header() {
+  return (
+    <header className="mb-6">
+      <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-ink">
+        Audit Log
+      </h1>
+      <p className="mt-1.5 text-sm text-ink-secondary">
+        บันทึกกิจกรรมของระบบ · เพิ่มอย่างเดียว แก้ไข/ลบไม่ได้ (append-only)
+      </p>
+    </header>
   )
 }

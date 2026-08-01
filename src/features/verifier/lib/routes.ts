@@ -8,7 +8,7 @@
  */
 export const UNASSIGNED_PROJECT = 'unassigned'
 
-/** Route segment for a batch's project; `null` means the unassigned bucket. */
+/** Route segment for a session's project; `null` means the unassigned bucket. */
 export function projectSegment(projectId: string | null | undefined): string {
   return projectId ?? UNASSIGNED_PROJECT
 }
@@ -18,17 +18,17 @@ export function projectHref(projectId: string | null | undefined): string {
 }
 
 export function queueHref(projectId: string | null | undefined): string {
-  return `${projectHref(projectId)}/batches`
+  return `${projectHref(projectId)}/sessions`
 }
 
-export function batchHref(projectId: string | null | undefined, batchId: string): string {
-  return `${queueHref(projectId)}/${batchId}`
+export function sessionHref(projectId: string | null | undefined, sessionId: string): string {
+  return `${queueHref(projectId)}/${sessionId}`
 }
 
 export function treeHref(
   projectId: string | null | undefined,
-  batchId: string,
+  sessionId: string,
   treeId: string,
 ): string {
-  return `${batchHref(projectId, batchId)}/tree/${treeId}`
+  return `${sessionHref(projectId, sessionId)}/tree/${treeId}`
 }

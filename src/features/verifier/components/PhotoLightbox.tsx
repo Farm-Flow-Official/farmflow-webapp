@@ -13,7 +13,7 @@ import { useHotkeys } from '@/lib/hooks/useHotkeys'
  * inside the photo's `relative` container.
  *
  * The overlay deliberately does NOT block the page's ←/→ shortcuts: staying
- * full-screen while stepping through a batch is the fastest way to review.
+ * full-screen while stepping through a session is the fastest way to review.
  */
 export function PhotoLightbox({ src, alt }: { src: string; alt: string }) {
   const [open, setOpen] = useState(false)
@@ -28,7 +28,7 @@ export function PhotoLightbox({ src, alt }: { src: string; alt: string }) {
       // `code` too — on a Thai layout the F key reports key: 'ด'.
       if (e.key === 'Escape' || e.key.toLowerCase() === 'f' || e.code === 'KeyF') {
         // Capture phase + stopPropagation so Escape closes the overlay instead
-        // of also triggering the page's "back to batch" shortcut.
+        // of also triggering the page's "back to session" shortcut.
         e.stopPropagation()
         setOpen(false)
       }

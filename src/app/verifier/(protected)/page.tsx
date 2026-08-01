@@ -18,7 +18,7 @@ export const metadata: Metadata = {
  *
  * The queue is scoped to a project from here on, so every later screen can state
  * plainly which project's work is on screen — a verifier must never approve a
- * batch while unsure which project it belongs to.
+ * session while unsure which project it belongs to.
  */
 export default async function VerifierProjectPickerPage() {
   // The portal's front door. It used to throw straight through, which made a
@@ -50,7 +50,7 @@ export default async function VerifierProjectPickerPage() {
         </h1>
         <p className="mt-1.5 text-sm text-ink-secondary">
           {projects.length > 0
-            ? `${projects.length} โครงการในความรับผิดชอบ · รอตรวจรวม ${totalPending} batch`
+            ? `${projects.length} โครงการในความรับผิดชอบ · รอตรวจรวม ${totalPending} session`
             : 'ยังไม่มีงานตรวจในความรับผิดชอบของคุณ'}
         </p>
       </header>
@@ -87,7 +87,7 @@ function ProjectCard({ project }: { project: VerifierProject }) {
 
   return (
     <Link
-      href={`/verifier/projects/${project.id}/batches`}
+      href={`/verifier/projects/${project.id}/sessions`}
       className="group flex h-full flex-col justify-between gap-4 rounded-xl border border-line bg-panel p-5 shadow-sm transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
     >
       <div className="flex items-start gap-3">
@@ -120,7 +120,7 @@ function ProjectCard({ project }: { project: VerifierProject }) {
           </p>
           <p className="mt-0.5 flex items-center gap-1 text-xs text-ink-muted">
             <Boxes className="h-3.5 w-3.5" strokeWidth={1.75} />
-            ทั้งหมด {project.totalCount} batch
+            ทั้งหมด {project.totalCount} session
           </p>
         </div>
         <ChevronRight

@@ -1,19 +1,30 @@
 'use client'
 
 import { useMemo, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Plus, Trash2, TreePine, MapPinned, AlertTriangle } from 'lucide-react'
 import { DataTable, type Column } from '@/components/ui/data-table'
+import { ListToolbar } from '@/components/ui/list-toolbar'
+import { AreaRai } from '@/components/ui/area-rai'
+import { ContactCell } from '@/features/farmers/components/ContactCell'
 import { Badge } from '@/components/ui/badge'
 import { Modal } from '@/components/ui/modal'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { Toast, useToast } from '@/components/ui/toast'
 import type { ProjectDetail, ProjectMemberFarm } from '@/features/projects/types'
-import type { ProjectLookups } from '@/features/projects/services/fetchProjects'
+import type { ProjectLookups } from '@/features/projects/types/lookups'
 import {
   enrolFarm,
   setProjectSpecies,
   withdrawFarm,
 } from '@/features/projects/actions/projectActions'
+
+const FARM_SORTS = [
+  { value: 'farmName', label: 'ชื่อฟาร์ม' },
+  { value: 'calculatedAreaRai', label: 'พื้นที่' },
+  { value: 'farmStatus', label: 'สถานะ' },
+  { value: 'withinDeclaredBoundary', label: 'ขอบเขต' },
+]
 
 type Props = {
   project: ProjectDetail
@@ -22,6 +33,7 @@ type Props = {
 }
 
 export function ProjectWorkspace({ project: initial, lookups, canWrite }: Props) {
+  const router = useRouter()
   const [project, setProject] = useState(initial)
   const [adding, setAdding] = useState(false)
   const [removing, setRemoving] = useState<ProjectMemberFarm | null>(null)
@@ -30,6 +42,42 @@ export function ProjectWorkspace({ project: initial, lookups, canWrite }: Props)
   // Farms the picker may offer: those free to enrol, minus any already added in
   // this session (the server list was fetched before those enrollments).
   const memberIds = useMemo(() => new Set(project.farms.map((f) => f.id)), [project.farms])
+
+  const [farmQuery, setFarmQuery] = useState('')
+  const [farmSort, setFarmSort] = useState('farmName')
+  const [farmDir, setFarmDir] = useState<'asc' | 'desc'>('asc')
+
+  const visibleFarms = useMemo(() => {
+    const needle = farmQuery.trim().toLowerCase()
+    const rows = needle
+      ? project.farms.filter(
+          (f) =>
+            f.farmName.toLowerCase().includes(needle) ||
+            (f.ownerName?.toLowerCase().includes(needle) ?? false),
+        )
+      : project.farms
+
+    const pick = (f: ProjectMemberFarm) => {
+      switch (farmSort) {
+        case 'calculatedAreaRai':
+          return f.calculatedAreaRai ?? -1
+        case 'farmStatus':
+          return f.farmStatus
+        case 'withinDeclaredBoundary':
+          // Sort the ones that need attention (outside, then unknown) first.
+          return f.withinDeclaredBoundary === false ? 0 : f.withinDeclaredBoundary == null ? 1 : 2
+        default:
+          return f.farmName
+      }
+    }
+
+    return [...rows].sort((a, b) => {
+      const av = pick(a)
+      const bv = pick(b)
+      if (av === bv) return 0
+      return (av < bv ? -1 : 1) * (farmDir === 'asc' ? 1 : -1)
+    })
+  }, [project.farms, farmQuery, farmSort, farmDir])
   const available = useMemo(
     () => lookups.enrollableFarms.filter((f) => !memberIds.has(f.id)),
     [lookups.enrollableFarms, memberIds],
@@ -85,12 +133,27 @@ export function ProjectWorkspace({ project: initial, lookups, canWrite }: Props)
       ),
     },
     {
+      key: 'contact',
+      header: 'ข้อมูลติดต่อ',
+      cell: (f) => (
+        // Clicking reveal must not also open the farm — the row is a link.
+        <span onClick={(e) => e.stopPropagation()} role="presentation">
+          <ContactCell
+            farmerId={f.ownerUserId}
+            phoneMasked={f.ownerPhoneMasked}
+            emailMasked={f.ownerEmailMasked}
+            hasContact={f.hasContact}
+          />
+        </span>
+      ),
+    },
+    {
       key: 'area',
-      header: 'พื้นที่ (ไร่)',
+      header: 'พื้นที่',
       align: 'right',
       cell: (f) => (
-        <span className="text-[13px] text-ink-secondary">
-          {f.calculatedAreaRai != null ? f.calculatedAreaRai.toFixed(2) : '—'}
+        <span className="text-ink-secondary">
+          <AreaRai rai={f.calculatedAreaRai} />
         </span>
       ),
     },
@@ -162,14 +225,34 @@ export function ProjectWorkspace({ project: initial, lookups, canWrite }: Props)
           )}
         </div>
 
+        {/* ADMIN-PROJ-04 — a project can hold hundreds of farms; scanning them
+            without search or sort was the complaint. Filtered in the browser
+            because this list is bounded by one project's membership. */}
+        <ListToolbar
+          q={farmQuery}
+          onQueryChange={setFarmQuery}
+          placeholder="ค้นหาชื่อฟาร์มหรือเกษตรกร…"
+          sorts={FARM_SORTS}
+          sortValue={farmSort}
+          dir={farmDir}
+          onSortChange={(s, d) => {
+            setFarmSort(s)
+            setFarmDir(d)
+          }}
+        />
+
         <DataTable
           columns={columns}
-          rows={project.farms}
+          rows={visibleFarms}
           getRowKey={(f) => f.id}
+          // ADMIN-PROJ-02 — each row opens the farm it names.
+          onRowClick={(f) => router.push(`/admin/farms/${f.id}`)}
           empty={{
             icon: <MapPinned className="mb-2 h-8 w-8 text-ink-disabled" strokeWidth={1.5} />,
-            title: 'ยังไม่มีฟาร์มในโครงการ',
-            description: 'เพิ่มฟาร์มด้วยตนเอง หรือรอให้เกษตรกรสมัครผ่านแอปมือถือ',
+            title: farmQuery ? 'ไม่พบฟาร์มที่ตรงกับคำค้นหา' : 'ยังไม่มีฟาร์มในโครงการ',
+            description: farmQuery
+              ? 'ลองคำค้นหาอื่น'
+              : 'เพิ่มฟาร์มด้วยตนเอง หรือรอให้เกษตรกรสมัครผ่านแอปมือถือ',
           }}
         />
       </section>

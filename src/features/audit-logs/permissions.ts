@@ -1,17 +1,12 @@
 import type { AdminProfile } from '@/features/auth/types'
 
 /**
- * RBAC seam. Spec A-11 says the Audit Log is **MASTER (SuperAdmin) only**, but
- * the exact `roleId` / permission key contract from the API isn't finalized yet.
- * This is the single place to enforce it later.
+ * Can this admin read the audit log?
  *
- * For now it returns `true` so the prototype is fully usable in a demo. When the
- * API contract is known, swap the body for the real check, e.g.:
- *
- *   return admin.roleId === 'SuperAdmin' ||
- *     admin.permissions.includes('audit:read')
+ * `audit:read` is seeded to MASTER alone — the log records every other admin's
+ * actions, including suspensions and their stated reasons, so it is the one
+ * page where "everyone can look" is the wrong default.
  */
 export function canViewAuditLog(admin: AdminProfile): boolean {
-  void admin
-  return true
+  return admin.permissions.includes('audit:read')
 }

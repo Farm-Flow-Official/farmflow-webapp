@@ -47,6 +47,22 @@ export function Modal({
   const panelRef = useRef<HTMLDivElement>(null)
   const place = PLACEMENTS[placement]
 
+  /**
+   * `onClose` read through a ref, so the effect below can depend on nothing.
+   *
+   * It used to depend on `[onClose]`. Callers pass inline arrows, so a dialog
+   * that owns its own form state re-created that prop on every keystroke — the
+   * effect tore down and re-ran, and its "move focus into the panel" step threw
+   * focus back to the first button. The symptom was a textarea you could not
+   * type into: one character landed, then focus jumped away. Depending on
+   * nothing means open/focus/lock happen exactly once, at mount, which is what
+   * they always meant.
+   */
+  const onCloseRef = useRef(onClose)
+  useEffect(() => {
+    onCloseRef.current = onClose
+  })
+
   useEffect(() => {
     const previouslyFocused = document.activeElement as HTMLElement | null
     const panel = panelRef.current
@@ -62,7 +78,7 @@ export function Modal({
     function onKeyDown(e: KeyboardEvent) {
       if (e.key === 'Escape') {
         e.stopPropagation()
-        onClose()
+        onCloseRef.current()
         return
       }
       if (e.key !== 'Tab' || !panel) return
@@ -94,7 +110,9 @@ export function Modal({
       document.body.style.overflow = prevOverflow
       previouslyFocused?.focus?.()
     }
-  }, [onClose])
+    // Mount-only: see `onCloseRef`. Re-running this would steal focus back from
+    // whatever the user is typing into.
+  }, [])
 
   return (
     // z-index sits above Leaflet's internal panes/controls (~700–1000) so map

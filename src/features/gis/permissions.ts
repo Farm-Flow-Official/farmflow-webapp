@@ -1,15 +1,12 @@
 import type { AdminProfile } from '@/features/auth/types'
 
 /**
- * RBAC seam. Spec A-06 says the GIS map is for **VERIFY and MASTER** (verifiers
- * resolve overlap disputes; master oversees). The exact `roleId` / permission
- * key contract from the API isn't finalized yet; this is the single place to
- * enforce it later, e.g.:
+ * Can this admin open the GIS map?
  *
- *   return admin.roleId === 'SuperAdmin' || admin.roleId === 'Verifier' ||
- *     admin.permissions.includes('gis:read')
+ * `gis:read` is seeded to MASTER, VERIFIER and PROJECT_DEV — verifiers resolve
+ * overlap disputes, project developers need to see what they are enrolling.
+ * FINANCE and GENERAL have no business with farm boundaries.
  */
 export function canViewGis(admin: AdminProfile): boolean {
-  void admin
-  return true
+  return admin.permissions.includes('gis:read')
 }

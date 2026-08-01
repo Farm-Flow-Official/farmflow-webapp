@@ -95,16 +95,38 @@ export default async function PortalLandingPage() {
           })}
         </div>
 
-        {/* Public verify link */}
-        <div className="mt-8 text-center">
-          <Link
-            href="/verifier/verify/qr-check"
-            className="inline-flex items-center gap-1.5 text-xs text-ink-muted transition-colors hover:text-ink"
-          >
-            <QrCode className="h-3.5 w-3.5" strokeWidth={1.75} />
-            ตรวจสอบเอกสาร (สาธารณะ — ไม่ต้องเข้าสู่ระบบ)
-          </Link>
-        </div>
+        {/*
+          PORTAL-02 — this was a grey 12px link under the cards, and UAT users
+          did not realise it was clickable at all. It is the platform's public
+          anti-greenwashing check: the one door here that is *for* outsiders,
+          who have no account and no reason to guess that small text is a
+          button. Given its own card, on the brand green, so it reads as a
+          destination rather than a footnote.
+        */}
+        <Link
+          href="/verifier/verify/qr-check"
+          className="group mt-6 flex flex-col items-start gap-4 rounded-2xl border border-primary/20 bg-primary-subtle p-6 transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 sm:flex-row sm:items-center"
+        >
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary text-white">
+            <QrCode className="h-6 w-6" strokeWidth={1.9} />
+          </span>
+
+          <div className="flex-1">
+            <h2 className="text-base font-semibold text-ink">ตรวจสอบเอกสารคาร์บอนเครดิต</h2>
+            <p className="mt-1 text-[13px] text-ink-secondary">
+              สแกน QR หรือกรอกรหัสเพื่อตรวจสอบว่าใบรับรองเป็นของจริง —{' '}
+              <span className="font-medium text-primary">สาธารณะ ไม่ต้องเข้าสู่ระบบ</span>
+            </p>
+          </div>
+
+          <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white transition-colors group-hover:bg-primary-hover">
+            ตรวจสอบเอกสาร
+            <ArrowRight
+              className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
+              strokeWidth={2}
+            />
+          </span>
+        </Link>
 
         <p className="mt-6 text-center text-xs text-ink-muted">
           FarmFlow Carbon Platform

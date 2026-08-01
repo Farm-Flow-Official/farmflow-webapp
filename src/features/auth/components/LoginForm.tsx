@@ -1,7 +1,10 @@
 'use client'
 
 import { useActionState } from 'react'
+import { ExternalLink } from 'lucide-react'
 import { loginAdmin } from '@/features/auth/actions/loginAdmin'
+import { PasswordInput } from '@/components/ui/password-input'
+import { LINE_OA_URL } from '@/lib/constants/contact'
 import type { LoginState } from '@/features/auth/types'
 
 export function LoginForm() {
@@ -61,10 +64,9 @@ export function LoginForm() {
           >
             รหัสผ่าน
           </label>
-          <input
+          <PasswordInput
             id="password"
             name="password"
-            type="password"
             autoComplete="current-password"
             required
             placeholder="••••••••"
@@ -106,6 +108,25 @@ export function LoginForm() {
           'เข้าสู่ระบบ'
         )}
       </button>
+
+      {/*
+        ADMIN-LOGIN-02 — the one screen where a locked-out admin has no other
+        route to a human. Secondary weight on purpose: it must be findable when
+        sign-in fails, not compete with the sign-in button when it works.
+      */}
+      <p className="mt-5 text-center text-[13px] text-[#6B7280]">
+        เข้าสู่ระบบไม่ได้?{' '}
+        <a
+          href={LINE_OA_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1 font-medium text-[#004C22] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#004C22] focus-visible:ring-offset-2"
+        >
+          ติดต่อผู้ดูแลระบบ
+          <ExternalLink className="h-3 w-3" strokeWidth={2} aria-hidden />
+          <span className="sr-only">(เปิดแท็บใหม่ไปยัง LINE Official Account)</span>
+        </a>
+      </p>
     </form>
   )
 }

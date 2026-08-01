@@ -5,9 +5,11 @@ import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard,
   Users,
+  Sprout,
   FolderTree,
   Map,
   Megaphone,
+  LifeBuoy,
   Settings,
   ScrollText,
   UserCog,
@@ -20,9 +22,16 @@ import { LinkNavProgress } from '@/components/ui/nav-progress'
 
 type IconType = ComponentType<SVGProps<SVGSVGElement>>
 
-/** `key` is the second stroke of the `g` shortcut — kept next to the label so
- *  the sidebar teaches the shortcut instead of hiding it in the guide. */
-type NavItem = { href: string; label: string; icon: IconType; key: string }
+/**
+ * `key` is the second stroke of the `g` shortcut — kept next to the label so
+ * the sidebar teaches the shortcut instead of hiding it in the guide.
+ *
+ * `permission` is the API permission code the menu needs. The server already
+ * refuses these routes without it (`requirePermission`); hiding the entry stops
+ * the console advertising work a role cannot do (ADMIN-USERS-05). Items with no
+ * `permission` are open to every signed-in admin.
+ */
+type NavItem = { href: string; label: string; icon: IconType; key: string; permission?: string }
 type NavSection = { heading: string; items: NavItem[] }
 
 const NAV: NavSection[] = [
@@ -32,28 +41,78 @@ const NAV: NavSection[] = [
   },
   {
     heading: 'Projects',
-    items: [{ href: '/admin/projects', label: 'Projects', icon: FolderTree, key: 'P' }],
+    items: [
+      {
+        href: '/admin/projects',
+        label: 'Projects',
+        icon: FolderTree,
+        key: 'P',
+        permission: 'projects:read',
+      },
+    ],
   },
   {
     heading: 'Farmers',
-    items: [{ href: '/admin/farmers', label: 'Farmer Management', icon: Users, key: 'F' }],
+    items: [
+      {
+        href: '/admin/farmers',
+        label: 'Farmer Management',
+        icon: Users,
+        key: 'F',
+        permission: 'farmers:read',
+      },
+      {
+        href: '/admin/farms',
+        label: 'คิวอนุมัติแปลง',
+        icon: Sprout,
+        key: 'Q',
+        permission: 'farmers:read',
+      },
+    ],
   },
   {
     heading: 'Verification',
-    items: [{ href: '/admin/gis', label: 'GIS Map', icon: Map, key: 'M' }],
+    items: [{ href: '/admin/gis', label: 'GIS Map', icon: Map, key: 'M', permission: 'gis:read' }],
   },
   {
     heading: 'Content',
     items: [
-      { href: '/admin/announcements', label: 'Announcements', icon: Megaphone, key: 'A' },
+      {
+        href: '/admin/announcements',
+        label: 'Announcements',
+        icon: Megaphone,
+        key: 'A',
+        permission: 'announcements:read',
+      },
+      // The dashboard has always linked to Support Tickets; the sidebar never
+      // did, so the page was reachable only by knowing it was there.
+      { href: '/admin/support', label: 'Support Tickets', icon: LifeBuoy, key: 'T' },
     ],
   },
   {
     heading: 'System',
     items: [
-      { href: '/admin/settings', label: 'Settings', icon: Settings, key: 'S' },
-      { href: '/admin/audit-log', label: 'Audit Log', icon: ScrollText, key: 'L' },
-      { href: '/admin/admin-users', label: 'Admin Users', icon: UserCog, key: 'U' },
+      {
+        href: '/admin/settings',
+        label: 'Settings',
+        icon: Settings,
+        key: 'S',
+        permission: 'settings:read',
+      },
+      {
+        href: '/admin/audit-log',
+        label: 'Audit Log',
+        icon: ScrollText,
+        key: 'L',
+        permission: 'audit:read',
+      },
+      {
+        href: '/admin/admin-users',
+        label: 'Admin Users',
+        icon: UserCog,
+        key: 'U',
+        permission: 'admins:manage',
+      },
     ],
   },
 ]
@@ -63,14 +122,26 @@ type Props = {
   open?: boolean
   /** Called when a nav item is chosen — used to close the mobile drawer. */
   onNavigate?: () => void
+  /** The signed-in admin's permission codes, from `/admin/auth/me`. */
+  permissions?: string[]
 }
 
-export function AdminSidebar({ open = false, onNavigate }: Props) {
+export function AdminSidebar({ open = false, onNavigate, permissions }: Props) {
   const pathname = usePathname()
   const guide = useGuide()
 
   const isActive = (href: string) =>
     href === '/admin' ? pathname === '/admin' : pathname.startsWith(href)
+
+  // Undefined permissions means "not loaded" rather than "none" — showing an
+  // empty sidebar during that window would look broken, so fall back to showing
+  // everything and let the server refuse anything the role cannot reach.
+  const allowed = (item: NavItem) =>
+    !item.permission || !permissions || permissions.includes(item.permission)
+
+  const sections = NAV.map((s) => ({ ...s, items: s.items.filter(allowed) })).filter(
+    (s) => s.items.length > 0,
+  )
 
   return (
     <aside
@@ -84,7 +155,7 @@ export function AdminSidebar({ open = false, onNavigate }: Props) {
         <p className="hidden px-3 pb-1 text-[10px] text-ink-muted lg:block">
           กด <Kbd>G</Kbd> แล้วตามด้วยตัวอักษรเพื่อข้ามเมนู
         </p>
-        {NAV.map((section) => (
+        {sections.map((section) => (
           <div key={section.heading} className="mb-1.5">
             <p className="px-3 pb-1 pt-3 text-[10px] font-bold uppercase tracking-[0.12em] text-ink-muted">
               {section.heading}
