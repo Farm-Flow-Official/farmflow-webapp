@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react'
 import type { AdminProfile } from '@/features/auth/types'
 import { AdminTopbar } from '@/components/ui/topbar'
+import { AnnouncementBanner } from '@/components/ui/announcement-banner'
+import type { LiveAnnouncement } from '@/features/announcements/types/targets'
 import { AdminSidebar } from '@/components/ui/sidebar-nav'
 import { AdminGuideProvider } from '@/features/admin/guide/GuideBook'
 import { AdminKeyboardNav } from '@/features/admin/components/AdminKeyboardNav'
@@ -14,9 +16,12 @@ import { AdminKeyboardNav } from '@/features/admin/components/AdminKeyboardNav'
  */
 export function AdminShell({
   admin,
+  announcements = { banner: [], bell: [] },
   children,
 }: {
   admin: AdminProfile
+  /** Live announcements targeted at this dashboard, split by channel. */
+  announcements?: { banner: LiveAnnouncement[]; bell: LiveAnnouncement[] }
   children: React.ReactNode
 }) {
   const [open, setOpen] = useState(false)
@@ -40,9 +45,10 @@ export function AdminShell({
           admin={admin}
           menuOpen={open}
           onMenuClick={() => setOpen((v) => !v)}
+          announcements={announcements.bell}
         />
 
-        <AdminSidebar open={open} onNavigate={close} />
+        <AdminSidebar open={open} onNavigate={close} permissions={admin.permissions} />
 
         {/* Mobile backdrop — only when the drawer is open, never on desktop */}
         {open && (
@@ -54,7 +60,10 @@ export function AdminShell({
           />
         )}
 
-        <main className="min-h-screen pt-16 lg:ml-60">{children}</main>
+        <main className="min-h-screen pt-16 lg:ml-60">
+          <AnnouncementBanner announcements={announcements.banner} />
+          {children}
+        </main>
 
         <AdminKeyboardNav />
       </div>

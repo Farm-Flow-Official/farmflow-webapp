@@ -8,16 +8,16 @@ import { NavProgressBar } from '@/features/verifier/components/NavProgressBar'
 type Props = {
   prevHref: string | null
   nextHref: string | null
-  /** Where Escape / `b` goes back to — the batch review page. */
+  /** Where Escape / `b` goes back to — the session review page. */
   backHref: string
 }
 
 /**
  * Keyboard driving for the per-tree inspection page (V-05): a verifier works a
- * batch of 50+ photos, so reaching for the mouse on every photo is the whole
+ * session of 50+ photos, so reaching for the mouse on every photo is the whole
  * cost of the review.
  *
- * ← / → (or k / j) step through the batch, Escape or `b` returns to the batch.
+ * ← / → (or k / j) step through the session, Escape or `b` returns to the session.
  * Navigation runs in a transition so the current photo stays on screen — with a
  * progress bar — instead of blanking, and both neighbours are prefetched.
  */

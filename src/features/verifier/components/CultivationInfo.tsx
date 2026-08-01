@@ -21,7 +21,7 @@ function plantingAge(year: number | null): { label: string; age: number | null }
 /**
  * Cultivation facts of the assessed subplot (ADR 0007) — the unit the carbon is
  * actually computed for. A farm can hold several single-species subplots, so
- * this makes explicit which one this batch is, plus the planting/density facts a
+ * this makes explicit which one this session is, plus the planting/density facts a
  * verifier uses to judge whether the measurements are plausible.
  */
 export function CultivationInfo({

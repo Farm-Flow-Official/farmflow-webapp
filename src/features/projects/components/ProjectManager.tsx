@@ -261,6 +261,16 @@ function RowAction({
 
 /* ── Create / Edit form (modal) ─────────────────────────────────────────── */
 
+/**
+ * The crediting periods offered by default (ADMIN-PROJ-01). Anything else goes
+ * through "กำหนดเอง" — the standard sets no fixed term, so this list is a
+ * convenience, not a constraint.
+ */
+const PERIOD_YEARS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+/** Sentinel `<option>` value that switches the select into a free-text field. */
+const CUSTOM = 'custom'
+
 const FIELD_BASE =
   'h-10 w-full rounded-lg border bg-panel px-3 text-sm text-ink placeholder:text-ink-muted transition-shadow focus:outline-none focus:ring-2'
 const FIELD_OK = 'border-line focus:border-primary focus:ring-primary/15'
@@ -284,6 +294,12 @@ function ProjectForm({
   const [status, setStatus] = useState<ProjectStatus>(initial?.status ?? 'draft')
   const [mode, setMode] = useState(initial?.implementationMode ?? 'standalone')
   const [period, setPeriod] = useState(initial?.creditingPeriodYears?.toString() ?? '')
+  // An existing project outside 1–10 opens straight into the custom field, so
+  // editing it does not silently reset a 20-year period to blank.
+  const [customPeriod, setCustomPeriod] = useState(
+    initial?.creditingPeriodYears != null &&
+      !PERIOD_YEARS.includes(initial.creditingPeriodYears),
+  )
   const [startDate, setStartDate] = useState(initial?.creditingStartDate ?? '')
   const [orgId, setOrgId] = useState(initial?.verifierOrgId ?? '')
   const [touched, setTouched] = useState(false)
@@ -421,16 +437,61 @@ function ProjectForm({
             <label htmlFor="prj-period" className="mb-1.5 block text-sm font-medium text-ink">
               ระยะเวลาคิดเครดิต
             </label>
-            <select
-              id="prj-period"
-              value={period}
-              onChange={(e) => setPeriod(e.target.value)}
-              className={`${FIELD_BASE} ${FIELD_OK}`}
-            >
-              <option value="">ยังไม่ระบุ</option>
-              <option value="7">7 ปี</option>
-              <option value="10">10 ปี</option>
-            </select>
+            {/*
+              ADMIN-PROJ-01 — was a two-option list (7 / 10). The crediting
+              period is not fixed by the standard, and locking it here forced
+              admins into the PDD wizard to set anything else, which made the
+              project record disagree with its own document. 1–10 covers every
+              period seen in practice; "กำหนดเอง" covers the rest.
+            */}
+            {customPeriod ? (
+              <div className="relative">
+                <input
+                  id="prj-period"
+                  type="number"
+                  min={1}
+                  max={100}
+                  step={1}
+                  value={period}
+                  onChange={(e) => setPeriod(e.target.value)}
+                  placeholder="เช่น 20"
+                  aria-label="ระยะเวลาคิดเครดิต (ปี)"
+                  className={`${FIELD_BASE} ${FIELD_OK} pr-16`}
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCustomPeriod(false)
+                    setPeriod('')
+                  }}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded px-1.5 text-xs text-ink-muted transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                >
+                  ยกเลิก
+                </button>
+              </div>
+            ) : (
+              <select
+                id="prj-period"
+                value={period}
+                onChange={(e) => {
+                  if (e.target.value === CUSTOM) {
+                    setCustomPeriod(true)
+                    setPeriod('')
+                    return
+                  }
+                  setPeriod(e.target.value)
+                }}
+                className={`${FIELD_BASE} ${FIELD_OK}`}
+              >
+                <option value="">ยังไม่ระบุ</option>
+                {PERIOD_YEARS.map((y) => (
+                  <option key={y} value={y}>
+                    {y} ปี
+                  </option>
+                ))}
+                <option value={CUSTOM}>กำหนดเอง…</option>
+              </select>
+            )}
           </div>
 
           <div>

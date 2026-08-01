@@ -6,6 +6,9 @@ import { ADMIN_GUIDE_SECTIONS, type AdminGuideSectionId } from '@/features/admin
 /** Section that answers "what am I looking at?" for the current route. */
 function resolveSection(pathname: string): AdminGuideSectionId {
   if (pathname.startsWith('/admin/farmers')) return 'farmers'
+  // `/admin/farms` is the approval queue; `/admin/farmers` is the people. The
+  // longer prefix is checked first above so neither shadows the other.
+  if (pathname.startsWith('/admin/farms')) return 'farms'
   if (pathname.startsWith('/admin/gis')) return 'gis'
   if (pathname.startsWith('/admin/announcements')) return 'content'
   if (

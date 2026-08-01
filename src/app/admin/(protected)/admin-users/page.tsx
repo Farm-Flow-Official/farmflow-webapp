@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { ShieldAlert } from 'lucide-react'
 import { getAdminSession } from '@/features/auth/services/adminSession'
 import { fetchAdmins } from '@/features/admin-users/services/fetchAdmins'
+import { fetchProjectLookups } from '@/features/projects/services/fetchProjects'
 import { canManageAdmins } from '@/features/admin-users/permissions'
 import { AdminUserManager } from '@/features/admin-users/components/AdminUserManager'
 
@@ -10,7 +11,13 @@ export const metadata: Metadata = {
 }
 
 export default async function AdminUsersPage() {
-  const [admins, admin] = await Promise.all([fetchAdmins(), getAdminSession()])
+  const [admins, admin, lookups] = await Promise.all([
+    fetchAdmins(),
+    getAdminSession(),
+    // Verifier accounts must name an accrediting body; the project lookups
+    // already expose the list, so there is no second source to keep in sync.
+    fetchProjectLookups(),
+  ])
 
   // The protected layout already guarantees a session; this is a type guard.
   const canManage = admin ? canManageAdmins(admin) : false
@@ -31,6 +38,7 @@ export default async function AdminUsersPage() {
           // Spec A-12: list excludes the current admin — they cannot act on
           // their own account (suspend/delete self is disallowed).
           initialAdmins={admins.filter((a) => a.id !== admin?.id)}
+          verifierOrgs={lookups.verifierOrgs}
         />
       ) : (
         <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-line bg-panel py-16 text-center">

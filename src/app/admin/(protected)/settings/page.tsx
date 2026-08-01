@@ -4,15 +4,18 @@ import { getAdminSession } from '@/features/auth/services/adminSession'
 import { fetchSystemConfig } from '@/features/settings/services/fetchSystemConfig'
 import { canManageSettings } from '@/features/settings/permissions'
 import { SettingsForm } from '@/features/settings/components/SettingsForm'
+import { AvailabilityPanel } from '@/features/settings/components/AvailabilityPanel'
+import { fetchAvailability } from '@/features/settings/services/fetchAvailability'
 
 export const metadata: Metadata = {
   title: 'Settings — FarmFlow Admin',
 }
 
 export default async function SettingsPage() {
-  const [config, admin] = await Promise.all([
+  const [config, admin, availability] = await Promise.all([
     fetchSystemConfig(),
     getAdminSession(),
+    fetchAvailability(),
   ])
 
   // The protected layout already guarantees a session; this is a type guard.
@@ -30,7 +33,10 @@ export default async function SettingsPage() {
       </header>
 
       {canManage ? (
-        <SettingsForm config={config} currentAdminUsername={admin?.username ?? 'admin'} />
+        <div className="flex flex-col gap-6">
+          <SettingsForm config={config} currentAdminUsername={admin?.username ?? 'admin'} />
+          <AvailabilityPanel rows={availability} />
+        </div>
       ) : (
         <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-line bg-panel py-16 text-center">
           <ShieldAlert className="h-8 w-8 text-ink-disabled" strokeWidth={1.5} />

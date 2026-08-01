@@ -29,7 +29,7 @@ export default async function VerifierProjectOverviewPage({
     {
       label: 'รอตรวจรับรอง',
       value: String(summary.pendingReview),
-      sublabel: 'batch ในคิว',
+      sublabel: 'session ในคิว',
       alert: summary.pendingReview > 0,
       Icon: Boxes,
       accentClass: 'bg-warning-bg text-warning',
@@ -45,7 +45,7 @@ export default async function VerifierProjectOverviewPage({
     {
       label: 'อนุมัติเดือนนี้',
       value: String(summary.approvedThisMonth),
-      sublabel: 'batch',
+      sublabel: 'session',
       alert: false,
       Icon: CircleCheck,
       accentClass: 'bg-success-bg text-success',
@@ -53,7 +53,7 @@ export default async function VerifierProjectOverviewPage({
     {
       label: 'ปฏิเสธเดือนนี้',
       value: String(summary.rejectedThisMonth),
-      sublabel: 'batch',
+      sublabel: 'session',
       alert: false,
       Icon: CircleX,
       accentClass: 'bg-error-bg text-error',

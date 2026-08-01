@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { TriangleAlert, ChevronRight, ShieldCheck } from 'lucide-react'
 import type { AnomalyAlert } from '@/features/verifier/types'
-import { batchHref } from '@/features/verifier/lib/routes'
+import { sessionHref } from '@/features/verifier/lib/routes'
 
 export function AnomalyAlertPanel({
   alerts,
@@ -34,7 +34,7 @@ export function AnomalyAlertPanel({
         </span>
         <div className="flex-1">
           <h2 className="text-base font-semibold text-ink">การแจ้งเตือนความผิดปกติ</h2>
-          <p className="text-xs text-ink-muted">batch ที่ระบบ AI flag ไว้ ควรตรวจสอบก่อนรับรอง</p>
+          <p className="text-xs text-ink-muted">session ที่ระบบ AI flag ไว้ ควรตรวจสอบก่อนรับรอง</p>
         </div>
         {hasAlerts && (
           <span className="inline-flex items-center gap-1 rounded-full bg-error-bg px-2.5 py-1 text-xs font-bold tabular-nums text-error">
@@ -47,14 +47,14 @@ export function AnomalyAlertPanel({
         <div className="flex flex-col items-center justify-center gap-2 py-14 text-center">
           <ShieldCheck className="h-8 w-8 text-ink-disabled" strokeWidth={1.5} />
           <p className="text-sm font-semibold text-ink-secondary">ไม่มีรายการผิดปกติ</p>
-          <p className="text-[13px] text-ink-muted">ทุก batch ผ่านเกณฑ์ความเชื่อมั่นแล้ว</p>
+          <p className="text-[13px] text-ink-muted">ทุก session ผ่านเกณฑ์ความเชื่อมั่นแล้ว</p>
         </div>
       ) : (
         <ul className="divide-y divide-line">
           {alerts.map((a) => (
             <li key={a.id}>
               <Link
-                href={batchHref(projectId, a.batchId)}
+                href={sessionHref(projectId, a.sessionId)}
                 className="group flex items-center gap-4 px-5 py-4 transition-colors hover:bg-error-bg/40 focus-visible:bg-error-bg/40 focus-visible:outline-none"
               >
                 {/* Severity accent rail */}
@@ -67,7 +67,7 @@ export function AnomalyAlertPanel({
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
                     <span className="font-medium text-ink">{a.farmName}</span>
-                    <span className="font-mono text-xs text-ink-muted">{a.batchId}</span>
+                    <span className="font-mono text-xs text-ink-muted">{a.sessionId}</span>
                   </div>
                   <p className="mt-0.5 text-[13px] text-ink-secondary">{a.reason}</p>
                 </div>

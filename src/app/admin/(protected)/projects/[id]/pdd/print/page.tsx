@@ -4,6 +4,8 @@ import { notFound } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
 import { fetchPdd } from '@/features/pdd/services/fetchPdd'
 import { PrintButton } from '@/features/verifier/components/PrintButton'
+import { Logo } from '@/components/ui/logo'
+import { formatDateTime } from '@/lib/utils/format'
 import {
   IMPLEMENTATION_MODE_LABELS,
   PROJECT_SCALE_LABELS,
@@ -30,18 +32,55 @@ export default async function PddPrintPage({ params }: { params: Promise<{ id: s
 
   const c = (pdd.content ?? {}) as Record<string, Record<string, unknown>>
   const p = pdd.project
+  const printedAt = formatDateTime(new Date().toISOString())
 
   return (
     <>
       {/* Scoped to this route so the A4 geometry never leaks into the console. */}
       <style>{`
-        @page { size: A4; margin: 18mm 16mm; }
+        /* Top margin leaves room for the running header, bottom for the footer. */
+        @page { size: A4; margin: 24mm 16mm 20mm; }
         @media print {
           html, body { background: #fff; }
           .pdd-section { break-inside: avoid; }
           .pdd-break { break-before: page; }
           h2, h3 { break-after: avoid; }
           tr, li { break-inside: avoid; }
+
+          /*
+            ADMIN-PDD-04 — a running header and footer on every sheet, so a page
+            that gets separated from the bundle still says which project and
+            which document version it belongs to. Chrome repeats position-fixed
+            elements on each printed page, which is the only way to do this
+            without a server-side PDF engine (see the note on this file).
+
+            Page NUMBERS are deliberately absent: the CSS counter(page) function
+            is not supported in Chrome's print engine, and a wrong or missing
+            number on a formal document is worse than none. The guide tells the
+            operator to enable the browser's own header/footer when numbering is
+            required.
+          */
+          .pdd-running-header,
+          .pdd-running-footer {
+            position: fixed;
+            left: 0;
+            right: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 8pt;
+            color: #6B7280;
+          }
+          .pdd-running-header {
+            top: -14mm;
+            border-bottom: 0.4pt solid #D1D5DB;
+            padding-bottom: 2mm;
+          }
+          .pdd-running-footer {
+            bottom: -12mm;
+            border-top: 0.4pt solid #D1D5DB;
+            padding-top: 2mm;
+          }
         }
       `}</style>
 
@@ -58,6 +97,24 @@ export default async function PddPrintPage({ params }: { params: Promise<{ id: s
         </div>
 
         <article className="mx-auto max-w-[820px] bg-white p-12 text-[13px] leading-relaxed text-ink shadow-sm print:max-w-none print:p-0 print:shadow-none">
+          {/* Running header/footer — print only; see the stylesheet above. */}
+          <div className="pdd-running-header hidden print:flex" aria-hidden>
+            <span className="flex items-center gap-1.5">
+              <Logo size={12} />
+              <span className="font-semibold text-ink">FarmFlow</span>
+              <span>· PDD</span>
+            </span>
+            <span>
+              {p.projectCode} · {p.nameTh}
+            </span>
+          </div>
+          <div className="pdd-running-footer hidden print:flex" aria-hidden>
+            <span>
+              เอกสารข้อเสนอโครงการ (T-VER) · เวอร์ชัน {pdd.version ?? '—'}
+            </span>
+            <span>พิมพ์เมื่อ {printedAt}</span>
+          </div>
+
           {/* Cover */}
           <header className="pdd-section mb-8 border-b-2 border-ink pb-6 text-center">
             <p className="text-xs tracking-wide text-ink-secondary">

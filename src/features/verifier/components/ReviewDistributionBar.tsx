@@ -28,7 +28,7 @@ export function ReviewDistributionBar({
       <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
         <div>
           <h2 className="text-base font-semibold text-ink">สถานะการตรวจรับรอง</h2>
-          <p className="text-xs text-ink-muted">สัดส่วน batch ตามสถานะ · รวม {formatNumber(total)} รายการ</p>
+          <p className="text-xs text-ink-muted">สัดส่วน session ตามสถานะ · รวม {formatNumber(total)} รายการ</p>
         </div>
       </div>
 
