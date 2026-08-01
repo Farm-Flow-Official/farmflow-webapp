@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/navigation'
-import { MapPinned, Pencil, Trash2, Undo2, X, Check, Loader2, Info } from 'lucide-react'
+import { MapPinned, Pencil, Trash2, Undo2, X, Check, Loader2, Info, Maximize2 } from 'lucide-react'
+import { Modal } from '@/components/ui/modal'
 import { addSamplePlot, removeSamplePlot } from '@/features/pdd/actions/pddActions'
 import type { PddDetail } from '@/features/pdd/types'
 import type { PlotShape, Position } from '@/features/pdd/components/map/SamplePlotMap'
@@ -52,6 +53,7 @@ export function SamplePlotEditor({
   const [plotName, setPlotName] = useState('')
   const [busy, setBusy] = useState(false)
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [expanded, setExpanded] = useState(false)
 
   const plots: PlotShape[] = useMemo(
     () =>
@@ -72,14 +74,16 @@ export function SamplePlotEditor({
     setPlotName('')
   }, [])
 
-  // Escape aborts, Backspace removes the last vertex — the two things anyone
-  // reaches for mid-draw without being told.
+  // Backspace removes the last vertex — the thing anyone reaches for mid-draw
+  // without being told. Escape is handled by the dialog instead (see
+  // `closeExpanded`), because Modal traps it before it can reach this listener
+  // and only the dialog knows whether Escape means "abandon this shape" or
+  // "close the map".
   useEffect(() => {
     if (!drawing) return
     function onKey(e: KeyboardEvent) {
       const el = e.target
       if (el instanceof HTMLElement && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA')) return
-      if (e.key === 'Escape') cancelDraw()
       if (e.key === 'Backspace') {
         e.preventDefault()
         setDraftRing((prev) => prev.slice(0, -1))
@@ -87,6 +91,24 @@ export function SamplePlotEditor({
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
+  }, [drawing])
+
+  /**
+   * Drawing only happens in the expanded dialog: placing vertices needs to pan
+   * and zoom, and the inline map has neither. So the draw button opens the
+   * dialog with the pencil already armed rather than leaving someone tapping at
+   * a map that will not move.
+   */
+  const startDrawing = useCallback(() => {
+    setDrawing(true)
+    setExpanded(true)
+  }, [])
+
+  // Escape while drawing abandons the shape; Escape otherwise closes the map.
+  // Losing an unfinished polygon to a stray key would be the worse surprise.
+  const closeExpanded = useCallback(() => {
+    if (drawing) return cancelDraw()
+    setExpanded(false)
   }, [drawing, cancelDraw])
 
   async function savePlot() {
@@ -118,33 +140,34 @@ export function SamplePlotEditor({
 
   const canClose = draftRing.length >= 3
 
-  return (
-    <section className="rounded-xl border border-line bg-panel p-5 shadow-sm">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h3 className="flex items-center gap-2 text-sm font-semibold text-ink">
-            <MapPinned className="h-4 w-4 text-primary" strokeWidth={2} />
-            แปลงตัวอย่าง (Sample Plots)
-          </h3>
-          <p className="mt-0.5 text-xs text-ink-muted">
-            พื้นที่ย่อยที่ใช้เก็บข้อมูลตามแผนติดตามผล — วาดบนแผนที่โดยมีขอบเขตโครงการที่ประกาศเป็นฉากหลัง
-          </p>
-        </div>
+  // One set of map props, two mounts: a locked preview in the form and a live
+  // one in the dialog. They must not drift apart.
+  const mapProps = {
+    declaredBoundary,
+    plots,
+    draftRing,
+    drawing,
+    onPoint: (position: Position) => setDraftRing((prev) => [...prev, position]),
+    onCloseRing: savePlot,
+    selectedPlotId: selectedId,
+    onSelectPlot: setSelectedId,
+  }
 
-        {editable && !drawing && (
-          <button
-            type="button"
-            onClick={() => setDrawing(true)}
-            className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-          >
-            <Pencil className="h-4 w-4" strokeWidth={2} />
-            วาดแปลงใหม่
-          </button>
-        )}
-      </div>
+  const drawButton = (
+    <button
+      type="button"
+      onClick={startDrawing}
+      className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+    >
+      <Pencil className="h-4 w-4" strokeWidth={2} />
+      วาดแปลงใหม่
+    </button>
+  )
 
-      {drawing && (
-        <div className="mt-4 rounded-lg border border-info/40 bg-info-bg px-4 py-3">
+  // The draw controls live in the dialog, which is the only place drawing
+  // happens.
+  const drawPanel = drawing && (
+    <div className="shrink-0 border-b border-line bg-info-bg px-5 py-3">
           <p className="flex items-start gap-2 text-xs text-info">
             <Info className="mt-px h-3.5 w-3.5 shrink-0" strokeWidth={2} />
             คลิกบนแผนที่เพื่อวางจุด · คลิกจุดแรกอีกครั้งเพื่อปิดรูป · กด{' '}
@@ -196,23 +219,90 @@ export function SamplePlotEditor({
               บันทึกแปลง
             </button>
           </div>
-        </div>
-      )}
+    </div>
+  )
 
-      <div className="mt-4 h-[420px] overflow-hidden rounded-lg border border-line">
-        <SamplePlotMap
-          declaredBoundary={declaredBoundary}
-          plots={plots}
-          draftRing={draftRing}
-          drawing={drawing}
-          onPoint={(position) => setDraftRing((prev) => [...prev, position])}
-          onCloseRing={savePlot}
-          selectedPlotId={selectedId}
-          onSelectPlot={setSelectedId}
-        />
+  return (
+    <section className="rounded-xl border border-line bg-panel p-5 shadow-sm">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h3 className="flex items-center gap-2 text-sm font-semibold text-ink">
+            <MapPinned className="h-4 w-4 text-primary" strokeWidth={2} />
+            แปลงตัวอย่าง (Sample Plots)
+          </h3>
+          <p className="mt-0.5 text-xs text-ink-muted">
+            พื้นที่ย่อยที่ใช้เก็บข้อมูลตามแผนติดตามผล — วาดบนแผนที่โดยมีขอบเขตโครงการที่ประกาศเป็นฉากหลัง
+          </p>
+        </div>
+
+        {editable && drawButton}
       </div>
 
+      {/* Preview: shows the shapes, moves for nobody. */}
+      <div className="relative mt-4 h-[420px] overflow-hidden rounded-lg border border-line">
+        <SamplePlotMap {...mapProps} locked />
+        <button
+          type="button"
+          onClick={() => setExpanded(true)}
+          className="absolute right-3 top-3 z-[800] inline-flex items-center gap-1.5 rounded-lg border border-line bg-panel/95 px-3 py-2 text-xs font-semibold text-ink shadow-sm backdrop-blur transition-colors hover:bg-panel focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+        >
+          <Maximize2 className="h-3.5 w-3.5" strokeWidth={2} />
+          ขยายแผนที่
+        </button>
+      </div>
+
+      <p className="mt-1.5 text-[11px] leading-relaxed text-ink-muted">
+        แผนที่นี้ล็อกการเลื่อนและซูมไว้ เพื่อไม่ให้ปัดโดนระหว่างเลื่อนหน้าจอ — กด{' '}
+        <span className="font-medium text-ink-secondary">ขยายแผนที่</span> เพื่อเลื่อน ซูม หรือวาดแปลง
+      </p>
+
       <Legend hasDeclared={Boolean(declaredBoundary)} />
+
+      {expanded && (
+        <Modal
+          onClose={closeExpanded}
+          // A stray tap on the backdrop must not throw away an unfinished shape.
+          closeOnBackdrop={!drawing}
+          labelledBy="sample-plot-map-title"
+          panelClassName="flex h-[92vh] w-[96vw] max-w-6xl flex-col overflow-hidden p-0"
+        >
+          <div className="flex shrink-0 flex-wrap items-start justify-between gap-3 border-b border-line px-5 py-3">
+            <div>
+              <h4 id="sample-plot-map-title" className="text-sm font-semibold text-ink">
+                แปลงตัวอย่าง (Sample Plots)
+              </h4>
+              <p className="mt-0.5 text-xs text-ink-muted">
+                เลื่อนและซูมได้ตามปกติ · กดปิดเมื่อดูเสร็จ
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2">
+              {editable && !drawing && drawButton}
+              <button
+                type="button"
+                onClick={closeExpanded}
+                title={drawing ? 'ยกเลิกการวาดก่อน แล้วกดอีกครั้งเพื่อปิด' : 'ปิด'}
+                className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-line bg-panel px-3 text-sm font-medium text-ink-secondary transition-colors hover:bg-surface hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              >
+                <X className="h-4 w-4" strokeWidth={1.75} />
+                ปิด
+              </button>
+            </div>
+          </div>
+
+          {drawPanel}
+
+          {/* min-h-0 lets the map take the leftover height instead of overflowing
+              the panel — flex children refuse to shrink below content otherwise. */}
+          <div className="min-h-0 flex-1">
+            <SamplePlotMap {...mapProps} />
+          </div>
+
+          <div className="shrink-0 border-t border-line px-5 py-2">
+            <Legend hasDeclared={Boolean(declaredBoundary)} inDialog />
+          </div>
+        </Modal>
+      )}
 
       <ul className="mt-3 flex flex-col gap-1.5">
         {pdd.samplePlots.length === 0 ? (
@@ -256,12 +346,18 @@ export function SamplePlotEditor({
   )
 }
 
-function Legend({ hasDeclared }: { hasDeclared: boolean }) {
+function Legend({ hasDeclared, inDialog = false }: { hasDeclared: boolean; inDialog?: boolean }) {
   return (
-    <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-ink-muted">
+    <div
+      className={`flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-ink-muted ${inDialog ? '' : 'mt-2'}`}
+    >
       {hasDeclared && (
         <span className="flex items-center gap-1.5">
-          <span className="h-0 w-4 border-t-2 border-dashed border-[#1E40AF]" />
+          {/* White dashes on a dark bar — the swatch has to read the way the
+              line does on imagery, or the legend stops matching the map. */}
+          <span className="flex h-3 w-5 items-center justify-center rounded-sm bg-[#0F172A]/70">
+            <span className="h-0 w-full border-t-2 border-dashed border-white" />
+          </span>
           ขอบเขตโครงการที่ประกาศ
         </span>
       )}
