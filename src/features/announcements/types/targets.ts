@@ -96,4 +96,4 @@ export type LiveAnnouncement = {
 export const BANNER_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp']
 export const BANNER_MAX_MB = 10
 export const BANNER_MAX_BYTES = BANNER_MAX_MB * 1024 * 1024
-export const BANNER_LIMITS_TEXT = `JPG / PNG / WebP ขนาดไม่เกิน ${BANNER_MAX_MB} MB`
+export const BANNER_LIMITS_TEXT = 'JPG / PNG / WebP'

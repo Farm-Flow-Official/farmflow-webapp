@@ -7,7 +7,16 @@ import { useStoredIds } from '@/lib/hooks/useStoredIds'
 import { publicFileUrl } from '@/lib/farm-cover'
 import type { LiveAnnouncement } from '@/features/announcements/types/targets'
 
-const DISMISSED_KEY = 'farmflow.announcements.dismissed'
+/**
+ * Dismissals are keyed per dashboard, not per browser.
+ *
+ * All four dashboards live on one origin and share one localStorage, so a
+ * single key meant that closing a notice on Admin also closed it on Verifier,
+ * Business and Executive. An admin who targets four dashboards is addressing
+ * four audiences; on a shared device that collapsed into one showing, and it
+ * read as the other three being broken.
+ */
+const dismissedKey = (surface: string) => `farmflow.announcements.dismissed.${surface}`
 
 /** Nothing to subscribe to — hydration happens once and never changes back. */
 const noSubscribe = () => () => {}
@@ -35,8 +44,15 @@ const noSubscribe = () => () => {}
  * Only the newest undismissed one is shown. Two stacked notices compete rather
  * than inform, and the rest are still in the bell.
  */
-export function AnnouncementBanner({ announcements }: { announcements: LiveAnnouncement[] }) {
-  const [dismissed, setDismissed] = useStoredIds(DISMISSED_KEY)
+export function AnnouncementBanner({
+  announcements,
+  surface,
+}: {
+  announcements: LiveAnnouncement[]
+  /** Which dashboard this is — scopes the dismissal. */
+  surface: 'admin' | 'verifier' | 'business' | 'executive'
+}) {
+  const [dismissed, setDismissed] = useStoredIds(dismissedKey(surface))
   const titleId = useId()
 
   /**

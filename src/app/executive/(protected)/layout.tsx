@@ -47,7 +47,7 @@ export default async function ExecutiveLayout({
   return (
     <div className="min-h-dvh bg-surface">
       <ExecutiveTopbar profile={executive} announcements={bell} />
-      <AnnouncementBanner announcements={banner} />
+      <AnnouncementBanner announcements={banner} surface="executive" />
       <div className="mx-auto max-w-[1200px] px-4 py-8 sm:px-8">{children}</div>
     </div>
   )
