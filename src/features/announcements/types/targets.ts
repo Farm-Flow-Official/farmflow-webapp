@@ -82,3 +82,13 @@ export type LiveAnnouncement = {
   endAt: string | null
   createdAt: string
 }
+
+/**
+ * What the banner upload accepts. Mirrors the API's own limits — kept here so
+ * the browser can refuse a file instantly and say *why*, instead of relaying a
+ * server validation error that reads "Invalid request data" to someone who
+ * just picked a holiday photo.
+ */
+export const BANNER_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp']
+export const BANNER_MAX_BYTES = 5 * 1024 * 1024
+export const BANNER_LIMITS_TEXT = 'JPG / PNG / WebP ขนาดไม่เกิน 5 MB'

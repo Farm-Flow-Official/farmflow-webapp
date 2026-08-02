@@ -8,7 +8,12 @@ import { Modal } from '@/components/ui/modal'
 import { TargetPicker } from '@/features/announcements/components/TargetPicker'
 import { uploadAnnouncementBanner } from '@/features/announcements/actions/bannerActions'
 import { publicFileUrl } from '@/lib/farm-cover'
-import type { AnnouncementTarget } from '@/features/announcements/types/targets'
+import {
+  BANNER_LIMITS_TEXT,
+  BANNER_MAX_BYTES,
+  BANNER_MIME_TYPES,
+  type AnnouncementTarget,
+} from '@/features/announcements/types/targets'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { Toast, useToast } from '@/components/ui/toast'
 import { formatDate } from '@/lib/utils/format'
@@ -254,6 +259,17 @@ function AnnouncementForm({
   async function pickBanner(file: File | undefined) {
     if (!file) return
     setBannerError(null)
+
+    // Checked here as well as on the server, because the round trip is the
+    // slow part and "that file is 12 MB" is worth saying before spending it.
+    if (!BANNER_MIME_TYPES.includes(file.type)) {
+      return setBannerError(`ไฟล์นี้ไม่ใช่รูปที่รองรับ — รับเฉพาะ ${BANNER_LIMITS_TEXT}`)
+    }
+    if (file.size > BANNER_MAX_BYTES) {
+      const mb = (file.size / 1024 / 1024).toFixed(1)
+      return setBannerError(`รูปใหญ่เกินไป (${mb} MB) — รับไม่เกิน 5 MB`)
+    }
+
     setUploading(true)
 
     const form = new FormData()
@@ -345,14 +361,14 @@ function AnnouncementForm({
                 <ImagePlus className="h-5 w-5 text-ink-muted" strokeWidth={1.75} />
               )}
               <span className="text-[13px] text-ink-secondary">
-                {uploading ? 'กำลังอัปโหลด…' : 'เลือกรูป (JPG / PNG / WebP · ไม่เกิน 5 MB)'}
+                {uploading ? 'กำลังอัปโหลด…' : `เลือกรูป (${BANNER_LIMITS_TEXT})`}
               </span>
               <span className="text-[11px] text-ink-muted">
                 แสดงเฉพาะปลายทางที่เลือกเป็น &ldquo;แบนเนอร์&rdquo;
               </span>
               <input
                 type="file"
-                accept="image/jpeg,image/png,image/webp"
+                accept={BANNER_MIME_TYPES.join(',')}
                 disabled={uploading}
                 onChange={(e) => void pickBanner(e.target.files?.[0])}
                 className="sr-only"
