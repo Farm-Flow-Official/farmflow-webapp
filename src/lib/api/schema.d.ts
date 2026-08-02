@@ -401,6 +401,26 @@ export interface paths {
         patch: operations["patchApiV1AdminFarmersByIdStatus"];
         trace?: never;
     };
+    "/api/v1/admin/farmers/{id}/credentials": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Change a farmer's username or password
+         * @description The support path for a farmer who cannot sign in. Editing in place rather than recreating the account, because a new account would take every farm, session and credit with it. A generated password is returned once and never logged; the audit trail records that a reset happened, not what it was.
+         */
+        patch: operations["patchApiV1AdminFarmersByIdCredentials"];
+        trace?: never;
+    };
     "/api/v1/admin/farms/": {
         parameters: {
             query?: never;
@@ -529,6 +549,26 @@ export interface paths {
         head?: never;
         /** Update announcement */
         patch: operations["patchApiV1AdminAnnouncementsById"];
+        trace?: never;
+    };
+    "/api/v1/admin/announcements/banner": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Upload an announcement banner image
+         * @description Stores the image and returns its id, which the create/update call then attaches as `bannerFileId`. Separate from the announcement write so an image can be swapped without re-sending the text.
+         */
+        post: operations["postApiV1AdminAnnouncementsBanner"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/v1/admin/system/settings": {
@@ -884,6 +924,66 @@ export interface paths {
          * @description Clears the session cookie.
          */
         post: operations["postApiV1VerifierAuthSign-out"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/executive/auth/sign-in": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Executive sign in
+         * @description Authenticates an EXECUTIVE-role account and sets the HttpOnly session cookie. Every other role is rejected with 403.
+         */
+        post: operations["postApiV1ExecutiveAuthSign-in"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/executive/auth/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get current executive
+         * @description Returns the authenticated executive's id, username, and role.
+         */
+        get: operations["getApiV1ExecutiveAuthMe"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/executive/auth/sign-out": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Executive sign out
+         * @description Clears the session cookie.
+         */
+        post: operations["postApiV1ExecutiveAuthSign-out"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3701,6 +3801,11 @@ export interface operations {
                         message: string;
                         data: {
                             id: string;
+                            /** @description Login handle — not contact detail, so not masked */
+                            username: string;
+                            /** @description False for SSO-only accounts (no local password) */
+                            hasPassword: boolean;
+                            lastLoginAt: (string | null) | null;
                             /** @description Personal Data, or a non-PII fallback (ADR 0013) */
                             fullName: string;
                             phone: (string | null) | null;
@@ -3791,6 +3896,9 @@ export interface operations {
                         message: string;
                         data: {
                             id: string;
+                            username: string;
+                            hasPassword: boolean;
+                            lastLoginAt: (string | null) | null;
                             fullName: string;
                             phone: (string | null) | null;
                             email: (string | null) | null;
@@ -4044,6 +4152,11 @@ export interface operations {
                         message: string;
                         data: {
                             id: string;
+                            /** @description Login handle — not contact detail, so not masked */
+                            username: string;
+                            /** @description False for SSO-only accounts (no local password) */
+                            hasPassword: boolean;
+                            lastLoginAt: (string | null) | null;
                             /** @description Personal Data, or a non-PII fallback (ADR 0013) */
                             fullName: string;
                             phone: (string | null) | null;
@@ -4134,6 +4247,205 @@ export interface operations {
             };
             /** @description Not found - the farmer does not exist. */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Validation error - the request failed schema validation. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    patchApiV1AdminFarmersByIdCredentials: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description New login handle */
+                    username?: string;
+                    /** @description New password, chosen by the admin */
+                    password?: string;
+                    /** @description Let the server pick a readable password and return it once */
+                    generatePassword?: boolean;
+                };
+                "application/x-www-form-urlencoded": {
+                    /** @description New login handle */
+                    username?: string;
+                    /** @description New password, chosen by the admin */
+                    password?: string;
+                    /** @description Let the server pick a readable password and return it once */
+                    generatePassword?: boolean;
+                };
+                "multipart/form-data": {
+                    /** @description New login handle */
+                    username?: string;
+                    /** @description New password, chosen by the admin */
+                    password?: string;
+                    /** @description Let the server pick a readable password and return it once */
+                    generatePassword?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description The account's new credentials */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            username: string;
+                            password: (string | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Validation error - the request failed schema validation. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized - missing or invalid admin session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden - missing the required permission. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Not found - the farmer does not exist. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Validation error - the request failed schema validation. */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -5290,6 +5602,135 @@ export interface operations {
             };
             /** @description Not found - the announcement does not exist. */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Validation error - e.g. an empty title. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    postApiV1AdminAnnouncementsBanner: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * Format: binary
+                     * @description Banner image shown across the top of the targeted dashboard
+                     * @default File
+                     */
+                    file: string;
+                };
+                "application/x-www-form-urlencoded": {
+                    /**
+                     * Format: binary
+                     * @description Banner image shown across the top of the targeted dashboard
+                     * @default File
+                     */
+                    file: string;
+                };
+                "multipart/form-data": {
+                    /**
+                     * Format: binary
+                     * @description Banner image shown across the top of the targeted dashboard
+                     * @default File
+                     */
+                    file: string;
+                };
+            };
+        };
+        responses: {
+            /** @description The stored banner image */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            fileId: string;
+                            mimeType: string;
+                            sizeBytes: number;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized - missing or invalid admin session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden - missing the required permission. */
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -7619,6 +8060,241 @@ export interface operations {
             };
         };
     };
+    "postApiV1ExecutiveAuthSign-in": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    username: string;
+                    /** @description Executive password (plain text over TLS) */
+                    password: string;
+                };
+                "application/x-www-form-urlencoded": {
+                    username: string;
+                    /** @description Executive password (plain text over TLS) */
+                    password: string;
+                };
+                "multipart/form-data": {
+                    username: string;
+                    /** @description Executive password (plain text over TLS) */
+                    password: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Executive sign-in successful — the session cookie is set; no token in the body */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            executive: {
+                                id: string;
+                                username: string;
+                                role: string;
+                                mustChangePassword: boolean;
+                            };
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized — missing or invalid executive session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden — this account is not an executive. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Validation error — the request body failed schema validation. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    getApiV1ExecutiveAuthMe: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Current authenticated executive */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            id: string;
+                            username: string;
+                            role: string;
+                            mustChangePassword: boolean;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized — missing or invalid executive session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden — this account is not an executive. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "postApiV1ExecutiveAuthSign-out": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Session cookie cleared */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            /** @constant */
+                            revoked: true;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
     getApiV1VerifierProjects: {
         parameters: {
             query?: never;
@@ -9045,7 +9721,7 @@ export interface operations {
                         data: {
                             id: string;
                             /** @enum {string} */
-                            category: "avatar" | "cover_photo" | "tree_snapshot" | "pdd_attachment";
+                            category: "avatar" | "cover_photo" | "tree_snapshot" | "pdd_attachment" | "announcement_banner";
                             mimeType: string;
                             sizeBytes: number;
                             /** @enum {string} */
@@ -14514,7 +15190,7 @@ export interface operations {
                         data: {
                             id: string;
                             /** @enum {string} */
-                            category: "avatar" | "cover_photo" | "tree_snapshot" | "pdd_attachment";
+                            category: "avatar" | "cover_photo" | "tree_snapshot" | "pdd_attachment" | "announcement_banner";
                             mimeType: string;
                             sizeBytes: number;
                             /** @enum {string} */

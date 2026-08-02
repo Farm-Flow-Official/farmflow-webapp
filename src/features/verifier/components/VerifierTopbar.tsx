@@ -82,10 +82,12 @@ export function VerifierTopbar({
 
       <div className="flex items-center gap-3">
         <NotificationBell
-          surface="verifier"
           announcements={announcements}
-          initial={notifications}
-          seeAllHref="/verifier/notifications"
+          feed={{
+            surface: 'verifier',
+            initial: notifications,
+            seeAllHref: '/verifier/notifications',
+          }}
         />
 
         <span className="hidden rounded-full border border-primary-muted bg-primary-subtle px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-success sm:inline">

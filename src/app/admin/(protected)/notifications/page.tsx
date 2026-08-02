@@ -4,6 +4,7 @@ import {
   fetchNotifications,
 } from '@/features/notifications/services/fetchNotifications'
 import { NotificationList } from '@/features/notifications/components/NotificationList'
+import { fetchLiveAnnouncements } from '@/features/announcements/services/fetchLiveAnnouncements'
 import {
   NOTIFICATION_PAGE_SIZE,
   type NotificationType,
@@ -25,9 +26,17 @@ export default async function AdminNotificationsPage({
 }) {
   const sp = await searchParams
   const page = Math.max(1, Number(one(sp.page) ?? 1))
-  const type = one(sp.type) as NotificationType | undefined
+  const rawType = one(sp.type)
+  // "announcement" is a pill on this page, not a notification type the API
+  // knows — sending it would be a guaranteed 422 for a filter we handle here.
+  const type = (
+    rawType && rawType !== 'announcement' ? rawType : undefined
+  ) as NotificationType | undefined
 
-  const [feed, summary] = await Promise.all([
+  // The announcements come along because the bell carries them: a reader who
+  // saw a notice in the dropdown must find it again on the page that dropdown
+  // links to, or "ดูทั้งหมด" is a lie.
+  const [feed, summary, announcements] = await Promise.all([
     fetchNotifications('admin', {
       limit: NOTIFICATION_PAGE_SIZE,
       offset: (page - 1) * NOTIFICATION_PAGE_SIZE,
@@ -35,6 +44,7 @@ export default async function AdminNotificationsPage({
       type,
     }),
     fetchNotificationSummary('admin'),
+    fetchLiveAnnouncements('admin', 'bell'),
   ])
 
   return (
@@ -54,6 +64,7 @@ export default async function AdminNotificationsPage({
         total={feed.total}
         page={page}
         summary={summary}
+        announcements={announcements}
       />
     </div>
   )

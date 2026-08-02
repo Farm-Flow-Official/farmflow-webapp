@@ -2,7 +2,13 @@
  * View-model types for the Admin Users domain, aligned with the Elysia
  * `/admin/admins` responses and the RBAC roles from ADR 0014.
  */
-export type AdminRole = 'MASTER' | 'VERIFIER' | 'PROJECT_DEV' | 'FINANCE' | 'GENERAL'
+export type AdminRole =
+  | 'MASTER'
+  | 'VERIFIER'
+  | 'PROJECT_DEV'
+  | 'FINANCE'
+  | 'GENERAL'
+  | 'EXECUTIVE'
 
 /** ADMINS.admin_status, surfaced as Active/Inactive in the UI. */
 export type AdminStatus = 'Active' | 'Inactive'
@@ -42,6 +48,7 @@ export const ROLE_USERNAME_PREFIX: Partial<Record<AdminRole, string>> = {
   VERIFIER: 'verify',
   PROJECT_DEV: 'dev',
   FINANCE: 'finance',
+  EXECUTIVE: 'exec',
 }
 
 export const ADMIN_ROLES: AdminRole[] = [
@@ -50,6 +57,7 @@ export const ADMIN_ROLES: AdminRole[] = [
   'PROJECT_DEV',
   'FINANCE',
   'GENERAL',
+  'EXECUTIVE',
 ]
 
 /** Human-readable role context (RBAC, ADR 0014). Used in selectors + the table. */
@@ -73,5 +81,9 @@ export const ROLE_INFO: Record<AdminRole, { label: string; description: string }
   GENERAL: {
     label: 'General',
     description: 'สิทธิ์พื้นฐานสำหรับเจ้าหน้าที่ทั่วไป',
+  },
+  EXECUTIVE: {
+    label: 'Executive',
+    description: 'ผู้บริหาร — เข้าได้เฉพาะ Executive Dashboard เท่านั้น เข้าหลังบ้านไม่ได้',
   },
 }

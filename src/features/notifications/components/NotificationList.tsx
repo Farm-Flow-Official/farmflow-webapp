@@ -3,10 +3,11 @@
 import { useTransition } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { BellOff, CheckCheck } from 'lucide-react'
+import { BellOff, CheckCheck, Megaphone } from 'lucide-react'
 import { Pagination } from '@/components/ui/pagination'
-import { formatDateTime, formatRelativeTime } from '@/lib/utils/format'
+import { formatDate, formatDateTime, formatRelativeTime } from '@/lib/utils/format'
 import { markAllNotificationsRead } from '@/features/notifications/actions/notificationActions'
+import type { LiveAnnouncement } from '@/features/announcements/types/targets'
 import {
   NOTIFICATION_KINDS,
   NOTIFICATION_PAGE_SIZE,
@@ -30,12 +31,22 @@ export function NotificationList({
   total,
   page,
   summary,
+  announcements,
 }: {
   surface: NotificationSurface
   rows: StaffNotification[]
   total: number
   page: number
   summary: NotificationSummary[]
+  /**
+   * The same announcements the bell carries.
+   *
+   * They live here because the bell's link says "ทั้งหมด" and a reader who saw
+   * a notice in the dropdown must find it again on the page it points at. They
+   * are not paginated with the notifications — announcements are a small live
+   * set, not a history — so they sit above the list rather than inside it.
+   */
+  announcements: LiveAnnouncement[]
 }) {
   const router = useRouter()
   const pathname = usePathname()
@@ -45,6 +56,13 @@ export function NotificationList({
   const activeType = params.get('type') ?? 'all'
   const unreadOnly = params.get('unread') === '1'
   const totalUnread = summary.reduce((sum, s) => sum + s.unread, 0)
+
+  // Announcements are a live set with no unread state of their own here, so
+  // they show under "ทั้งหมด" and under their own pill, and hide the moment the
+  // reader narrows to a system type — at which point they would be noise.
+  const showAnnouncements =
+    announcements.length > 0 && !unreadOnly && (activeType === 'all' || activeType === 'announcement')
+  const empty = rows.length === 0
 
   function setParam(key: string, value: string | null) {
     const next = new URLSearchParams(params.toString())
@@ -83,6 +101,15 @@ export function NotificationList({
           )
         })}
 
+        {announcements.length > 0 && (
+          <Pill
+            active={activeType === 'announcement'}
+            onClick={() => setParam('type', 'announcement')}
+          >
+            ประกาศ
+          </Pill>
+        )}
+
         <span className="mx-1 h-5 w-px bg-line" aria-hidden />
 
         <Pill active={unreadOnly} onClick={() => setParam('unread', unreadOnly ? null : '1')}>
@@ -102,10 +129,30 @@ export function NotificationList({
         )}
       </div>
 
-      {rows.length === 0 ? (
+      {showAnnouncements && (
+        <section className="mb-4">
+          <h2 className="mb-2 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-ink-muted">
+            <Megaphone className="h-3 w-3" strokeWidth={2} />
+            ประกาศจากผู้ดูแลระบบ
+          </h2>
+          <ul className="divide-y divide-line overflow-hidden rounded-xl border border-line bg-panel">
+            {announcements.map((a) => (
+              <li key={a.id} className="px-5 py-4">
+                <p className="text-sm font-medium text-ink">{a.title}</p>
+                <p className="mt-0.5 whitespace-pre-line text-[13px] leading-relaxed text-ink-secondary">
+                  {a.body}
+                </p>
+                <p className="mt-1 text-[11px] text-ink-muted">{formatDate(a.createdAt)}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {activeType === 'announcement' ? null : empty ? (
         <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-line bg-panel py-16 text-center">
           <BellOff className="h-8 w-8 text-ink-disabled" strokeWidth={1.5} />
-          <p className="text-sm font-semibold text-ink-secondary">ไม่มีการแจ้งเตือน</p>
+          <p className="text-sm font-semibold text-ink-secondary">ไม่มีการแจ้งเตือนจากระบบ</p>
           <p className="text-[13px] text-ink-muted">
             {unreadOnly || activeType !== 'all'
               ? 'ลองล้างตัวกรองเพื่อดูรายการทั้งหมด'
@@ -156,12 +203,14 @@ export function NotificationList({
         </ul>
       )}
 
-      <Pagination
-        page={page}
-        total={total}
-        pageSize={NOTIFICATION_PAGE_SIZE}
-        onPageChange={(next) => setParam('page', String(next))}
-      />
+      {activeType !== 'announcement' && (
+        <Pagination
+          page={page}
+          total={total}
+          pageSize={NOTIFICATION_PAGE_SIZE}
+          onPageChange={(next) => setParam('page', String(next))}
+        />
+      )}
     </>
   )
 }

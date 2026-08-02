@@ -64,10 +64,12 @@ export function AdminTopbar({
         </span>
 
         <NotificationBell
-          surface="admin"
           announcements={announcements}
-          initial={notifications}
-          seeAllHref="/admin/notifications"
+          feed={{
+            surface: 'admin',
+            initial: notifications,
+            seeAllHref: '/admin/notifications',
+          }}
         />
 
         {/* Help lives in the top-right, where users look for it — and stays put

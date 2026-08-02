@@ -2,6 +2,7 @@
 
 import { Megaphone, X } from 'lucide-react'
 import { useStoredIds } from '@/lib/hooks/useStoredIds'
+import { publicFileUrl } from '@/lib/farm-cover'
 import type { LiveAnnouncement } from '@/features/announcements/types/targets'
 
 const DISMISSED_KEY = 'farmflow.announcements.dismissed'
@@ -23,6 +24,8 @@ export function AnnouncementBanner({ announcements }: { announcements: LiveAnnou
   const current = announcements.find((a) => !dismissed.includes(a.id))
   if (!current) return null
 
+  const bannerUrl = publicFileUrl(current.bannerFileId)
+
   return (
     <div
       role="status"
@@ -34,6 +37,17 @@ export function AnnouncementBanner({ announcements }: { announcements: LiveAnnou
         <p className="mt-0.5 whitespace-pre-line text-[13px] leading-relaxed text-ink-secondary">
           {current.body}
         </p>
+        {/* The image sits under the words, not instead of them: a banner whose
+            meaning lives only in a picture is unreadable to a screen reader and
+            invisible when the image fails to load. */}
+        {bannerUrl && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={bannerUrl}
+            alt=""
+            className="mt-2 max-h-40 w-full rounded-lg object-cover"
+          />
+        )}
       </div>
       <button
         type="button"

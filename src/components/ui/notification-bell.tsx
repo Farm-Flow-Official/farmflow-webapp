@@ -24,6 +24,9 @@ const SEEN_KEY = 'farmflow.announcements.seen'
 /** How often the badge re-checks with the server. */
 const POLL_MS = 60_000
 
+/** A dashboard with no system feed still needs something to render from. */
+const EMPTY: BellSnapshot = { unread: 0, rows: [] }
+
 /**
  * The one bell in a staff dashboard's topbar.
  *
@@ -46,23 +49,33 @@ const POLL_MS = 60_000
  * freshness nobody asked for.
  */
 export function NotificationBell({
-  surface,
   announcements,
-  initial,
-  seeAllHref,
+  feed,
 }: {
-  surface: NotificationSurface
   announcements: LiveAnnouncement[]
-  initial: BellSnapshot
-  seeAllHref: string
+  /**
+   * The system-notification feed, when this dashboard has one.
+   *
+   * Executive and Business have no work queues and raise no MRV signals, so
+   * they get announcements and nothing else. Making the feed optional says that
+   * in the type rather than handing those dashboards a surface with no events
+   * and a poll that always answers zero.
+   */
+  feed?: {
+    surface: NotificationSurface
+    initial: BellSnapshot
+    seeAllHref: string
+  }
 }) {
   const [open, setOpen] = useState(false)
-  const [snapshot, setSnapshot] = useState(initial)
+  const [snapshot, setSnapshot] = useState<BellSnapshot>(feed?.initial ?? EMPTY)
   const [seen, setSeen] = useStoredIds(SEEN_KEY)
   const [pending, startTransition] = useTransition()
   const ref = useRef<HTMLDivElement>(null)
+  const surface = feed?.surface
 
   const refresh = useCallback(() => {
+    if (!surface) return
     void pollBell(surface).then(setSnapshot)
   }, [surface])
 
@@ -70,6 +83,7 @@ export function NotificationBell({
   // to a dashboard they left open at lunch should not wait out the interval to
   // find out what happened while they were gone.
   useEffect(() => {
+    if (!surface) return
     const timer = setInterval(refresh, POLL_MS)
     const onFocus = () => refresh()
     window.addEventListener('focus', onFocus)
@@ -77,7 +91,7 @@ export function NotificationBell({
       clearInterval(timer)
       window.removeEventListener('focus', onFocus)
     }
-  }, [refresh])
+  }, [refresh, surface])
 
   useEffect(() => {
     if (!open) return
@@ -113,10 +127,12 @@ export function NotificationBell({
   }
 
   function dismiss(id: string) {
+    if (!surface) return
     startTransition(async () => setSnapshot(await markNotificationRead(surface, id)))
   }
 
   function dismissAll() {
+    if (!surface) return
     startTransition(async () => setSnapshot(await markAllNotificationsRead(surface)))
   }
 
@@ -217,13 +233,15 @@ export function NotificationBell({
             )}
           </div>
 
+          {feed && (
           <Link
-            href={seeAllHref}
+            href={feed.seeAllHref}
             onClick={() => setOpen(false)}
             className="block border-t border-line px-4 py-2.5 text-center text-[12px] font-medium text-primary transition-colors hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           >
             ดูการแจ้งเตือนทั้งหมด
           </Link>
+          )}
         </div>
       )}
     </div>

@@ -56,6 +56,15 @@ const NAV: NavSection[] = [
     heading: 'Farmers',
     items: [
       {
+        href: '/admin/farmer-users',
+        label: 'Farmer Users',
+        icon: UserCog,
+        key: 'U',
+        // Account repair, not land management — gated on the permission that
+        // actually lets you change a password.
+        permission: 'farmers:manage',
+      },
+      {
         href: '/admin/farmers',
         label: 'Farmer Management',
         icon: Users,
