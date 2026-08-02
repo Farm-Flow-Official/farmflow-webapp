@@ -3,6 +3,7 @@ import { getAdminSession } from '@/features/auth/services/adminSession'
 import { VERIFIER_ROLE } from '@/features/auth/roles'
 import { AdminShell } from '@/components/ui/admin-shell'
 import { fetchLiveAnnouncements } from '@/features/announcements/services/fetchLiveAnnouncements'
+import { pollBell } from '@/features/notifications/actions/notificationActions'
 
 export default async function ProtectedAdminLayout({
   children,
@@ -19,13 +20,16 @@ export default async function ProtectedAdminLayout({
 
   // Fetched here so every admin screen carries the same notices without each
   // page having to ask. Both calls fail soft to [] — see the service.
-  const [banner, bell] = await Promise.all([
+  // The bell's first paint comes from the server, so the badge is right before
+  // any polling happens — a count that appears a second late reads as a bug.
+  const [banner, bell, notifications] = await Promise.all([
     fetchLiveAnnouncements('admin', 'banner'),
     fetchLiveAnnouncements('admin', 'bell'),
+    pollBell('admin'),
   ])
 
   return (
-    <AdminShell admin={admin} announcements={{ banner, bell }}>
+    <AdminShell admin={admin} announcements={{ banner, bell }} notifications={notifications}>
       {children}
     </AdminShell>
   )

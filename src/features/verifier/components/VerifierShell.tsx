@@ -5,6 +5,7 @@ import type { VerifierProfile } from '@/features/verifier/auth/types'
 import { VerifierTopbar } from '@/features/verifier/components/VerifierTopbar'
 import { AnnouncementBanner } from '@/components/ui/announcement-banner'
 import type { LiveAnnouncement } from '@/features/announcements/types/targets'
+import type { BellSnapshot } from '@/features/notifications/actions/notificationActions'
 import { VerifierSidebar } from '@/features/verifier/components/VerifierSidebar'
 import { VerifierGuideProvider } from '@/features/verifier/guide/GuideBook'
 import type { VerifierProject } from '@/features/verifier/services/fetchVerifierProjects'
@@ -17,6 +18,7 @@ export function VerifierShell({
   verifier,
   projects,
   announcements = { banner: [], bell: [] },
+  notifications = { unread: 0, rows: [] },
   children,
 }: {
   verifier: VerifierProfile
@@ -24,6 +26,8 @@ export function VerifierShell({
   projects: VerifierProject[]
   /** Live announcements targeted at this portal, split by channel. */
   announcements?: { banner: LiveAnnouncement[]; bell: LiveAnnouncement[] }
+  /** First bell snapshot, rendered on the server; the bell polls from here on. */
+  notifications?: BellSnapshot
   children: React.ReactNode
 }) {
   const [open, setOpen] = useState(false)
@@ -48,6 +52,7 @@ export function VerifierShell({
           menuOpen={open}
           onMenuClick={() => setOpen((v) => !v)}
           announcements={announcements.bell}
+          notifications={notifications}
         />
         <VerifierSidebar open={open} onNavigate={close} />
 

@@ -57,6 +57,7 @@ const ROLE_STYLE: Record<AdminRole, { dot: string; avatar: string }> = {
   PROJECT_DEV: { dot: 'bg-amber-600', avatar: 'bg-amber-100 text-amber-700' },
   FINANCE: { dot: 'bg-ink', avatar: 'bg-ink text-white' },
   GENERAL: { dot: 'bg-ink-muted', avatar: 'bg-surface text-ink-secondary' },
+  EXECUTIVE: { dot: 'bg-violet-600', avatar: 'bg-violet-100 text-violet-700' },
 }
 
 const ROLE_FILTERS: { value: 'all' | AdminRole; label: string }[] = [

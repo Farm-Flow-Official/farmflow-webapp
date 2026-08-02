@@ -1,11 +1,13 @@
 'use client'
 
 import { useId, useMemo, useState } from 'react'
-import { Plus, Pencil, Trash2, Megaphone } from 'lucide-react'
+import { Plus, Pencil, Trash2, Megaphone, ImagePlus, Loader2 } from 'lucide-react'
 import { DataTable, type Column } from '@/components/ui/data-table'
 import { Badge } from '@/components/ui/badge'
 import { Modal } from '@/components/ui/modal'
 import { TargetPicker } from '@/features/announcements/components/TargetPicker'
+import { uploadAnnouncementBanner } from '@/features/announcements/actions/bannerActions'
+import { publicFileUrl } from '@/lib/farm-cover'
 import type { AnnouncementTarget } from '@/features/announcements/types/targets'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { Toast, useToast } from '@/components/ui/toast'
@@ -231,6 +233,9 @@ function AnnouncementForm({
   const [startAt, setStartAt] = useState(toLocalInput(initial?.startAt))
   const [endAt, setEndAt] = useState(toLocalInput(initial?.endAt))
   const [touched, setTouched] = useState(false)
+  const [bannerFileId, setBannerFileId] = useState<string | null>(initial?.bannerFileId ?? null)
+  const [bannerError, setBannerError] = useState<string | null>(null)
+  const [uploading, setUploading] = useState(false)
 
   const titleError = touched && title.trim() === ''
   const windowError =
@@ -244,6 +249,24 @@ function AnnouncementForm({
       ? 'ประกาศที่เผยแพร่ต้องเลือกอย่างน้อย 1 ปลายทาง'
       : null
 
+  const bannerUrl = publicFileUrl(bannerFileId)
+
+  async function pickBanner(file: File | undefined) {
+    if (!file) return
+    setBannerError(null)
+    setUploading(true)
+
+    const form = new FormData()
+    form.append('file', file)
+    const res = await uploadAnnouncementBanner(form)
+
+    setUploading(false)
+    if (!res.ok) return setBannerError(res.error)
+    // Stored immediately, attached when the announcement is saved — an image
+    // uploaded for a notice that is then cancelled is an orphan, not a leak.
+    setBannerFileId(res.fileId)
+  }
+
   function submit() {
     setTouched(true)
     if (title.trim() === '' || windowError || targetError) return
@@ -252,6 +275,7 @@ function AnnouncementForm({
       body: body.trim(),
       status,
       targets,
+      bannerFileId,
       startAt: startAt ? new Date(startAt).toISOString() : null,
       endAt: endAt ? new Date(endAt).toISOString() : null,
     })
@@ -289,6 +313,54 @@ function AnnouncementForm({
             }`}
           />
           {titleError && <p className="mt-1 text-xs text-error">กรุณากรอกหัวข้อ</p>}
+        </div>
+
+        <div>
+          <label className="mb-1.5 block text-sm font-medium text-ink">
+            รูปแบนเนอร์ <span className="font-normal text-ink-muted">(ไม่บังคับ)</span>
+          </label>
+
+          {bannerUrl ? (
+            <div className="flex items-start gap-3">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={bannerUrl}
+                alt="ตัวอย่างแบนเนอร์"
+                className="h-20 w-32 shrink-0 rounded-lg border border-line object-cover"
+              />
+              <button
+                type="button"
+                onClick={() => setBannerFileId(null)}
+                className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-line bg-panel px-3 text-[12px] font-medium text-ink-secondary transition-colors hover:bg-surface hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              >
+                <Trash2 className="h-3.5 w-3.5" strokeWidth={1.9} />
+                เอารูปออก
+              </button>
+            </div>
+          ) : (
+            <label className="flex cursor-pointer flex-col items-center gap-1.5 rounded-lg border border-dashed border-line bg-surface px-4 py-5 text-center transition-colors hover:border-primary hover:bg-primary/5">
+              {uploading ? (
+                <Loader2 className="h-5 w-5 animate-spin text-primary" strokeWidth={1.75} />
+              ) : (
+                <ImagePlus className="h-5 w-5 text-ink-muted" strokeWidth={1.75} />
+              )}
+              <span className="text-[13px] text-ink-secondary">
+                {uploading ? 'กำลังอัปโหลด…' : 'เลือกรูป (JPG / PNG / WebP · ไม่เกิน 5 MB)'}
+              </span>
+              <span className="text-[11px] text-ink-muted">
+                แสดงเฉพาะปลายทางที่เลือกเป็น &ldquo;แบนเนอร์&rdquo;
+              </span>
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                disabled={uploading}
+                onChange={(e) => void pickBanner(e.target.files?.[0])}
+                className="sr-only"
+              />
+            </label>
+          )}
+
+          {bannerError && <p className="mt-1 text-xs text-error">{bannerError}</p>}
         </div>
 
         <div>

@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
+  Bell,
   LayoutDashboard,
   Users,
   Sprout,
@@ -55,6 +56,15 @@ const NAV: NavSection[] = [
     heading: 'Farmers',
     items: [
       {
+        href: '/admin/farmer-users',
+        label: 'Farmer Users',
+        icon: UserCog,
+        key: 'U',
+        // Account repair, not land management — gated on the permission that
+        // actually lets you change a password.
+        permission: 'farmers:manage',
+      },
+      {
         href: '/admin/farmers',
         label: 'Farmer Management',
         icon: Users,
@@ -87,6 +97,8 @@ const NAV: NavSection[] = [
       // The dashboard has always linked to Support Tickets; the sidebar never
       // did, so the page was reachable only by knowing it was there.
       { href: '/admin/support', label: 'Support Tickets', icon: LifeBuoy, key: 'T' },
+      // The bell holds the last eight; this is where the rest of them live.
+      { href: '/admin/notifications', label: 'การแจ้งเตือน', icon: Bell, key: 'N' },
     ],
   },
   {

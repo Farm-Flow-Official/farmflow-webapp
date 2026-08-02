@@ -3,15 +3,24 @@
 import Link from 'next/link'
 import { LogOut, Menu, X } from 'lucide-react'
 import { Logo } from '@/components/ui/logo'
+import { NotificationBell } from '@/components/ui/notification-bell'
+import type { LiveAnnouncement } from '@/features/announcements/types/targets'
 import type { BusinessProfile } from '@/features/business/auth/types'
 
 type Props = {
   profile: BusinessProfile
   menuOpen?: boolean
   onMenuClick?: () => void
+  /** Announcements an admin targeted at this dashboard (ADMIN-ANN-02). */
+  announcements?: LiveAnnouncement[]
 }
 
-export function BusinessTopbar({ profile, menuOpen = false, onMenuClick }: Props) {
+export function BusinessTopbar({
+  profile,
+  menuOpen = false,
+  onMenuClick,
+  announcements = [],
+}: Props) {
   const initial = profile.username?.charAt(0).toUpperCase() || 'B'
 
   return (
@@ -41,8 +50,12 @@ export function BusinessTopbar({ profile, menuOpen = false, onMenuClick }: Props
         </div>
       </div>
 
-      {/* Right: role badge · user · logout */}
+      {/* Right: notifications · role badge · user · logout */}
       <div className="flex items-center gap-3">
+        {/* No system feed here: this dashboard owns no queue and raises no MRV
+            signals, so the bell carries announcements only. */}
+        <NotificationBell announcements={announcements} />
+
         <span className="hidden rounded-full border border-primary-muted bg-primary-subtle px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-success sm:inline">
           {profile.role}
         </span>

@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
+  Bell,
   LayoutDashboard,
   Boxes,
   QrCode,
@@ -62,6 +63,8 @@ function navFor(projectId: string | null): NavSection[] {
       heading: 'Tools',
       // Public, shell-less page → open in a new tab so the portal stays put.
       items: [
+        // The bell holds the last eight; this is where the rest of them live.
+        { href: '/verifier/notifications', label: 'การแจ้งเตือน', icon: Bell },
         { href: '/verifier/verify/qr-check', label: 'QR Verify', icon: QrCode, newTab: true },
         // VERIFIER-NAV-01 — external verifiers had no way to reach a human from
         // inside the portal, unlike Admin. Same LINE OA both portals use.
