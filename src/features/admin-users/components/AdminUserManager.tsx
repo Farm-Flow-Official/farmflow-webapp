@@ -18,6 +18,7 @@ import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { Pagination } from '@/components/ui/pagination'
 import { Toast, useToast } from '@/components/ui/toast'
 import { PasswordInput } from '@/components/ui/password-input'
+import { ResetPasswordDialog } from '@/features/admin-users/components/ResetPasswordDialog'
 import { GeneratedPasswordDialog } from '@/features/admin-users/components/GeneratedPasswordDialog'
 import { formatDate, formatRelativeTime } from '@/lib/utils/format'
 import {
@@ -78,6 +79,8 @@ export function AdminUserManager({ initialAdmins, verifierOrgs }: Props) {
   const [statusTarget, setStatusTarget] = useState<AdminUser | null>(null)
   const [deleting, setDeleting] = useState<AdminUser | null>(null)
   /** A just-generated password, shown once (ADMIN-USERS-04). */
+  /** The account whose password is being reset, if the dialog is open. */
+  const [resetting, setResetting] = useState<AdminUser | null>(null)
   const [newPassword, setNewPassword] = useState<{ username: string; password: string } | null>(
     null,
   )
@@ -126,14 +129,19 @@ export function AdminUserManager({ initialAdmins, verifierOrgs }: Props) {
     }
   }
 
-  async function handleResetPassword(admin: AdminUser) {
-    const res = await resetAdminPassword(admin.id)
+  async function handleResetPassword(admin: AdminUser, password: string | undefined) {
+    const res = await resetAdminPassword(admin.id, password)
     if (!res.ok) {
       showToast(res.error ?? 'ตั้งรหัสผ่านใหม่ไม่สำเร็จ')
       return
     }
+    setResetting(null)
     if (res.generatedPassword) {
+      // Only a generated one needs showing — a typed password is already known
+      // to the person who typed it.
       setNewPassword({ username: admin.username, password: res.generatedPassword })
+    } else {
+      showToast('ตั้งรหัสผ่านใหม่เรียบร้อย')
     }
   }
 
@@ -240,7 +248,7 @@ export function AdminUserManager({ initialAdmins, verifierOrgs }: Props) {
           <IconButton label="แก้ไขบทบาท" onClick={() => setEditing(a)}>
             <Pencil className="h-4 w-4" strokeWidth={1.75} />
           </IconButton>
-          <IconButton label="ตั้งรหัสผ่านใหม่" onClick={() => handleResetPassword(a)}>
+          <IconButton label="ตั้งรหัสผ่านใหม่" onClick={() => setResetting(a)}>
             <KeyRound className="h-4 w-4" strokeWidth={1.75} />
           </IconButton>
           <IconButton
@@ -346,6 +354,14 @@ export function AdminUserManager({ initialAdmins, verifierOrgs }: Props) {
           verifierOrgs={verifierOrgs}
           onInvite={handleInvite}
           onClose={() => setInviting(false)}
+        />
+      )}
+
+      {resetting && (
+        <ResetPasswordDialog
+          username={resetting.username}
+          onSubmit={(password) => handleResetPassword(resetting, password)}
+          onClose={() => setResetting(null)}
         />
       )}
 
