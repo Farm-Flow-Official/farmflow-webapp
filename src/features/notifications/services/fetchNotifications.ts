@@ -34,7 +34,13 @@ export async function fetchNotifications(
   surface: NotificationSurface,
   query: Query = {},
 ): Promise<NotificationPage> {
-  const params = { query }
+  // openapi-fetch expects `{ params: { query } }`. Passing `{ query }` at the
+  // top level type-checks — the option bag is loosely typed — and is then
+  // silently ignored, so every request went out bare: no limit, no offset, no
+  // filters. The list still looked plausible, which is why it survived a
+  // review: the API's defaults answered, and only the "unread only" filter was
+  // obviously wrong.
+  const params = { params: { query } }
 
   try {
     const { data } =

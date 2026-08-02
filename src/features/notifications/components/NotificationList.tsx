@@ -3,10 +3,13 @@
 import { useTransition } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { BellOff, CheckCheck, Megaphone } from 'lucide-react'
+import { BellOff, Check, CheckCheck, Megaphone } from 'lucide-react'
 import { Pagination } from '@/components/ui/pagination'
 import { formatDate, formatDateTime, formatRelativeTime } from '@/lib/utils/format'
-import { markAllNotificationsRead } from '@/features/notifications/actions/notificationActions'
+import {
+  markAllNotificationsRead,
+  markNotificationRead,
+} from '@/features/notifications/actions/notificationActions'
 import type { LiveAnnouncement } from '@/features/announcements/types/targets'
 import {
   NOTIFICATION_KINDS,
@@ -78,6 +81,21 @@ export function NotificationList({
   function clearAll() {
     startTransition(async () => {
       await markAllNotificationsRead(surface)
+      router.refresh()
+    })
+  }
+
+  /**
+   * Mark one read.
+   *
+   * The bell did this on open and the page did not, so a notice opened from
+   * here stayed unread for ever — the reader had done the thing the notice
+   * asked for and the dot argued otherwise. Opening the linked page counts as
+   * reading it, and there is a button for the notices that link nowhere.
+   */
+  function markRead(id: string) {
+    startTransition(async () => {
+      await markNotificationRead(surface, id)
       router.refresh()
     })
   }
@@ -189,14 +207,31 @@ export function NotificationList({
                   </p>
                 </div>
 
-                {n.href && (
-                  <Link
-                    href={n.href}
-                    className="shrink-0 self-center rounded-lg border border-line bg-panel px-3 py-1.5 text-[12px] font-medium text-ink-secondary transition-colors hover:bg-surface hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-                  >
-                    เปิดดู
-                  </Link>
-                )}
+                <div className="flex shrink-0 items-center gap-1.5 self-center">
+                  {!n.isRead && (
+                    <button
+                      type="button"
+                      onClick={() => markRead(n.id)}
+                      disabled={pending}
+                      title="ทำเครื่องหมายว่าอ่านแล้ว"
+                      className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-line bg-panel px-2.5 text-[12px] font-medium text-ink-secondary transition-colors hover:bg-surface hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:opacity-50"
+                    >
+                      <Check className="h-3.5 w-3.5" strokeWidth={2} />
+                      อ่านแล้ว
+                    </button>
+                  )}
+
+                  {n.href && (
+                    <Link
+                      href={n.href}
+                      // Opening the thing the notice points at *is* reading it.
+                      onClick={() => !n.isRead && markRead(n.id)}
+                      className="rounded-lg border border-line bg-panel px-3 py-1.5 text-[12px] font-medium text-ink-secondary transition-colors hover:bg-surface hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                    >
+                      เปิดดู
+                    </Link>
+                  )}
+                </div>
               </li>
             )
           })}
