@@ -30,7 +30,11 @@ export const ANNOUNCEMENT_CHANNELS: {
   label: string
   hint: string
 }[] = [
-  { value: 'banner', label: 'แบนเนอร์', hint: 'แสดงบนหน้าจอ — สำหรับเรื่องที่ต้องเห็นทันที' },
+  {
+    value: 'banner',
+    label: 'แบนเนอร์',
+    hint: 'เด้งกลางจอเมื่อเปิดแดชบอร์ด ต้องกดปิดก่อนใช้งานต่อ — สำหรับเรื่องที่ต้องเห็นทันที',
+  },
   { value: 'bell', label: 'กระดิ่ง', hint: 'อยู่ในรายการแจ้งเตือน — สำหรับเรื่องที่ย้อนดูได้' },
 ]
 
@@ -82,3 +86,14 @@ export type LiveAnnouncement = {
   endAt: string | null
   createdAt: string
 }
+
+/**
+ * What the banner upload accepts. Mirrors the API's own limits — kept here so
+ * the browser can refuse a file instantly and say *why*, instead of relaying a
+ * server validation error that reads "Invalid request data" to someone who
+ * just picked a holiday photo.
+ */
+export const BANNER_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp']
+export const BANNER_MAX_MB = 10
+export const BANNER_MAX_BYTES = BANNER_MAX_MB * 1024 * 1024
+export const BANNER_LIMITS_TEXT = 'JPG / PNG / WebP'

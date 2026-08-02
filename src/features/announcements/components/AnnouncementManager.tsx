@@ -8,7 +8,13 @@ import { Modal } from '@/components/ui/modal'
 import { TargetPicker } from '@/features/announcements/components/TargetPicker'
 import { uploadAnnouncementBanner } from '@/features/announcements/actions/bannerActions'
 import { publicFileUrl } from '@/lib/farm-cover'
-import type { AnnouncementTarget } from '@/features/announcements/types/targets'
+import {
+  BANNER_LIMITS_TEXT,
+  BANNER_MAX_BYTES,
+  BANNER_MIME_TYPES,
+  type AnnouncementTarget,
+} from '@/features/announcements/types/targets'
+import { shrinkImageForUpload } from '@/lib/utils/image'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { Toast, useToast } from '@/components/ui/toast'
 import { formatDate } from '@/lib/utils/format'
@@ -251,13 +257,24 @@ function AnnouncementForm({
 
   const bannerUrl = publicFileUrl(bannerFileId)
 
-  async function pickBanner(file: File | undefined) {
-    if (!file) return
+  async function pickBanner(picked: File | undefined) {
+    if (!picked) return
     setBannerError(null)
     setUploading(true)
 
+    // Shrink first, ask questions later. A poster exported from a design tool
+    // is routinely 15–20 MB, and refusing it would send the admin off to find
+    // an image editor for something the browser can do in a moment — and that
+    // every viewer benefits from, since nobody wants to download 20 MB to read
+    // a notice.
+    const shrunk = await shrinkImageForUpload(picked, BANNER_MAX_BYTES)
+    if (!shrunk.ok) {
+      setUploading(false)
+      return setBannerError(shrunk.error)
+    }
+
     const form = new FormData()
-    form.append('file', file)
+    form.append('file', shrunk.file)
     const res = await uploadAnnouncementBanner(form)
 
     setUploading(false)
@@ -345,14 +362,14 @@ function AnnouncementForm({
                 <ImagePlus className="h-5 w-5 text-ink-muted" strokeWidth={1.75} />
               )}
               <span className="text-[13px] text-ink-secondary">
-                {uploading ? 'กำลังอัปโหลด…' : 'เลือกรูป (JPG / PNG / WebP · ไม่เกิน 5 MB)'}
+                {uploading ? 'กำลังเตรียมรูป…' : `เลือกรูป (${BANNER_LIMITS_TEXT})`}
               </span>
               <span className="text-[11px] text-ink-muted">
-                แสดงเฉพาะปลายทางที่เลือกเป็น &ldquo;แบนเนอร์&rdquo;
+                รูปใหญ่จะถูกย่อให้อัตโนมัติ · แสดงเฉพาะปลายทางที่เลือกเป็น &ldquo;แบนเนอร์&rdquo;
               </span>
               <input
                 type="file"
-                accept="image/jpeg,image/png,image/webp"
+                accept={BANNER_MIME_TYPES.join(',')}
                 disabled={uploading}
                 onChange={(e) => void pickBanner(e.target.files?.[0])}
                 className="sr-only"
