@@ -66,7 +66,7 @@ export function VerifierShell({
         )}
 
         <main className="min-h-screen pt-16 lg:ml-60">
-          <AnnouncementBanner announcements={announcements.banner} />
+          <AnnouncementBanner announcements={announcements.banner} surface="verifier" />
           {children}
         </main>
       </div>

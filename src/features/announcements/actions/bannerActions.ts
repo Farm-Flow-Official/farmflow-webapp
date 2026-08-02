@@ -1,6 +1,7 @@
 'use server'
 
 import { api } from '@/lib/api'
+import { BANNER_LIMITS_TEXT } from '@/features/announcements/types/targets'
 
 export type BannerUpload = { ok: true; fileId: string } | { ok: false; error: string }
 
@@ -20,6 +21,13 @@ export async function uploadAnnouncementBanner(form: FormData): Promise<BannerUp
     })
 
     if (!data?.success) {
+      // The API's validation error for a rejected upload is "Invalid request
+      // data" with a TypeBox dump attached — true, and useless to the person
+      // holding the wrong file. Say the rule instead.
+      const code = (error as { error?: { code?: string } } | undefined)?.error?.code
+      if (code === 'VALIDATION_ERROR') {
+        return { ok: false, error: `ไฟล์ไม่ถูกต้อง — รับเฉพาะ ${BANNER_LIMITS_TEXT}` }
+      }
       const message = (error as { error?: { message?: string } } | undefined)?.error?.message
       return { ok: false, error: message?.trim() || 'อัปโหลดรูปไม่สำเร็จ' }
     }
