@@ -11,6 +11,7 @@ import { publicFileUrl } from '@/lib/farm-cover'
 import {
   BANNER_LIMITS_TEXT,
   BANNER_MAX_BYTES,
+  BANNER_MAX_MB,
   BANNER_MIME_TYPES,
   type AnnouncementTarget,
 } from '@/features/announcements/types/targets'
@@ -267,7 +268,7 @@ function AnnouncementForm({
     }
     if (file.size > BANNER_MAX_BYTES) {
       const mb = (file.size / 1024 / 1024).toFixed(1)
-      return setBannerError(`รูปใหญ่เกินไป (${mb} MB) — รับไม่เกิน 5 MB`)
+      return setBannerError(`รูปใหญ่เกินไป (${mb} MB) — รับไม่เกิน ${BANNER_MAX_MB} MB`)
     }
 
     setUploading(true)
