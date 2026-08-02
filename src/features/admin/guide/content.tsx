@@ -1,4 +1,13 @@
-import { Compass, Users, Sprout, Map, Megaphone, ShieldCheck, Keyboard } from 'lucide-react'
+import {
+  Bell,
+  Compass,
+  Users,
+  Sprout,
+  Map,
+  Megaphone,
+  ShieldCheck,
+  Keyboard,
+} from 'lucide-react'
 import { Kbd } from '@/components/ui/kbd'
 import { P, Steps, Note, Topic, Key, KeyGroup } from '@/components/ui/guide-parts'
 import type { GuideSection } from '@/components/ui/guide-book'
@@ -9,6 +18,7 @@ export type AdminGuideSectionId =
   | 'farms'
   | 'gis'
   | 'content'
+  | 'notifications'
   | 'system'
   | 'shortcuts'
 
@@ -31,6 +41,7 @@ export const ADMIN_GUIDE_SECTIONS: GuideSection[] = [
             ['Farmer Management', 'ค้นหาบัญชีเกษตรกร ดูฟาร์มในสังกัด ระงับหรือเปิดใช้งานบัญชี'],
             ['GIS Map', 'ดูขอบเขตแปลงทั้งหมดบนแผนที่ และหาแปลงที่ทับซ้อนกัน'],
             ['Announcements', 'เขียนประกาศที่ขึ้นในแอปของเกษตรกร'],
+            ['การแจ้งเตือน', 'งานค้าง สัญญาณเสี่ยง และคำตัดสินของทีม'],
             ['System', 'ตั้งค่าระบบ ผู้ดูแล และตรวจ Audit Log ย้อนหลัง'],
           ]}
         />
@@ -203,6 +214,46 @@ export const ADMIN_GUIDE_SECTIONS: GuideSection[] = [
         <Note>
           เขียนเสร็จแล้วยังไม่แน่ใจ ให้บันทึกเป็นฉบับร่างก่อนเสมอ — การเผยแพร่ไม่มีขั้นอนุมัติซ้ำ
           ข้อความจะถึงปลายทางทันทีที่กด (หรือทันทีที่ถึงเวลาที่ตั้งไว้)
+        </Note>
+      </div>
+    ),
+  },
+  {
+    id: 'notifications',
+    title: 'กระดิ่งแจ้งเตือน',
+    summary: 'ระบบบอกเองว่ามีอะไรรอคุณอยู่',
+    icon: Bell,
+    body: (
+      <div className="flex flex-col gap-4">
+        <P>
+          กระดิ่งบนหัวจอรวมสองอย่างไว้ที่เดียว —{' '}
+          <span className="font-medium text-ink">ประกาศ</span>ที่ผู้ดูแลเขียนเอง และ
+          <span className="font-medium text-ink">แจ้งเตือนที่ระบบสร้างขึ้น</span>{' '}
+          จากสิ่งที่เกิดจริงในงาน
+        </P>
+        <Topic title="สี่ประเภท">
+          <P>
+            <span className="font-medium text-warning">งานค้าง</span> = มีของรอคุณลงมือ เช่น
+            แปลงใหม่ที่ยังไม่อนุมัติ ·{' '}
+            <span className="font-medium text-error">สัญญาณเสี่ยง</span> = ข้อมูลดูไม่ปกติ
+            ควรตรวจก่อนออกเครดิต ·{' '}
+            <span className="font-medium text-success">คำตัดสิน</span> = คนอื่นในทีมตัดสินอะไรไปแล้ว ·{' '}
+            <span className="font-medium text-ink">ระบบ</span> = แดชบอร์ดปิดปรับปรุง สิทธิ์เปลี่ยน
+          </P>
+        </Topic>
+        <Topic title="ใครเห็นอะไร">
+          <P>
+            แจ้งเตือนส่งถึง<span className="font-medium text-ink">หน้าที่</span> ไม่ใช่ตัวบุคคล —
+            “แปลงรออนุมัติ” ไปถึงทุกคนที่มีสิทธิ์อนุมัติแปลง รวมถึงคนที่เพิ่งเข้าทีมวันนี้
+            และเลิกเป็นภาระของคนที่ลาออกไปแล้ว · สถานะอ่านแยกรายคน
+            คุณกดอ่านไม่ได้ทำให้ของคนอื่นหายไปด้วย
+          </P>
+        </Topic>
+        <Note>
+          กระดิ่งเก็บ 8 รายการล่าสุด · กด{' '}
+          <span className="font-medium text-ink">ดูการแจ้งเตือนทั้งหมด</span> หรือ{' '}
+          <Kbd>G</Kbd> <Kbd>N</Kbd> เพื่อดูย้อนหลังทั้งหมดพร้อมตัวกรอง ·
+          ตัวเลขบนกระดิ่งอัปเดตเองทุกนาที ไม่ต้องรีเฟรชหน้า
         </Note>
       </div>
     ),

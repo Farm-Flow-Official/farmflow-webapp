@@ -9,6 +9,14 @@ export type FarmerAccountStatus = 'Active' | 'Suspended'
 
 export type Farmer = {
   id: string
+  /**
+   * The handle the farmer types into the app. Not contact detail, so not
+   * masked — support cannot fix a login it is not allowed to see.
+   */
+  username: string
+  /** False for SSO-only accounts, which have no password to reset. */
+  hasPassword: boolean
+  lastLoginAt: string | null
   /** Personal name, or a non-PII fallback (ADR 0013) — always present. */
   fullName: string
   /** **Masked** (`08x-xxx-5678`). The real value needs an audited reveal. */

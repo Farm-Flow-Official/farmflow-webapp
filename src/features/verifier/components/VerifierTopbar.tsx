@@ -7,8 +7,9 @@ import { Kbd } from '@/components/ui/kbd'
 import type { VerifierProfile } from '@/features/verifier/auth/types'
 import { signOutVerifier } from '@/features/verifier/auth/actions'
 import { useGuide } from '@/components/ui/guide-book'
-import { AnnouncementBell } from '@/components/ui/announcement-bell'
+import { NotificationBell } from '@/components/ui/notification-bell'
 import type { LiveAnnouncement } from '@/features/announcements/types/targets'
+import type { BellSnapshot } from '@/features/notifications/actions/notificationActions'
 import type { VerifierProject } from '@/features/verifier/services/fetchVerifierProjects'
 
 type Props = {
@@ -17,8 +18,10 @@ type Props = {
   projects: VerifierProject[]
   menuOpen?: boolean
   onMenuClick?: () => void
-  /** Live announcements for the bell (ADMIN-ANN-02); empty hides it. */
+  /** Live announcements for the bell (ADMIN-ANN-02). */
   announcements?: LiveAnnouncement[]
+  /** First notification snapshot; the bell polls onward from it. */
+  notifications?: BellSnapshot
 }
 
 export function VerifierTopbar({
@@ -27,6 +30,7 @@ export function VerifierTopbar({
   menuOpen = false,
   onMenuClick,
   announcements = [],
+  notifications = { unread: 0, rows: [] },
 }: Props) {
   const initial = verifier.username?.charAt(0).toUpperCase() || 'V'
   const guide = useGuide()
@@ -77,7 +81,14 @@ export function VerifierTopbar({
       </div>
 
       <div className="flex items-center gap-3">
-        <AnnouncementBell announcements={announcements} />
+        <NotificationBell
+          announcements={announcements}
+          feed={{
+            surface: 'verifier',
+            initial: notifications,
+            seeAllHref: '/verifier/notifications',
+          }}
+        />
 
         <span className="hidden rounded-full border border-primary-muted bg-primary-subtle px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-success sm:inline">
           {verifier.org}

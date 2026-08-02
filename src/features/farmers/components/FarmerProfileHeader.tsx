@@ -18,6 +18,7 @@ export function FarmerProfileHeader({ farmer }: { farmer: FarmerDetail }) {
   const [status, setStatus] = useState<FarmerAccountStatus>(farmer.accountStatus)
   const [confirming, setConfirming] = useState(false)
   const [pending, setPending] = useState(false)
+  const [reason, setReason] = useState('')
   const { message, showToast } = useToast()
 
   const isActive = status === 'Active'
@@ -27,7 +28,7 @@ export function FarmerProfileHeader({ farmer }: { farmer: FarmerDetail }) {
 
   async function runAction() {
     setPending(true)
-    const res = await setFarmerStatus(farmer.id, nextStatus)
+    const res = await setFarmerStatus(farmer.id, nextStatus, reason)
     setPending(false)
     if (!res.ok) {
       showToast(res.error ?? 'อัปเดตสถานะไม่สำเร็จ')
@@ -35,6 +36,7 @@ export function FarmerProfileHeader({ farmer }: { farmer: FarmerDetail }) {
     }
     setStatus(nextStatus)
     setConfirming(false)
+    setReason('')
     showToast(
       nextStatus === 'Suspended' ? 'ระงับบัญชีเรียบร้อย' : 'เปิดใช้งานบัญชีเรียบร้อย',
     )
@@ -87,9 +89,33 @@ export function FarmerProfileHeader({ farmer }: { farmer: FarmerDetail }) {
         <ConfirmDialog
           title={isActive ? 'ยืนยันการระงับบัญชี' : 'ยืนยันการเปิดใช้งาน'}
           description={
-            isActive
-              ? `ระงับบัญชีของ "${farmer.fullName}"? เกษตรกรจะไม่สามารถเข้าใช้งานได้จนกว่าจะเปิดใช้งานอีกครั้ง`
-              : `เปิดใช้งานบัญชีของ "${farmer.fullName}" ให้กลับมาใช้งานได้ตามปกติ?`
+            isActive ? (
+              <>
+                <p>
+                  ระงับบัญชีของ &ldquo;{farmer.fullName}&rdquo;?
+                  เกษตรกรจะไม่สามารถเข้าใช้งานได้จนกว่าจะเปิดใช้งานอีกครั้ง
+                </p>
+                {/* The reason is mandatory server-side and is shown to the
+                    farmer verbatim — being locked out with no explanation is
+                    the failure mode this guards. */}
+                <label
+                  htmlFor="suspend-reason"
+                  className="mt-3 block text-[13px] font-medium text-ink-secondary"
+                >
+                  เหตุผล <span className="text-error">*</span>
+                </label>
+                <textarea
+                  id="suspend-reason"
+                  value={reason}
+                  onChange={(e) => setReason(e.target.value)}
+                  rows={3}
+                  placeholder="เกษตรกรจะเห็นข้อความนี้"
+                  className="mt-1 w-full rounded-lg border border-line bg-panel px-3 py-2 text-sm text-ink placeholder:text-ink-muted outline-none transition-shadow focus:border-primary focus:ring-[3px] focus:ring-primary/10"
+                />
+              </>
+            ) : (
+              `เปิดใช้งานบัญชีของ "${farmer.fullName}" ให้กลับมาใช้งานได้ตามปกติ?`
+            )
           }
           confirmLabel={isActive ? 'ระงับบัญชี' : 'เปิดใช้งาน'}
           tone={isActive ? 'danger' : 'primary'}

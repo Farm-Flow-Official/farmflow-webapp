@@ -5,6 +5,7 @@ import type { AdminProfile } from '@/features/auth/types'
 import { AdminTopbar } from '@/components/ui/topbar'
 import { AnnouncementBanner } from '@/components/ui/announcement-banner'
 import type { LiveAnnouncement } from '@/features/announcements/types/targets'
+import type { BellSnapshot } from '@/features/notifications/actions/notificationActions'
 import { AdminSidebar } from '@/components/ui/sidebar-nav'
 import { AdminGuideProvider } from '@/features/admin/guide/GuideBook'
 import { AdminKeyboardNav } from '@/features/admin/components/AdminKeyboardNav'
@@ -17,11 +18,14 @@ import { AdminKeyboardNav } from '@/features/admin/components/AdminKeyboardNav'
 export function AdminShell({
   admin,
   announcements = { banner: [], bell: [] },
+  notifications = { unread: 0, rows: [] },
   children,
 }: {
   admin: AdminProfile
   /** Live announcements targeted at this dashboard, split by channel. */
   announcements?: { banner: LiveAnnouncement[]; bell: LiveAnnouncement[] }
+  /** First bell snapshot, rendered on the server; the bell polls from here on. */
+  notifications?: BellSnapshot
   children: React.ReactNode
 }) {
   const [open, setOpen] = useState(false)
@@ -46,6 +50,7 @@ export function AdminShell({
           menuOpen={open}
           onMenuClick={() => setOpen((v) => !v)}
           announcements={announcements.bell}
+          notifications={notifications}
         />
 
         <AdminSidebar open={open} onNavigate={close} permissions={admin.permissions} />
