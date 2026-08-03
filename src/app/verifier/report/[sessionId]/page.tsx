@@ -49,6 +49,21 @@ export default async function SessionReportPage({
   const verifyUrl = `${proto}://${host}/verifier/verify/qr-check?session_id=${documentId}`
   const qr = await QRCode.toDataURL(verifyUrl, { width: 240, margin: 1 })
 
+  /**
+   * Approved sessions are reported from the record frozen at approval; pending
+   * ones from a live count, clearly labelled as provisional.
+   *
+   * The two agree right up until they do not — a tree re-reviewed after the
+   * fact would move the live figure while the credits already issued stayed
+   * where they were. A certificate must cite what was issued, so once there is
+   * a decision, that is the only thing this page reads.
+   */
+  const certified = session.result
+  const certifiedTrees = certified?.passedTrees ?? session.tally.passed
+  const rejectedTrees = certified?.rejectedTrees ?? session.tally.rejected
+  const certifiedCarbonKg =
+    certified?.approvedTco2e != null ? certified.approvedTco2e * 1000 : session.totalCarbonKgCo2e
+
   // VERIFIER-DETAIL-03 — draw the plot on the imagery when we have a boundary,
   // so the document shows *which* land was assessed rather than just some land.
   const overlay = plotOverlay(session.polygon)
@@ -85,11 +100,26 @@ export default async function SessionReportPage({
             <p>
               เลขที่เอกสาร: <span className="font-mono text-ink">{documentId}</span>
             </p>
-            <p>ออกรายงานเมื่อ: {formatDateTime(issuedAt)}</p>
+            <p>
+              {certified
+                ? `วันที่ตรวจรับรอง: ${formatDateTime(certified.reviewedAt)}`
+                : 'ยังไม่ผ่านการตรวจรับรอง'}
+            </p>
+            <p className="text-ink-muted">พิมพ์เมื่อ: {formatDateTime(issuedAt)}</p>
           </div>
         </header>
 
         <h1 className="mt-6 text-xl font-semibold">รายงานการตรวจรับรองคาร์บอน</h1>
+
+        {/* Printed before a decision, this page is identical to the real thing
+            in every respect that matters to someone holding it. Say plainly
+            that it is not one. */}
+        {!certified && (
+          <p className="mt-3 rounded-lg border border-warning-border bg-warning-bg px-4 py-2.5 text-[13px] font-medium text-warning print:border-black print:bg-white print:text-black">
+            เอกสารชั่วคราว — รอบตรวจนี้ยังไม่ผ่านการตรวจรับรอง
+            ตัวเลขทั้งหมดเป็นค่าปัจจุบันที่ยังเปลี่ยนได้ ใช้อ้างอิงเป็นทางการไม่ได้
+          </p>
+        )}
 
         {/* Farm + satellite */}
         <section className="mt-5 grid grid-cols-[1fr_220px] gap-6">
@@ -162,11 +192,27 @@ export default async function SessionReportPage({
             */}
             <Stat
               label="คาร์บอนรวม"
-              value={formatCarbonTonnes(session.totalCarbonKgCo2e)}
-              sub={formatCarbonExact(session.totalCarbonKgCo2e)}
+              value={formatCarbonTonnes(certifiedCarbonKg)}
+              sub={formatCarbonExact(certifiedCarbonKg)}
             />
             <Stat label="ความเชื่อมั่น AI เฉลี่ย" value={`${Math.round(session.avgConfidence * 100)}%`} />
-            <Stat label="จำนวนต้นไม้" value={`${session.treeCount} ต้น`} />
+            {/*
+              The certified count, not the submitted one. This document is a
+              claim about issued credits, and the carbon beside it is computed
+              from these trees alone — pairing it with "how many were sent in"
+              gives a reader two numbers that cannot be reconciled. What was
+              sent in stays on the page, underneath, because leaving it out
+              would hide the rejections.
+            */}
+            <Stat
+              label="จำนวนต้นไม้ที่ผ่านการรับรอง"
+              value={`${certifiedTrees} ต้น`}
+              sub={`จากที่ส่งมา ${session.tally.submitted} ต้น · ปฏิเสธ ${rejectedTrees} ต้น${
+                session.tally.unassessed > 0
+                  ? ` · ไม่มีผลประเมิน ${session.tally.unassessed} ต้น`
+                  : ''
+              }`}
+            />
           </div>
         </section>
 
@@ -178,8 +224,13 @@ export default async function SessionReportPage({
             </h2>
             <p className="font-medium text-ink">{verifier.username}</p>
             <p className="text-xs text-ink-muted">หน่วยงาน: {verifier.org}</p>
+            {/* The signature is dated when the decision was made, not when
+                somebody pressed print — otherwise the same certificate reissued
+                next month carries a different signing date. */}
             <p className="mt-3 border-t border-dashed border-line pt-1 text-xs text-ink-muted">
-              ลงนามอิเล็กทรอนิกส์ · {formatDate(issuedAt)}
+              {certified
+                ? `ลงนามอิเล็กทรอนิกส์ · ${formatDate(certified.reviewedAt)}`
+                : 'ยังไม่ได้ลงนาม — รอผลการตรวจรับรอง'}
             </p>
           </div>
           <div className="text-center">
