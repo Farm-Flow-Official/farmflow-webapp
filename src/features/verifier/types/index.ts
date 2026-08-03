@@ -192,7 +192,38 @@ export type SessionRegistration = {
   nextCollectionYear: number | null
 }
 
+/**
+ * The session's trees, in the states that actually occur.
+ *
+ * `passed + rejected` need not equal `submitted`: a tree the assessor never
+ * finished is neither, carries no carbon, and used to disappear from every
+ * total while still being counted as a tree.
+ */
+export type SessionTally = {
+  submitted: number
+  passed: number
+  rejected: number
+  unassessed: number
+}
+
+/**
+ * What was decided at approval — null while the session is pending.
+ *
+ * The certificate cites these rather than a fresh count: they are the numbers
+ * the credits were issued against, and a recount agrees with them only until
+ * something changes.
+ */
+export type SessionResult = {
+  passedTrees: number
+  rejectedTrees: number
+  approvedTco2e: number | null
+  netAboveBaselineTco2e: number | null
+  reviewedAt: string
+}
+
 export type SessionDetail = VerificationSession & {
+  tally: SessionTally
+  result: SessionResult | null
   projectCode: string | null
   registration: SessionRegistration
   baseline: SessionBaseline | null

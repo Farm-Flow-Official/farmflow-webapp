@@ -5660,7 +5660,7 @@ export interface operations {
                 "application/json": {
                     /**
                      * Format: binary
-                     * @description Banner image shown across the top of the targeted dashboard
+                     * @description Banner image shown in the centre-screen notice on the targeted dashboard
                      * @default File
                      */
                     file: string;
@@ -5668,7 +5668,7 @@ export interface operations {
                 "application/x-www-form-urlencoded": {
                     /**
                      * Format: binary
-                     * @description Banner image shown across the top of the targeted dashboard
+                     * @description Banner image shown in the centre-screen notice on the targeted dashboard
                      * @default File
                      */
                     file: string;
@@ -5676,7 +5676,7 @@ export interface operations {
                 "multipart/form-data": {
                     /**
                      * Format: binary
-                     * @description Banner image shown across the top of the targeted dashboard
+                     * @description Banner image shown in the centre-screen notice on the targeted dashboard
                      * @default File
                      */
                     file: string;
@@ -8751,7 +8751,26 @@ export interface operations {
                                 cfValue: (number | null) | null;
                                 speciesNameEn: (string | null) | null;
                             };
+                            /** @description Every tree submitted, whatever became of it */
                             treeCount: number;
+                            /** @description passed + rejected need not equal submitted; see `unassessed` */
+                            tally: {
+                                submitted: number;
+                                /** @description Latest verdict is 'completed' — these carry the carbon */
+                                passed: number;
+                                /** @description Latest verdict is 'rejected', by the model or a person */
+                                rejected: number;
+                                /** @description Neither — the assessor never finished, so there is no figure to count */
+                                unassessed: number;
+                            };
+                            result: ({
+                                passedTrees: number;
+                                rejectedTrees: number;
+                                approvedTco2e: (number | null) | null;
+                                netAboveBaselineTco2e: (number | null) | null;
+                                /** Format: date-time */
+                                reviewedAt: string;
+                            } | null) | null;
                             avgConfidence: (number | null) | null;
                             anomalyFlag: boolean;
                             totalCarbonKgCo2e: number;

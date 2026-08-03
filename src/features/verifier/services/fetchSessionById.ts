@@ -88,6 +88,8 @@ export async function fetchSessionById(id: string): Promise<SessionDetail | null
     ownerName: s.farmerName,
     submittedAt: s.submittedAt,
     treeCount: s.treeCount,
+    tally: s.tally,
+    result: s.result ?? null,
     avgConfidence: s.avgConfidence ?? 0,
     anomalyFlag: s.anomalyFlag,
     status: s.status,

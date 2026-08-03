@@ -242,13 +242,48 @@ export default async function SessionDetailPage({
                 </dd>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-surface text-ink-secondary">
+            <div className="flex items-start gap-3">
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-surface text-ink-secondary">
                 <TreePine className="h-4 w-4" strokeWidth={1.9} />
               </span>
-              <div>
-                <dt className="text-xs text-ink-muted">จำนวนต้นไม้</dt>
-                <dd className="font-mono text-lg font-semibold text-ink">{session.treeCount}</dd>
+              <div className="min-w-0 flex-1">
+                <dt className="text-xs text-ink-muted">ต้นไม้ที่ส่งมา</dt>
+                <dd className="font-mono text-lg font-semibold text-ink">
+                  {session.tally.submitted}
+                </dd>
+
+                {/* The breakdown is what makes the carbon figure above
+                    explicable: it is computed from the passed trees alone, and
+                    without these lines the reader has no way to reconcile the
+                    two numbers. */}
+                <dd className="mt-2 flex flex-col gap-1 text-[12px]">
+                  <span className="flex items-center justify-between gap-2">
+                    <span className="text-ink-secondary">ใช้ได้ (คิดคาร์บอน)</span>
+                    <span className="font-mono font-semibold text-success">
+                      {session.tally.passed}
+                    </span>
+                  </span>
+                  <span className="flex items-center justify-between gap-2">
+                    <span className="text-ink-secondary">ปฏิเสธ</span>
+                    <span className="font-mono font-semibold text-error">
+                      {session.tally.rejected}
+                    </span>
+                  </span>
+                  {session.tally.unassessed > 0 && (
+                    <span className="flex items-center justify-between gap-2">
+                      <span className="text-warning">ยังไม่มีผลประเมิน</span>
+                      <span className="font-mono font-semibold text-warning">
+                        {session.tally.unassessed}
+                      </span>
+                    </span>
+                  )}
+                </dd>
+
+                {session.tally.unassessed > 0 && (
+                  <p className="mt-1.5 text-[11px] leading-relaxed text-ink-muted">
+                    ต้นที่ยังไม่มีผลประเมินจะไม่ถูกคิดคาร์บอน เพราะระบบยังไม่เคยคำนวณค่าให้
+                  </p>
+                )}
               </div>
             </div>
             {anomalyTrees > 0 && (
