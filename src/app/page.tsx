@@ -36,12 +36,12 @@ const PORTALS = [
     cta: 'ดูรายละเอียด',
   },
   {
-    href: '/executive',
+    href: '/executive/login',
     icon: LayoutGrid,
     title: 'Executive Dashboard',
-    sub: 'สำหรับผู้บริหาร · DEMO',
-    desc: 'ภาพรวมสุขภาพธุรกิจ — รายได้ เกษตรกร พื้นที่ และวงจรคาร์บอน · ข้อมูลตัวอย่างเพื่อรีวิว KPI',
-    cta: 'ดูตัวอย่าง',
+    sub: 'สำหรับผู้บริหาร (C-Level)',
+    desc: 'ภาพรวม ESG — คาร์บอน เกษตรกร พื้นที่ และธรรมาภิบาลข้อมูล แยกดูรายโครงการได้',
+    cta: 'เข้าสู่ระบบ',
   },
 ] as const
 
