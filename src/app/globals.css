@@ -36,6 +36,50 @@
   --color-info:             #1E40AF;
   --color-info-bg:          #EFF6FF;
 
+  /* ── Charts ─────────────────────────────── */
+  /* Categorical slots for series identity (donut segments, multi-line charts).
+     The ORDER is the colourblind-safety mechanism, not a preference: this set
+     clears every all-pairs gate (CVD ΔE >= 8, normal-vision ΔE >= 15) so any
+     subset in any arrangement — including a donut where the last segment wraps
+     round to touch the first — stays distinguishable. Verified with the dataviz
+     skill's validate_palette.js; re-run it before changing a single value.
+
+     chart-1 is green so a one-series chart still reads as FarmFlow. Orange is
+     deliberately ABSENT: against this green it scores ΔE 3.2 under protanopia,
+     i.e. the same colour. Yellow and pink fall under 3:1 on white, so any chart
+     using them must label its segments in text (all of ours do). */
+  --color-chart-1:          #008300;
+  --color-chart-2:          #2a78d6;
+  --color-chart-3:          #eda100;
+  --color-chart-4:          #e87ba4;
+  --color-chart-5:          #4a3aa7;
+  /* The tail bucket. Never a sixth identity — past five, series fold into it. */
+  --color-chart-other:      #9CA3AF;
+
+  /* Ordinal ramp for ORDERED categories (the carbon funnel). One hue, monotone
+     lightness, visible steps — a category ramp here would burn hue on
+     information the bar length already carries. */
+  --color-funnel-1:         #43B77A;
+  --color-funnel-2:         #2E9E63;
+  --color-funnel-3:         #1F7A46;
+  /* A stage that exists in the lifecycle but has no data behind it yet — drawn,
+     never filled, so "not built" never reads as "measured zero". */
+  --color-chart-ghost:      #D8DDE3;
+
+  /* ── ESG pillars ────────────────────────── */
+  /* A navigational encoding, not decoration: a card's accent says which pillar
+     it belongs to. Green/blue/amber sit in the validator's 6–8 CVD warn band,
+     which is legal only alongside secondary encoding — every pillar heading
+     carries its own name in text and its own icon, so colour is never the sole
+     signal. (Violet was the first choice and was rejected: against this blue it
+     scores ΔE 0.3 under deuteranopia — literally the same colour.) */
+  --color-esg-e:            #1F7A46;
+  --color-esg-e-bg:         #ECF7F0;
+  --color-esg-s:            #1D4ED8;
+  --color-esg-s-bg:         #EFF4FF;
+  --color-esg-g:            #B45309;
+  --color-esg-g-bg:         #FDF5E9;
+
   /* ── GIS Map ────────────────────────────── */
   --color-gis-verified:     #22C55E;
   --color-gis-flagged:      #EF4444;
