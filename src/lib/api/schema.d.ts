@@ -990,6 +990,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/executive/overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Executive portfolio overview
+         * @description Aggregates for the executive dashboard: certified and pipeline carbon, the reduction target, farmers, area, a 12-month cumulative trend, the review funnel, breakdowns by species and by project, and the governance signals behind the numbers. Pass `projectId` to narrow everything to one project — `byProject` and `projectOptions` stay portfolio-wide so the reader can still switch. Counts and sums only: no farmer identity and no per-farm coordinate.
+         */
+        get: operations["getApiV1ExecutiveOverview"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/verifier/projects": {
         parameters: {
             query?: never;
@@ -8285,6 +8305,200 @@ export interface operations {
                         data: {
                             /** @constant */
                             revoked: true;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    getApiV1ExecutiveOverview: {
+        parameters: {
+            query?: {
+                projectId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Executive aggregates, portfolio-wide or per project */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            /** @description ISO instant the aggregates were computed at */
+                            asOf: string;
+                            /** @description Latest configured carbon market price (THB per tonne CO₂e) */
+                            marketPriceThbPerTon: number;
+                            scope: ({
+                                projectId: string;
+                                projectName: string;
+                            } | null) | null;
+                            /** @description Every project with an active farm — never scoped, it is the scope picker */
+                            projectOptions: {
+                                id: string;
+                                code: string;
+                                name: string;
+                                farms: number;
+                            }[];
+                            /** @description Declared intention from the PDD, not a commitment */
+                            target: {
+                                /** @description Sum of the PDD forecast for live projects in scope */
+                                tco2ePerYear: number;
+                                projectsWithTarget: number;
+                                /** @description Live projects whose PDD forecast is still blank */
+                                projectsMissingTarget: number;
+                            };
+                            kpis: {
+                                certified: {
+                                    /** @description Cumulative carbon past the verifier gate (tCO₂e) */
+                                    value: number;
+                                    /** @description The same figure at the close of last month */
+                                    prevValue: number;
+                                    /** @description value × market price — an estimate, not revenue */
+                                    estValueThb: number;
+                                };
+                                pipeline: {
+                                    /** @description Assessed carbon whose session is still unreviewed (tCO₂e) */
+                                    value: number;
+                                    /** @description Completed sessions awaiting a verifier verdict */
+                                    pendingSessions: number;
+                                };
+                                farmers: {
+                                    value: number;
+                                    /** @description Active accounts that already existed a month ago */
+                                    prevValue: number;
+                                    /** @description Projects with at least one enrolled farm */
+                                    projects: number;
+                                };
+                                area: {
+                                    /** @description Total area of active farms (rai) */
+                                    value: number;
+                                    prevValue: number;
+                                    farms: number;
+                                };
+                            };
+                            /** @description 12 months, cumulative — the gap between the lines is the review backlog */
+                            trend: {
+                                /** @description Bangkok calendar month, YYYY-MM */
+                                month: string;
+                                /** @description Cumulative assessed carbon at month close (tCO₂e) */
+                                estimated: number;
+                                /** @description Cumulative certified carbon at month close (tCO₂e) */
+                                certified: number;
+                            }[];
+                            funnel: {
+                                estimatedTotal: number;
+                                awaitingReview: number;
+                                rejected: number;
+                                certified: number;
+                            };
+                            /** @description What the portfolio grows, most-planted first */
+                            bySpecies: {
+                                speciesCode: string;
+                                speciesNameTh: string;
+                                /** @description Active farms growing this species */
+                                farms: number;
+                                /** @description Certified carbon attributed to this species */
+                                tco2e: number;
+                                /** @description Rank across the whole portfolio — the chart's colour slot. Stable under a project filter so a species never changes hue. */
+                                colorIndex: number;
+                            }[];
+                            /** @description How much the numbers above can be trusted (ADR 0017 / 0022) */
+                            governance: {
+                                withinBoundaryRate: (number | null) | null;
+                                /** @description Photos whose farm had no boundary to check */
+                                unknownBoundary: number;
+                                avgConfidence: (number | null) | null;
+                                scoredTrees: number;
+                                /** @description Trees the vision model raised a flag on */
+                                anomalyTrees: number;
+                                /** @description Trees the model could not read — manual review */
+                                failedAssessments: number;
+                                /** @description Farms whose boundary overlaps another's */
+                                overlapFlaggedFarms: number;
+                            };
+                            byProject: {
+                                total: number;
+                                rows: {
+                                    projectId: string;
+                                    projectCode: string;
+                                    projectName: string;
+                                    tco2e: number;
+                                    farms: number;
+                                    areaRai: number;
+                                    lat: (number | null) | null;
+                                    lng: (number | null) | null;
+                                }[];
+                                others: {
+                                    projects: number;
+                                    tco2e: number;
+                                    farms: number;
+                                    areaRai: number;
+                                };
+                            };
+                            impact: {
+                                treeSnapshots: number;
+                                completedSessions: number;
+                                speciesCount: number;
+                            };
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized - missing or invalid executive session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden - missing the required permission. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
                         };
                         meta: {
                             requestId: string;

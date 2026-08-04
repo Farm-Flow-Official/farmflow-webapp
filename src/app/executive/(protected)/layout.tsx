@@ -48,7 +48,9 @@ export default async function ExecutiveLayout({
     <div className="min-h-dvh bg-surface">
       <ExecutiveTopbar profile={executive} announcements={bell} />
       <AnnouncementBanner announcements={banner} surface="executive" />
-      <div className="mx-auto max-w-[1200px] px-4 py-8 sm:px-8">{children}</div>
+      {/* 1440 to match the admin and verifier shells — the ESG layout runs three
+          pillars of cards, and 1200 left the four-up rows cramped on a laptop. */}
+      <div className="mx-auto max-w-[1440px] px-4 py-8 sm:px-8">{children}</div>
     </div>
   )
 }
