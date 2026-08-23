@@ -2,6 +2,7 @@ import { Wrench } from 'lucide-react'
 import { Logo } from '@/components/ui/logo'
 import { formatDateTime } from '@/lib/utils/format'
 import { LINE_OA_URL } from '@/lib/constants/contact'
+import { BackToPortals } from '@/components/ui/back-to-portals'
 
 /**
  * What a closed dashboard shows instead of itself (ADMIN-SYS-01).
@@ -61,6 +62,9 @@ export function MaintenanceScreen({
             ติดต่อผู้ดูแลระบบ
           </a>
         </div>
+
+        {/* Without this the only exit from a closed portal is an external link. */}
+        <BackToPortals className="mt-4" />
       </div>
     </main>
   )
