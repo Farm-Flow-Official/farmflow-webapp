@@ -15,7 +15,7 @@ export default async function ExecutiveLoginPage() {
   if (closed) {
     return (
       <MaintenanceScreen
-        title="Executive Dashboard"
+        title="Flow Decide"
         reason={closed.reason}
         expectedBackAt={closed.expectedBackAt}
       />
@@ -30,7 +30,7 @@ export default async function ExecutiveLoginPage() {
             <Logo size={32} />
             <span className="text-xl font-semibold tracking-tight text-primary">FarmFlow</span>
           </div>
-          <span className="text-xs text-ink-muted">Executive Dashboard</span>
+          <span className="text-xs text-ink-muted">Flow Decide</span>
         </div>
 
         <ExecutiveLoginForm />

@@ -31,8 +31,8 @@ export const ADMIN_GUIDE_SECTIONS: GuideSection[] = [
     body: (
       <div className="flex flex-col gap-4">
         <P>
-          Admin Dashboard คือศูนย์กลางดูแล<span className="font-medium text-ink">ข้อมูลตั้งต้นของทั้งระบบ</span> —
-          บัญชีเกษตรกร ขอบเขตแปลง ประกาศ และการตั้งค่า ส่วนการตรวจรับรองคาร์บอนเป็นงานของ Verifier Portal
+          Flow Control คือศูนย์กลางดูแล<span className="font-medium text-ink">ข้อมูลตั้งต้นของทั้งระบบ</span> —
+          บัญชีเกษตรกร ขอบเขตแปลง ประกาศ และการตั้งค่า ส่วนการตรวจรับรองคาร์บอนเป็นงานของ Flow Verify
           แยกออกไปอีกระบบ
         </P>
         <Steps

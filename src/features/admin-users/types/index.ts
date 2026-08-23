@@ -84,6 +84,6 @@ export const ROLE_INFO: Record<AdminRole, { label: string; description: string }
   },
   EXECUTIVE: {
     label: 'Executive',
-    description: 'ผู้บริหาร — เข้าได้เฉพาะ Executive Dashboard เท่านั้น เข้าหลังบ้านไม่ได้',
+    description: 'ผู้บริหาร — เข้าได้เฉพาะ Flow Decide เท่านั้น เข้าหลังบ้านไม่ได้',
   },
 }

@@ -52,7 +52,7 @@ export function AdminTopbar({
           <Logo size={26} />
           <div className="leading-none">
             <p className="text-base font-semibold tracking-tight text-primary">FarmFlow</p>
-            <p className="mt-1 text-[10px] text-ink-muted">Admin Dashboard</p>
+            <p className="mt-1 text-[10px] text-ink-muted">Flow Control</p>
           </div>
         </div>
       </div>

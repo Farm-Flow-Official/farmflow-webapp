@@ -25,8 +25,8 @@ export const CLOSABLE_DASHBOARDS: ClosableDashboard[] = [
 ]
 
 export const DASHBOARD_LABELS: Record<ClosableDashboard, string> = {
-  verifier: 'Verifier Portal',
+  verifier: 'Flow Verify',
   business: 'Business Dashboard',
-  executive: 'Executive Dashboard',
+  executive: 'Flow Decide',
   mobile: 'Mobile App',
 }

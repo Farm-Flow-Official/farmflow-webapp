@@ -18,7 +18,7 @@ const PORTALS = [
   {
     href: '/admin/login',
     icon: LayoutDashboard,
-    title: 'Admin Dashboard',
+    title: 'Flow Control',
     sub: 'สำหรับทีมภายใน',
     desc: 'จัดการเกษตรกร แปลงเพาะปลูก GIS ประกาศ และตั้งค่าระบบ',
     cta: 'เข้าสู่ระบบ',
@@ -26,7 +26,7 @@ const PORTALS = [
   {
     href: '/verifier/login',
     icon: ShieldCheck,
-    title: 'Verifier Portal',
+    title: 'Flow Verify',
     sub: 'สำหรับผู้ตรวจรับรองภายนอก',
     desc: 'ตรวจรับรองข้อมูลคาร์บอน (MRV) อนุมัติ/ปฏิเสธชุดข้อมูล',
     cta: 'เข้าสู่ระบบ',
@@ -34,7 +34,7 @@ const PORTALS = [
   {
     href: '/executive/login',
     icon: LayoutGrid,
-    title: 'Executive Dashboard',
+    title: 'Flow Decide',
     sub: 'สำหรับผู้บริหาร (C-Level)',
     desc: 'ภาพรวม ESG — คาร์บอน เกษตรกร พื้นที่ และธรรมาภิบาลข้อมูล แยกดูรายโครงการได้',
     cta: 'เข้าสู่ระบบ',
