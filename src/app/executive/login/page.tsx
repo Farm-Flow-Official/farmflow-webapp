@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { ExecutiveLoginForm } from '@/features/executive/components/ExecutiveLoginForm'
 import { Logo } from '@/components/ui/logo'
+import { BackToPortals } from '@/components/ui/back-to-portals'
 import { MaintenanceScreen } from '@/components/ui/maintenance-screen'
 import { checkDashboard } from '@/features/settings/services/fetchAvailability'
 
@@ -24,20 +25,24 @@ export default async function ExecutiveLoginPage() {
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-surface p-6">
-      <div className="w-full max-w-[440px] rounded-xl border border-line bg-panel px-12 py-12 shadow-[0_4px_12px_rgba(0,0,0,0.06)]">
-        <div className="mb-8 flex flex-col items-center gap-2">
-          <div className="flex items-center gap-2.5">
-            <Logo size={32} />
-            <span className="text-xl font-semibold tracking-tight text-primary">FarmFlow</span>
+      <div className="w-full max-w-[440px]">
+        <BackToPortals className="mb-3 -ml-2" />
+
+        <div className="rounded-xl border border-line bg-panel px-12 py-12 shadow-[0_4px_12px_rgba(0,0,0,0.06)]">
+          <div className="mb-8 flex flex-col items-center gap-2">
+            <div className="flex items-center gap-2.5">
+              <Logo size={32} />
+              <span className="text-xl font-semibold tracking-tight text-primary">FarmFlow</span>
+            </div>
+            <span className="text-xs text-ink-muted">Flow Decide</span>
           </div>
-          <span className="text-xs text-ink-muted">Flow Decide</span>
+
+          <ExecutiveLoginForm />
+
+          <p className="mt-6 text-center text-xs text-ink-muted">
+            FarmFlow Carbon Platform · Executive Access
+          </p>
         </div>
-
-        <ExecutiveLoginForm />
-
-        <p className="mt-6 text-center text-xs text-ink-muted">
-          FarmFlow Carbon Platform · Executive Access
-        </p>
       </div>
     </main>
   )
