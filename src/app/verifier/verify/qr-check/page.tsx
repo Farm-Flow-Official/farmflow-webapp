@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { CircleCheck, CircleX, ShieldCheck, Search } from 'lucide-react'
+import { BackToPortals } from '@/components/ui/back-to-portals'
 import { verifySession } from '@/features/verifier/services/verifySession'
 import { formatDate } from '@/lib/utils/format'
 
@@ -21,6 +22,11 @@ export default async function QrCheckPage({
   return (
     <main className="flex min-h-screen items-center justify-center bg-surface p-6">
       <div className="w-full max-w-[480px]">
+        {/* Reached two ways: clicked from the portal chooser, or scanned off a
+            printed certificate. The label has to make sense to the second
+            visitor, who has no account and is not going to a portal. */}
+        <BackToPortals label="หน้าแรก FarmFlow" className="mb-3 -ml-2" />
+
         {/* Brand */}
         <div className="mb-6 flex flex-col items-center gap-2">
           <div className="flex items-center gap-2.5">
