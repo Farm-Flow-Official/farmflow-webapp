@@ -27,7 +27,7 @@ export default async function ExecutiveLayout({
   if (closed) {
     return (
       <MaintenanceScreen
-        title="Executive Dashboard "
+        title="Flow Decide"
         reason={closed.reason}
         expectedBackAt={closed.expectedBackAt}
       />

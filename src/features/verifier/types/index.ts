@@ -1,5 +1,5 @@
 /**
- * View-model types for the Verifier Portal. The services map the Elysia
+ * View-model types for Flow Verify (the verifier portal). The services map the Elysia
  * `/verifier/*` responses onto these shapes; fields the API does not expose
  * (phone, address, check-in point, per-snapshot weather/time) are filled with
  * null by the mappers.

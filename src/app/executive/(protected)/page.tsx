@@ -19,7 +19,7 @@ import { ProjectMap } from '@/features/executive/components/ProjectMap'
 import { GovernancePanel } from '@/features/executive/components/GovernancePanel'
 
 export const metadata: Metadata = {
-  title: 'ESG Executive Dashboard — FarmFlow',
+  title: 'Flow Decide — FarmFlow',
 }
 
 type Search = Promise<Record<string, string | string[] | undefined>>

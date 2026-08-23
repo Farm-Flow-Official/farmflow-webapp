@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { LayoutDashboard, ShieldCheck, Briefcase, LayoutGrid, ArrowRight, QrCode } from 'lucide-react'
+import { LayoutDashboard, ShieldCheck, LayoutGrid, ArrowRight, QrCode } from 'lucide-react'
 import { Logo } from '@/components/ui/logo'
 import { getVerifierSession } from '@/features/verifier/auth/session'
 import { getAdminSession } from '@/features/auth/services/adminSession'
@@ -10,11 +10,15 @@ export const metadata: Metadata = {
   title: 'FarmFlow — เข้าสู่ระบบ',
 }
 
+// Business is deliberately absent: its screens still render <ComingSoon> because
+// the packages/payouts/billing API does not exist yet, and a door on this page is
+// a promise that something is behind it. The route stays reachable by URL for
+// whoever is building it — put the card back when the endpoints land.
 const PORTALS = [
   {
     href: '/admin/login',
     icon: LayoutDashboard,
-    title: 'Admin Dashboard',
+    title: 'Flow Control',
     sub: 'สำหรับทีมภายใน',
     desc: 'จัดการเกษตรกร แปลงเพาะปลูก GIS ประกาศ และตั้งค่าระบบ',
     cta: 'เข้าสู่ระบบ',
@@ -22,23 +26,15 @@ const PORTALS = [
   {
     href: '/verifier/login',
     icon: ShieldCheck,
-    title: 'Verifier Portal',
+    title: 'Flow Verify',
     sub: 'สำหรับผู้ตรวจรับรองภายนอก',
     desc: 'ตรวจรับรองข้อมูลคาร์บอน (MRV) อนุมัติ/ปฏิเสธชุดข้อมูล',
     cta: 'เข้าสู่ระบบ',
   },
   {
-    href: '/business',
-    icon: Briefcase,
-    title: 'Business Dashboard',
-    sub: 'สำหรับทีมธุรกิจ / การเงิน',
-    desc: 'จัดการแพ็กเกจ ตรวจสลิป จ่ายเงินเกษตรกร และภาพรวมรายได้ (รอ backend API)',
-    cta: 'ดูรายละเอียด',
-  },
-  {
     href: '/executive/login',
     icon: LayoutGrid,
-    title: 'Executive Dashboard',
+    title: 'Flow Decide',
     sub: 'สำหรับผู้บริหาร (C-Level)',
     desc: 'ภาพรวม ESG — คาร์บอน เกษตรกร พื้นที่ และธรรมาภิบาลข้อมูล แยกดูรายโครงการได้',
     cta: 'เข้าสู่ระบบ',
@@ -66,7 +62,7 @@ export default async function PortalLandingPage() {
         </div>
 
         {/* Portal cards */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {PORTALS.map((p) => {
             const Icon = p.icon
             return (
