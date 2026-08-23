@@ -58,7 +58,7 @@ export function VerifierTopbar({
           <Logo size={26} />
           <div className="leading-none">
             <p className="text-base font-semibold tracking-tight text-primary">FarmFlow</p>
-            <p className="mt-1 text-[10px] text-ink-muted">Verifier Portal</p>
+            <p className="mt-1 text-[10px] text-ink-muted">Flow Verify</p>
           </div>
         </div>
 

@@ -30,7 +30,7 @@ export default async function VerifierLoginPage() {
             <Logo size={32} />
             <span className="text-xl font-semibold tracking-tight text-primary">FarmFlow</span>
           </div>
-          <span className="text-xs text-ink-muted">Verifier Portal</span>
+          <span className="text-xs text-ink-muted">Flow Verify</span>
         </div>
 
         <VerifierLoginForm />

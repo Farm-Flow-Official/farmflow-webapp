@@ -24,7 +24,7 @@ export function ExecutiveHeader({ asOf, scope }: { asOf: string; scope: Executiv
     <header className="flex flex-wrap items-start justify-between gap-x-6 gap-y-4">
       <div className="min-w-0">
         <p className="text-[11px] font-semibold uppercase tracking-[0.09em] text-ink-muted">
-          ESG Executive Dashboard
+          Flow Decide · ESG
         </p>
         <h1 className="mt-1 text-[26px] font-semibold leading-tight tracking-tight text-ink sm:text-[30px]">
           {scope ? scope.projectName : 'ภาพรวมพอร์ตคาร์บอน'}

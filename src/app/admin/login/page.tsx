@@ -19,7 +19,7 @@ export default function AdminLoginPage() {
               FarmFlow
             </span>
           </div>
-          <span className="text-xs text-[#9CA3AF]">Admin Dashboard</span>
+          <span className="text-xs text-[#9CA3AF]">Flow Control</span>
         </div>
 
         {/* ── Form ── */}
