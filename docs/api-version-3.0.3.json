@@ -12259,6 +12259,2788 @@
                 "operationId": "patchApiV1AdminSystemAvailabilityByDashboard"
             }
         },
+        "/api/v1/admin/species/": {
+            "get": {
+                "tags": [
+                    "Admin Species"
+                ],
+                "summary": "List species with usage counts",
+                "description": "Every species with how many farms grow it, how many projects allow it, and how many trees have had their carbon computed against it. Those counts are what the editor turns into a warning and what refuses a delete.",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "All species with their usage counts",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "All species with their usage counts",
+                                    "type": "object",
+                                    "required": [
+                                        "success",
+                                        "message",
+                                        "data",
+                                        "meta"
+                                    ],
+                                    "properties": {
+                                        "success": {
+                                            "const": true,
+                                            "type": "boolean"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "required": [
+                                                    "id",
+                                                    "speciesCode",
+                                                    "speciesNameTh",
+                                                    "speciesNameEn",
+                                                    "equationFormula",
+                                                    "equationGroupId",
+                                                    "equationGroupCode",
+                                                    "forestCategoryId",
+                                                    "forestCategoryNameTh",
+                                                    "rValue",
+                                                    "cfValue",
+                                                    "tverReference",
+                                                    "equationStatus",
+                                                    "requiresHeight",
+                                                    "useD0NotDbh",
+                                                    "measurementPointCode",
+                                                    "createdAt",
+                                                    "updatedAt",
+                                                    "usage"
+                                                ],
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string"
+                                                    },
+                                                    "speciesCode": {
+                                                        "maxLength": 64,
+                                                        "type": "string"
+                                                    },
+                                                    "speciesNameTh": {
+                                                        "maxLength": 256,
+                                                        "type": "string"
+                                                    },
+                                                    "speciesNameEn": {
+                                                        "anyOf": [
+                                                            {
+                                                                "maxLength": 256,
+                                                                "type": "string"
+                                                            },
+                                                            {
+                                                                "type": "null"
+                                                            }
+                                                        ]
+                                                    },
+                                                    "equationFormula": {
+                                                        "anyOf": [
+                                                            {
+                                                                "maxLength": 128,
+                                                                "type": "string"
+                                                            },
+                                                            {
+                                                                "type": "null"
+                                                            }
+                                                        ]
+                                                    },
+                                                    "equationGroupId": {
+                                                        "anyOf": [
+                                                            {
+                                                                "type": "string"
+                                                            },
+                                                            {
+                                                                "type": "null"
+                                                            }
+                                                        ]
+                                                    },
+                                                    "equationGroupCode": {
+                                                        "nullable": true,
+                                                        "anyOf": [
+                                                            {
+                                                                "type": "string"
+                                                            },
+                                                            {
+                                                                "type": "null"
+                                                            }
+                                                        ]
+                                                    },
+                                                    "forestCategoryId": {
+                                                        "anyOf": [
+                                                            {
+                                                                "type": "string"
+                                                            },
+                                                            {
+                                                                "type": "null"
+                                                            }
+                                                        ]
+                                                    },
+                                                    "forestCategoryNameTh": {
+                                                        "nullable": true,
+                                                        "anyOf": [
+                                                            {
+                                                                "type": "string"
+                                                            },
+                                                            {
+                                                                "type": "null"
+                                                            }
+                                                        ]
+                                                    },
+                                                    "rValue": {
+                                                        "anyOf": [
+                                                            {
+                                                                "minimum": -140737488355328,
+                                                                "maximum": 140737488355327,
+                                                                "type": "number"
+                                                            },
+                                                            {
+                                                                "type": "null"
+                                                            }
+                                                        ]
+                                                    },
+                                                    "cfValue": {
+                                                        "anyOf": [
+                                                            {
+                                                                "minimum": -140737488355328,
+                                                                "maximum": 140737488355327,
+                                                                "type": "number"
+                                                            },
+                                                            {
+                                                                "type": "null"
+                                                            }
+                                                        ]
+                                                    },
+                                                    "tverReference": {
+                                                        "anyOf": [
+                                                            {
+                                                                "maxLength": 256,
+                                                                "type": "string"
+                                                            },
+                                                            {
+                                                                "type": "null"
+                                                            }
+                                                        ]
+                                                    },
+                                                    "equationStatus": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "approved",
+                                                            "provisional"
+                                                        ]
+                                                    },
+                                                    "requiresHeight": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "useD0NotDbh": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "measurementPointCode": {
+                                                        "nullable": true,
+                                                        "anyOf": [
+                                                            {
+                                                                "type": "string"
+                                                            },
+                                                            {
+                                                                "type": "null"
+                                                            }
+                                                        ]
+                                                    },
+                                                    "createdAt": {
+                                                        "type": "Date"
+                                                    },
+                                                    "updatedAt": {
+                                                        "type": "Date"
+                                                    },
+                                                    "usage": {
+                                                        "description": "What is standing on this species \u2014 drives the edit warning and blocks delete",
+                                                        "type": "object",
+                                                        "required": [
+                                                            "farms",
+                                                            "projects",
+                                                            "calculatedTrees"
+                                                        ],
+                                                        "properties": {
+                                                            "farms": {
+                                                                "description": "Active farms growing it (distinct farms, not subplots)",
+                                                                "type": "number"
+                                                            },
+                                                            "projects": {
+                                                                "description": "Projects that allow it",
+                                                                "type": "number"
+                                                            },
+                                                            "calculatedTrees": {
+                                                                "description": "Trees whose carbon was computed with it",
+                                                                "type": "number"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "required": [
+                                                "requestId",
+                                                "timestamp"
+                                            ],
+                                            "properties": {
+                                                "requestId": {
+                                                    "type": "string"
+                                                },
+                                                "timestamp": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - missing or invalid admin session.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "Unauthorized - missing or invalid admin session.",
+                                    "type": "object",
+                                    "required": [
+                                        "success",
+                                        "error",
+                                        "meta"
+                                    ],
+                                    "properties": {
+                                        "success": {
+                                            "const": false,
+                                            "type": "boolean"
+                                        },
+                                        "error": {
+                                            "type": "object",
+                                            "required": [
+                                                "code",
+                                                "message",
+                                                "details"
+                                            ],
+                                            "properties": {
+                                                "code": {
+                                                    "description": "Machine-readable error code",
+                                                    "type": "string"
+                                                },
+                                                "message": {
+                                                    "description": "Human-readable error message",
+                                                    "type": "string"
+                                                },
+                                                "details": {
+                                                    "nullable": true,
+                                                    "anyOf": [
+                                                        {
+                                                            "description": "Additional error details, if any"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "required": [
+                                                "requestId",
+                                                "timestamp"
+                                            ],
+                                            "properties": {
+                                                "requestId": {
+                                                    "type": "string"
+                                                },
+                                                "timestamp": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - the requester lacks the required permission.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "Forbidden - the requester lacks the required permission.",
+                                    "type": "object",
+                                    "required": [
+                                        "success",
+                                        "error",
+                                        "meta"
+                                    ],
+                                    "properties": {
+                                        "success": {
+                                            "const": false,
+                                            "type": "boolean"
+                                        },
+                                        "error": {
+                                            "type": "object",
+                                            "required": [
+                                                "code",
+                                                "message",
+                                                "details"
+                                            ],
+                                            "properties": {
+                                                "code": {
+                                                    "description": "Machine-readable error code",
+                                                    "type": "string"
+                                                },
+                                                "message": {
+                                                    "description": "Human-readable error message",
+                                                    "type": "string"
+                                                },
+                                                "details": {
+                                                    "nullable": true,
+                                                    "anyOf": [
+                                                        {
+                                                            "description": "Additional error details, if any"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "required": [
+                                                "requestId",
+                                                "timestamp"
+                                            ],
+                                            "properties": {
+                                                "requestId": {
+                                                    "type": "string"
+                                                },
+                                                "timestamp": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "operationId": "getApiV1AdminSpecies"
+            },
+            "post": {
+                "tags": [
+                    "Admin Species"
+                ],
+                "summary": "Create a species",
+                "description": "Creates a species and links it to the current T-VER constant.\n\n**Derived, not accepted:** `requiresHeight`, `useD0NotDbh` and the measurement point come from the chosen equation family. Sending them has no effect \u2014 they describe the equation, and a row must never claim a measurement its own equation does not take.\n\n**Errors:** **400 BAD_REQUEST** (equation family the engine does not implement \u2014 the response lists the supported ones) \u00b7 **409 CONFLICT** (duplicate species code).",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "speciesCode",
+                                    "speciesNameTh",
+                                    "equationFormula"
+                                ],
+                                "properties": {
+                                    "speciesCode": {
+                                        "minLength": 1,
+                                        "maxLength": 64,
+                                        "description": "Unique, e.g. OGW-TEAK",
+                                        "type": "string"
+                                    },
+                                    "speciesNameTh": {
+                                        "minLength": 1,
+                                        "maxLength": 256,
+                                        "type": "string"
+                                    },
+                                    "speciesNameEn": {
+                                        "nullable": true,
+                                        "anyOf": [
+                                            {
+                                                "maxLength": 256,
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
+                                    },
+                                    "equationFormula": {
+                                        "description": "Must be one of the families the carbon engine implements (GET /families)",
+                                        "type": "string"
+                                    },
+                                    "equationGroupId": {
+                                        "nullable": true,
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
+                                    },
+                                    "forestCategoryId": {
+                                        "nullable": true,
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
+                                    },
+                                    "rValue": {
+                                        "nullable": true,
+                                        "anyOf": [
+                                            {
+                                                "description": "Root-to-shoot ratio R",
+                                                "type": "number"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
+                                    },
+                                    "cfValue": {
+                                        "nullable": true,
+                                        "anyOf": [
+                                            {
+                                                "description": "Carbon fraction CF",
+                                                "type": "number"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
+                                    },
+                                    "tverReference": {
+                                        "nullable": true,
+                                        "anyOf": [
+                                            {
+                                                "maxLength": 256,
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
+                                    },
+                                    "equationStatus": {
+                                        "type": "string",
+                                        "enum": [
+                                            "approved",
+                                            "provisional"
+                                        ]
+                                    },
+                                    "defaultCircumferenceUnit": {
+                                        "type": "string",
+                                        "enum": [
+                                            "cm",
+                                            "inch"
+                                        ]
+                                    }
+                                }
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "speciesCode",
+                                    "speciesNameTh",
+                                    "equationFormula"
+                                ],
+                                "properties": {
+                                    "speciesCode": {
+                                        "minLength": 1,
+                                        "maxLength": 64,
+                                        "description": "Unique, e.g. OGW-TEAK",
+                                        "type": "string"
+                                    },
+                                    "speciesNameTh": {
+                                        "minLength": 1,
+                                        "maxLength": 256,
+                                        "type": "string"
+                                    },
+                                    "speciesNameEn": {
+                                        "nullable": true,
+                                        "anyOf": [
+                                            {
+                                                "maxLength": 256,
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
+                                    },
+                                    "equationFormula": {
+                                        "description": "Must be one of the families the carbon engine implements (GET /families)",
+                                        "type": "string"
+                                    },
+                                    "equationGroupId": {
+                                        "nullable": true,
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
+                                    },
+                                    "forestCategoryId": {
+                                        "nullable": true,
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
+                                    },
+                                    "rValue": {
+                                        "nullable": true,
+                                        "anyOf": [
+                                            {
+                                                "description": "Root-to-shoot ratio R",
+                                                "type": "number"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
+                                    },
+                                    "cfValue": {
+                                        "nullable": true,
+                                        "anyOf": [
+                                            {
+                                                "description": "Carbon fraction CF",
+                                                "type": "number"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
+                                    },
+                                    "tverReference": {
+                                        "nullable": true,
+                                        "anyOf": [
+                                            {
+                                                "maxLength": 256,
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
+                                    },
+                                    "equationStatus": {
+                                        "type": "string",
+                                        "enum": [
+                                            "approved",
+                                            "provisional"
+                                        ]
+                                    },
+                                    "defaultCircumferenceUnit": {
+                                        "type": "string",
+                                        "enum": [
+                                            "cm",
+                                            "inch"
+                                        ]
+                                    }
+                                }
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "speciesCode",
+                                    "speciesNameTh",
+                                    "equationFormula"
+                                ],
+                                "properties": {
+                                    "speciesCode": {
+                                        "minLength": 1,
+                                        "maxLength": 64,
+                                        "description": "Unique, e.g. OGW-TEAK",
+                                        "type": "string"
+                                    },
+                                    "speciesNameTh": {
+                                        "minLength": 1,
+                                        "maxLength": 256,
+                                        "type": "string"
+                                    },
+                                    "speciesNameEn": {
+                                        "nullable": true,
+                                        "anyOf": [
+                                            {
+                                                "maxLength": 256,
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
+                                    },
+                                    "equationFormula": {
+                                        "description": "Must be one of the families the carbon engine implements (GET /families)",
+                                        "type": "string"
+                                    },
+                                    "equationGroupId": {
+                                        "nullable": true,
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
+                                    },
+                                    "forestCategoryId": {
+                                        "nullable": true,
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
+                                    },
+                                    "rValue": {
+                                        "nullable": true,
+                                        "anyOf": [
+                                            {
+                                                "description": "Root-to-shoot ratio R",
+                                                "type": "number"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
+                                    },
+                                    "cfValue": {
+                                        "nullable": true,
+                                        "anyOf": [
+                                            {
+                                                "description": "Carbon fraction CF",
+                                                "type": "number"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
+                                    },
+                                    "tverReference": {
+                                        "nullable": true,
+                                        "anyOf": [
+                                            {
+                                                "maxLength": 256,
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
+                                    },
+                                    "equationStatus": {
+                                        "type": "string",
+                                        "enum": [
+                                            "approved",
+                                            "provisional"
+                                        ]
+                                    },
+                                    "defaultCircumferenceUnit": {
+                                        "type": "string",
+                                        "enum": [
+                                            "cm",
+                                            "inch"
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "The saved species row",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "The saved species row",
+                                    "type": "object",
+                                    "required": [
+                                        "success",
+                                        "message",
+                                        "data",
+                                        "meta"
+                                    ],
+                                    "properties": {
+                                        "success": {
+                                            "const": true,
+                                            "type": "boolean"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "required": [
+                                                "id",
+                                                "speciesCode",
+                                                "speciesNameTh",
+                                                "speciesNameEn",
+                                                "equationFormula",
+                                                "equationGroupId",
+                                                "forestCategoryId",
+                                                "rValue",
+                                                "cfValue",
+                                                "tverReference",
+                                                "equationStatus",
+                                                "requiresHeight",
+                                                "useD0NotDbh",
+                                                "createdAt",
+                                                "updatedAt"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "speciesCode": {
+                                                    "maxLength": 64,
+                                                    "type": "string"
+                                                },
+                                                "speciesNameTh": {
+                                                    "maxLength": 256,
+                                                    "type": "string"
+                                                },
+                                                "speciesNameEn": {
+                                                    "anyOf": [
+                                                        {
+                                                            "maxLength": 256,
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                },
+                                                "equationFormula": {
+                                                    "anyOf": [
+                                                        {
+                                                            "maxLength": 128,
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                },
+                                                "equationGroupId": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                },
+                                                "forestCategoryId": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                },
+                                                "rValue": {
+                                                    "anyOf": [
+                                                        {
+                                                            "minimum": -140737488355328,
+                                                            "maximum": 140737488355327,
+                                                            "type": "number"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                },
+                                                "cfValue": {
+                                                    "anyOf": [
+                                                        {
+                                                            "minimum": -140737488355328,
+                                                            "maximum": 140737488355327,
+                                                            "type": "number"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                },
+                                                "tverReference": {
+                                                    "anyOf": [
+                                                        {
+                                                            "maxLength": 256,
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                },
+                                                "equationStatus": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "approved",
+                                                        "provisional"
+                                                    ]
+                                                },
+                                                "requiresHeight": {
+                                                    "type": "boolean"
+                                                },
+                                                "useD0NotDbh": {
+                                                    "type": "boolean"
+                                                },
+                                                "createdAt": {
+                                                    "type": "Date"
+                                                },
+                                                "updatedAt": {
+                                                    "type": "Date"
+                                                }
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "required": [
+                                                "requestId",
+                                                "timestamp"
+                                            ],
+                                            "properties": {
+                                                "requestId": {
+                                                    "type": "string"
+                                                },
+                                                "timestamp": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - e.g. an equation the engine does not implement.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "Bad request - e.g. an equation the engine does not implement.",
+                                    "type": "object",
+                                    "required": [
+                                        "success",
+                                        "error",
+                                        "meta"
+                                    ],
+                                    "properties": {
+                                        "success": {
+                                            "const": false,
+                                            "type": "boolean"
+                                        },
+                                        "error": {
+                                            "type": "object",
+                                            "required": [
+                                                "code",
+                                                "message",
+                                                "details"
+                                            ],
+                                            "properties": {
+                                                "code": {
+                                                    "description": "Machine-readable error code",
+                                                    "type": "string"
+                                                },
+                                                "message": {
+                                                    "description": "Human-readable error message",
+                                                    "type": "string"
+                                                },
+                                                "details": {
+                                                    "nullable": true,
+                                                    "anyOf": [
+                                                        {
+                                                            "description": "Additional error details, if any"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "required": [
+                                                "requestId",
+                                                "timestamp"
+                                            ],
+                                            "properties": {
+                                                "requestId": {
+                                                    "type": "string"
+                                                },
+                                                "timestamp": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - missing or invalid admin session.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "Unauthorized - missing or invalid admin session.",
+                                    "type": "object",
+                                    "required": [
+                                        "success",
+                                        "error",
+                                        "meta"
+                                    ],
+                                    "properties": {
+                                        "success": {
+                                            "const": false,
+                                            "type": "boolean"
+                                        },
+                                        "error": {
+                                            "type": "object",
+                                            "required": [
+                                                "code",
+                                                "message",
+                                                "details"
+                                            ],
+                                            "properties": {
+                                                "code": {
+                                                    "description": "Machine-readable error code",
+                                                    "type": "string"
+                                                },
+                                                "message": {
+                                                    "description": "Human-readable error message",
+                                                    "type": "string"
+                                                },
+                                                "details": {
+                                                    "nullable": true,
+                                                    "anyOf": [
+                                                        {
+                                                            "description": "Additional error details, if any"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "required": [
+                                                "requestId",
+                                                "timestamp"
+                                            ],
+                                            "properties": {
+                                                "requestId": {
+                                                    "type": "string"
+                                                },
+                                                "timestamp": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - the requester lacks the required permission.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "Forbidden - the requester lacks the required permission.",
+                                    "type": "object",
+                                    "required": [
+                                        "success",
+                                        "error",
+                                        "meta"
+                                    ],
+                                    "properties": {
+                                        "success": {
+                                            "const": false,
+                                            "type": "boolean"
+                                        },
+                                        "error": {
+                                            "type": "object",
+                                            "required": [
+                                                "code",
+                                                "message",
+                                                "details"
+                                            ],
+                                            "properties": {
+                                                "code": {
+                                                    "description": "Machine-readable error code",
+                                                    "type": "string"
+                                                },
+                                                "message": {
+                                                    "description": "Human-readable error message",
+                                                    "type": "string"
+                                                },
+                                                "details": {
+                                                    "nullable": true,
+                                                    "anyOf": [
+                                                        {
+                                                            "description": "Additional error details, if any"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "required": [
+                                                "requestId",
+                                                "timestamp"
+                                            ],
+                                            "properties": {
+                                                "requestId": {
+                                                    "type": "string"
+                                                },
+                                                "timestamp": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict - duplicate species code, or the species is in use.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "Conflict - duplicate species code, or the species is in use.",
+                                    "type": "object",
+                                    "required": [
+                                        "success",
+                                        "error",
+                                        "meta"
+                                    ],
+                                    "properties": {
+                                        "success": {
+                                            "const": false,
+                                            "type": "boolean"
+                                        },
+                                        "error": {
+                                            "type": "object",
+                                            "required": [
+                                                "code",
+                                                "message",
+                                                "details"
+                                            ],
+                                            "properties": {
+                                                "code": {
+                                                    "description": "Machine-readable error code",
+                                                    "type": "string"
+                                                },
+                                                "message": {
+                                                    "description": "Human-readable error message",
+                                                    "type": "string"
+                                                },
+                                                "details": {
+                                                    "nullable": true,
+                                                    "anyOf": [
+                                                        {
+                                                            "description": "Additional error details, if any"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "required": [
+                                                "requestId",
+                                                "timestamp"
+                                            ],
+                                            "properties": {
+                                                "requestId": {
+                                                    "type": "string"
+                                                },
+                                                "timestamp": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error - the request failed schema validation.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "Validation error - the request failed schema validation.",
+                                    "type": "object",
+                                    "required": [
+                                        "success",
+                                        "error",
+                                        "meta"
+                                    ],
+                                    "properties": {
+                                        "success": {
+                                            "const": false,
+                                            "type": "boolean"
+                                        },
+                                        "error": {
+                                            "type": "object",
+                                            "required": [
+                                                "code",
+                                                "message",
+                                                "details"
+                                            ],
+                                            "properties": {
+                                                "code": {
+                                                    "description": "Machine-readable error code",
+                                                    "type": "string"
+                                                },
+                                                "message": {
+                                                    "description": "Human-readable error message",
+                                                    "type": "string"
+                                                },
+                                                "details": {
+                                                    "nullable": true,
+                                                    "anyOf": [
+                                                        {
+                                                            "description": "Additional error details, if any"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "required": [
+                                                "requestId",
+                                                "timestamp"
+                                            ],
+                                            "properties": {
+                                                "requestId": {
+                                                    "type": "string"
+                                                },
+                                                "timestamp": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "operationId": "postApiV1AdminSpecies"
+            }
+        },
+        "/api/v1/admin/species/lookups": {
+            "get": {
+                "tags": [
+                    "Admin Species"
+                ],
+                "summary": "Pickers for the species editor",
+                "description": "Equation groups, forest categories, and **the equation families the carbon engine actually implements**. The family list comes from the engine itself \u2014 a species saved with anything else produces an error instead of carbon for every tree in it, so this is the only list a picker may offer.",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Pickers for the species editor",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "Pickers for the species editor",
+                                    "type": "object",
+                                    "required": [
+                                        "success",
+                                        "message",
+                                        "data",
+                                        "meta"
+                                    ],
+                                    "properties": {
+                                        "success": {
+                                            "const": true,
+                                            "type": "boolean"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "required": [
+                                                "equationGroups",
+                                                "forestCategories",
+                                                "families"
+                                            ],
+                                            "properties": {
+                                                "equationGroups": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "required": [
+                                                            "id",
+                                                            "code",
+                                                            "nameEn"
+                                                        ],
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string"
+                                                            },
+                                                            "code": {
+                                                                "type": "string"
+                                                            },
+                                                            "nameEn": {
+                                                                "nullable": true,
+                                                                "anyOf": [
+                                                                    {
+                                                                        "type": "string"
+                                                                    },
+                                                                    {
+                                                                        "type": "null"
+                                                                    }
+                                                                ]
+                                                            }
+                                                        }
+                                                    }
+                                                },
+                                                "forestCategories": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "required": [
+                                                            "id",
+                                                            "code",
+                                                            "nameTh"
+                                                        ],
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string"
+                                                            },
+                                                            "code": {
+                                                                "type": "string"
+                                                            },
+                                                            "nameTh": {
+                                                                "type": "string"
+                                                            }
+                                                        }
+                                                    }
+                                                },
+                                                "families": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "required": [
+                                                            "formula",
+                                                            "reference",
+                                                            "requiresHeight",
+                                                            "useD0NotDbh",
+                                                            "measurementPointCode",
+                                                            "summaryTh"
+                                                        ],
+                                                        "properties": {
+                                                            "formula": {
+                                                                "type": "string"
+                                                            },
+                                                            "reference": {
+                                                                "description": "The T-VER citation recorded into every formula snapshot",
+                                                                "type": "string"
+                                                            },
+                                                            "requiresHeight": {
+                                                                "type": "boolean"
+                                                            },
+                                                            "useD0NotDbh": {
+                                                                "type": "boolean"
+                                                            },
+                                                            "measurementPointCode": {
+                                                                "type": "string"
+                                                            },
+                                                            "summaryTh": {
+                                                                "description": "One line describing what this family measures",
+                                                                "type": "string"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "required": [
+                                                "requestId",
+                                                "timestamp"
+                                            ],
+                                            "properties": {
+                                                "requestId": {
+                                                    "type": "string"
+                                                },
+                                                "timestamp": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - missing or invalid admin session.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "Unauthorized - missing or invalid admin session.",
+                                    "type": "object",
+                                    "required": [
+                                        "success",
+                                        "error",
+                                        "meta"
+                                    ],
+                                    "properties": {
+                                        "success": {
+                                            "const": false,
+                                            "type": "boolean"
+                                        },
+                                        "error": {
+                                            "type": "object",
+                                            "required": [
+                                                "code",
+                                                "message",
+                                                "details"
+                                            ],
+                                            "properties": {
+                                                "code": {
+                                                    "description": "Machine-readable error code",
+                                                    "type": "string"
+                                                },
+                                                "message": {
+                                                    "description": "Human-readable error message",
+                                                    "type": "string"
+                                                },
+                                                "details": {
+                                                    "nullable": true,
+                                                    "anyOf": [
+                                                        {
+                                                            "description": "Additional error details, if any"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "required": [
+                                                "requestId",
+                                                "timestamp"
+                                            ],
+                                            "properties": {
+                                                "requestId": {
+                                                    "type": "string"
+                                                },
+                                                "timestamp": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - the requester lacks the required permission.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "Forbidden - the requester lacks the required permission.",
+                                    "type": "object",
+                                    "required": [
+                                        "success",
+                                        "error",
+                                        "meta"
+                                    ],
+                                    "properties": {
+                                        "success": {
+                                            "const": false,
+                                            "type": "boolean"
+                                        },
+                                        "error": {
+                                            "type": "object",
+                                            "required": [
+                                                "code",
+                                                "message",
+                                                "details"
+                                            ],
+                                            "properties": {
+                                                "code": {
+                                                    "description": "Machine-readable error code",
+                                                    "type": "string"
+                                                },
+                                                "message": {
+                                                    "description": "Human-readable error message",
+                                                    "type": "string"
+                                                },
+                                                "details": {
+                                                    "nullable": true,
+                                                    "anyOf": [
+                                                        {
+                                                            "description": "Additional error details, if any"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "required": [
+                                                "requestId",
+                                                "timestamp"
+                                            ],
+                                            "properties": {
+                                                "requestId": {
+                                                    "type": "string"
+                                                },
+                                                "timestamp": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "operationId": "getApiV1AdminSpeciesLookups"
+            }
+        },
+        "/api/v1/admin/species/{id}": {
+            "patch": {
+                "tags": [
+                    "Admin Species"
+                ],
+                "summary": "Update a species",
+                "description": "Partial update. Changing the equation family re-derives the measurement columns with it.\n\n**Editing a species already in use is allowed** \u2014 T-VER methodology does get revised. It cannot rewrite history: `carbon_calculation_logs.formula_snapshot` froze the coefficients used for every tree already computed, so a change here moves future assessments only. Two trees of one species, measured identically either side of an edit, will carry different carbon. The web app states the blast radius in trees and farms before letting anyone touch a calculation field.",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "description": "Species id (cuid2)",
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "speciesCode": {
+                                        "minLength": 1,
+                                        "maxLength": 64,
+                                        "description": "Unique, e.g. OGW-TEAK",
+                                        "type": "string"
+                                    },
+                                    "speciesNameTh": {
+                                        "minLength": 1,
+                                        "maxLength": 256,
+                                        "type": "string"
+                                    },
+                                    "speciesNameEn": {
+                                        "nullable": true,
+                                        "anyOf": [
+                                            {
+                                                "maxLength": 256,
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
+                                    },
+                                    "equationFormula": {
+                                        "description": "Must be one of the families the carbon engine implements (GET /families)",
+                                        "type": "string"
+                                    },
+                                    "equationGroupId": {
+                                        "nullable": true,
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
+                                    },
+                                    "forestCategoryId": {
+                                        "nullable": true,
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
+                                    },
+                                    "rValue": {
+                                        "nullable": true,
+                                        "anyOf": [
+                                            {
+                                                "description": "Root-to-shoot ratio R",
+                                                "type": "number"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
+                                    },
+                                    "cfValue": {
+                                        "nullable": true,
+                                        "anyOf": [
+                                            {
+                                                "description": "Carbon fraction CF",
+                                                "type": "number"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
+                                    },
+                                    "tverReference": {
+                                        "nullable": true,
+                                        "anyOf": [
+                                            {
+                                                "maxLength": 256,
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
+                                    },
+                                    "equationStatus": {
+                                        "type": "string",
+                                        "enum": [
+                                            "approved",
+                                            "provisional"
+                                        ]
+                                    },
+                                    "defaultCircumferenceUnit": {
+                                        "type": "string",
+                                        "enum": [
+                                            "cm",
+                                            "inch"
+                                        ]
+                                    }
+                                }
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "speciesCode": {
+                                        "minLength": 1,
+                                        "maxLength": 64,
+                                        "description": "Unique, e.g. OGW-TEAK",
+                                        "type": "string"
+                                    },
+                                    "speciesNameTh": {
+                                        "minLength": 1,
+                                        "maxLength": 256,
+                                        "type": "string"
+                                    },
+                                    "speciesNameEn": {
+                                        "nullable": true,
+                                        "anyOf": [
+                                            {
+                                                "maxLength": 256,
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
+                                    },
+                                    "equationFormula": {
+                                        "description": "Must be one of the families the carbon engine implements (GET /families)",
+                                        "type": "string"
+                                    },
+                                    "equationGroupId": {
+                                        "nullable": true,
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
+                                    },
+                                    "forestCategoryId": {
+                                        "nullable": true,
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
+                                    },
+                                    "rValue": {
+                                        "nullable": true,
+                                        "anyOf": [
+                                            {
+                                                "description": "Root-to-shoot ratio R",
+                                                "type": "number"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
+                                    },
+                                    "cfValue": {
+                                        "nullable": true,
+                                        "anyOf": [
+                                            {
+                                                "description": "Carbon fraction CF",
+                                                "type": "number"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
+                                    },
+                                    "tverReference": {
+                                        "nullable": true,
+                                        "anyOf": [
+                                            {
+                                                "maxLength": 256,
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
+                                    },
+                                    "equationStatus": {
+                                        "type": "string",
+                                        "enum": [
+                                            "approved",
+                                            "provisional"
+                                        ]
+                                    },
+                                    "defaultCircumferenceUnit": {
+                                        "type": "string",
+                                        "enum": [
+                                            "cm",
+                                            "inch"
+                                        ]
+                                    }
+                                }
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "speciesCode": {
+                                        "minLength": 1,
+                                        "maxLength": 64,
+                                        "description": "Unique, e.g. OGW-TEAK",
+                                        "type": "string"
+                                    },
+                                    "speciesNameTh": {
+                                        "minLength": 1,
+                                        "maxLength": 256,
+                                        "type": "string"
+                                    },
+                                    "speciesNameEn": {
+                                        "nullable": true,
+                                        "anyOf": [
+                                            {
+                                                "maxLength": 256,
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
+                                    },
+                                    "equationFormula": {
+                                        "description": "Must be one of the families the carbon engine implements (GET /families)",
+                                        "type": "string"
+                                    },
+                                    "equationGroupId": {
+                                        "nullable": true,
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
+                                    },
+                                    "forestCategoryId": {
+                                        "nullable": true,
+                                        "anyOf": [
+                                            {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
+                                    },
+                                    "rValue": {
+                                        "nullable": true,
+                                        "anyOf": [
+                                            {
+                                                "description": "Root-to-shoot ratio R",
+                                                "type": "number"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
+                                    },
+                                    "cfValue": {
+                                        "nullable": true,
+                                        "anyOf": [
+                                            {
+                                                "description": "Carbon fraction CF",
+                                                "type": "number"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
+                                    },
+                                    "tverReference": {
+                                        "nullable": true,
+                                        "anyOf": [
+                                            {
+                                                "maxLength": 256,
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
+                                    },
+                                    "equationStatus": {
+                                        "type": "string",
+                                        "enum": [
+                                            "approved",
+                                            "provisional"
+                                        ]
+                                    },
+                                    "defaultCircumferenceUnit": {
+                                        "type": "string",
+                                        "enum": [
+                                            "cm",
+                                            "inch"
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "The saved species row",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "The saved species row",
+                                    "type": "object",
+                                    "required": [
+                                        "success",
+                                        "message",
+                                        "data",
+                                        "meta"
+                                    ],
+                                    "properties": {
+                                        "success": {
+                                            "const": true,
+                                            "type": "boolean"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "required": [
+                                                "id",
+                                                "speciesCode",
+                                                "speciesNameTh",
+                                                "speciesNameEn",
+                                                "equationFormula",
+                                                "equationGroupId",
+                                                "forestCategoryId",
+                                                "rValue",
+                                                "cfValue",
+                                                "tverReference",
+                                                "equationStatus",
+                                                "requiresHeight",
+                                                "useD0NotDbh",
+                                                "createdAt",
+                                                "updatedAt"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "speciesCode": {
+                                                    "maxLength": 64,
+                                                    "type": "string"
+                                                },
+                                                "speciesNameTh": {
+                                                    "maxLength": 256,
+                                                    "type": "string"
+                                                },
+                                                "speciesNameEn": {
+                                                    "anyOf": [
+                                                        {
+                                                            "maxLength": 256,
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                },
+                                                "equationFormula": {
+                                                    "anyOf": [
+                                                        {
+                                                            "maxLength": 128,
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                },
+                                                "equationGroupId": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                },
+                                                "forestCategoryId": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                },
+                                                "rValue": {
+                                                    "anyOf": [
+                                                        {
+                                                            "minimum": -140737488355328,
+                                                            "maximum": 140737488355327,
+                                                            "type": "number"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                },
+                                                "cfValue": {
+                                                    "anyOf": [
+                                                        {
+                                                            "minimum": -140737488355328,
+                                                            "maximum": 140737488355327,
+                                                            "type": "number"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                },
+                                                "tverReference": {
+                                                    "anyOf": [
+                                                        {
+                                                            "maxLength": 256,
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                },
+                                                "equationStatus": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "approved",
+                                                        "provisional"
+                                                    ]
+                                                },
+                                                "requiresHeight": {
+                                                    "type": "boolean"
+                                                },
+                                                "useD0NotDbh": {
+                                                    "type": "boolean"
+                                                },
+                                                "createdAt": {
+                                                    "type": "Date"
+                                                },
+                                                "updatedAt": {
+                                                    "type": "Date"
+                                                }
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "required": [
+                                                "requestId",
+                                                "timestamp"
+                                            ],
+                                            "properties": {
+                                                "requestId": {
+                                                    "type": "string"
+                                                },
+                                                "timestamp": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - e.g. an equation the engine does not implement.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "Bad request - e.g. an equation the engine does not implement.",
+                                    "type": "object",
+                                    "required": [
+                                        "success",
+                                        "error",
+                                        "meta"
+                                    ],
+                                    "properties": {
+                                        "success": {
+                                            "const": false,
+                                            "type": "boolean"
+                                        },
+                                        "error": {
+                                            "type": "object",
+                                            "required": [
+                                                "code",
+                                                "message",
+                                                "details"
+                                            ],
+                                            "properties": {
+                                                "code": {
+                                                    "description": "Machine-readable error code",
+                                                    "type": "string"
+                                                },
+                                                "message": {
+                                                    "description": "Human-readable error message",
+                                                    "type": "string"
+                                                },
+                                                "details": {
+                                                    "nullable": true,
+                                                    "anyOf": [
+                                                        {
+                                                            "description": "Additional error details, if any"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "required": [
+                                                "requestId",
+                                                "timestamp"
+                                            ],
+                                            "properties": {
+                                                "requestId": {
+                                                    "type": "string"
+                                                },
+                                                "timestamp": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - missing or invalid admin session.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "Unauthorized - missing or invalid admin session.",
+                                    "type": "object",
+                                    "required": [
+                                        "success",
+                                        "error",
+                                        "meta"
+                                    ],
+                                    "properties": {
+                                        "success": {
+                                            "const": false,
+                                            "type": "boolean"
+                                        },
+                                        "error": {
+                                            "type": "object",
+                                            "required": [
+                                                "code",
+                                                "message",
+                                                "details"
+                                            ],
+                                            "properties": {
+                                                "code": {
+                                                    "description": "Machine-readable error code",
+                                                    "type": "string"
+                                                },
+                                                "message": {
+                                                    "description": "Human-readable error message",
+                                                    "type": "string"
+                                                },
+                                                "details": {
+                                                    "nullable": true,
+                                                    "anyOf": [
+                                                        {
+                                                            "description": "Additional error details, if any"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "required": [
+                                                "requestId",
+                                                "timestamp"
+                                            ],
+                                            "properties": {
+                                                "requestId": {
+                                                    "type": "string"
+                                                },
+                                                "timestamp": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - the requester lacks the required permission.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "Forbidden - the requester lacks the required permission.",
+                                    "type": "object",
+                                    "required": [
+                                        "success",
+                                        "error",
+                                        "meta"
+                                    ],
+                                    "properties": {
+                                        "success": {
+                                            "const": false,
+                                            "type": "boolean"
+                                        },
+                                        "error": {
+                                            "type": "object",
+                                            "required": [
+                                                "code",
+                                                "message",
+                                                "details"
+                                            ],
+                                            "properties": {
+                                                "code": {
+                                                    "description": "Machine-readable error code",
+                                                    "type": "string"
+                                                },
+                                                "message": {
+                                                    "description": "Human-readable error message",
+                                                    "type": "string"
+                                                },
+                                                "details": {
+                                                    "nullable": true,
+                                                    "anyOf": [
+                                                        {
+                                                            "description": "Additional error details, if any"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "required": [
+                                                "requestId",
+                                                "timestamp"
+                                            ],
+                                            "properties": {
+                                                "requestId": {
+                                                    "type": "string"
+                                                },
+                                                "timestamp": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found - the species does not exist.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "Not found - the species does not exist.",
+                                    "type": "object",
+                                    "required": [
+                                        "success",
+                                        "error",
+                                        "meta"
+                                    ],
+                                    "properties": {
+                                        "success": {
+                                            "const": false,
+                                            "type": "boolean"
+                                        },
+                                        "error": {
+                                            "type": "object",
+                                            "required": [
+                                                "code",
+                                                "message",
+                                                "details"
+                                            ],
+                                            "properties": {
+                                                "code": {
+                                                    "description": "Machine-readable error code",
+                                                    "type": "string"
+                                                },
+                                                "message": {
+                                                    "description": "Human-readable error message",
+                                                    "type": "string"
+                                                },
+                                                "details": {
+                                                    "nullable": true,
+                                                    "anyOf": [
+                                                        {
+                                                            "description": "Additional error details, if any"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "required": [
+                                                "requestId",
+                                                "timestamp"
+                                            ],
+                                            "properties": {
+                                                "requestId": {
+                                                    "type": "string"
+                                                },
+                                                "timestamp": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict - duplicate species code, or the species is in use.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "Conflict - duplicate species code, or the species is in use.",
+                                    "type": "object",
+                                    "required": [
+                                        "success",
+                                        "error",
+                                        "meta"
+                                    ],
+                                    "properties": {
+                                        "success": {
+                                            "const": false,
+                                            "type": "boolean"
+                                        },
+                                        "error": {
+                                            "type": "object",
+                                            "required": [
+                                                "code",
+                                                "message",
+                                                "details"
+                                            ],
+                                            "properties": {
+                                                "code": {
+                                                    "description": "Machine-readable error code",
+                                                    "type": "string"
+                                                },
+                                                "message": {
+                                                    "description": "Human-readable error message",
+                                                    "type": "string"
+                                                },
+                                                "details": {
+                                                    "nullable": true,
+                                                    "anyOf": [
+                                                        {
+                                                            "description": "Additional error details, if any"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "required": [
+                                                "requestId",
+                                                "timestamp"
+                                            ],
+                                            "properties": {
+                                                "requestId": {
+                                                    "type": "string"
+                                                },
+                                                "timestamp": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error - the request failed schema validation.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "Validation error - the request failed schema validation.",
+                                    "type": "object",
+                                    "required": [
+                                        "success",
+                                        "error",
+                                        "meta"
+                                    ],
+                                    "properties": {
+                                        "success": {
+                                            "const": false,
+                                            "type": "boolean"
+                                        },
+                                        "error": {
+                                            "type": "object",
+                                            "required": [
+                                                "code",
+                                                "message",
+                                                "details"
+                                            ],
+                                            "properties": {
+                                                "code": {
+                                                    "description": "Machine-readable error code",
+                                                    "type": "string"
+                                                },
+                                                "message": {
+                                                    "description": "Human-readable error message",
+                                                    "type": "string"
+                                                },
+                                                "details": {
+                                                    "nullable": true,
+                                                    "anyOf": [
+                                                        {
+                                                            "description": "Additional error details, if any"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "required": [
+                                                "requestId",
+                                                "timestamp"
+                                            ],
+                                            "properties": {
+                                                "requestId": {
+                                                    "type": "string"
+                                                },
+                                                "timestamp": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "operationId": "patchApiV1AdminSpeciesById"
+            },
+            "delete": {
+                "tags": [
+                    "Admin Species"
+                ],
+                "summary": "Delete an unused species",
+                "description": "For a species nobody has committed to yet \u2014 a code typed wrong, coefficients entered against the wrong tree. Once a farm plants it, a project allows it, or a tree has been computed against it, the row stops being an editable setting and becomes part of the record explaining numbers that already left the building: **409**, with the counts that blocked it.",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "description": "Species id (cuid2)",
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Deletion confirmation \u2014 only ever returned for an unused species",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "Deletion confirmation \u2014 only ever returned for an unused species",
+                                    "type": "object",
+                                    "required": [
+                                        "success",
+                                        "message",
+                                        "data",
+                                        "meta"
+                                    ],
+                                    "properties": {
+                                        "success": {
+                                            "const": true,
+                                            "type": "boolean"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "required": [
+                                                "id"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "required": [
+                                                "requestId",
+                                                "timestamp"
+                                            ],
+                                            "properties": {
+                                                "requestId": {
+                                                    "type": "string"
+                                                },
+                                                "timestamp": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - missing or invalid admin session.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "Unauthorized - missing or invalid admin session.",
+                                    "type": "object",
+                                    "required": [
+                                        "success",
+                                        "error",
+                                        "meta"
+                                    ],
+                                    "properties": {
+                                        "success": {
+                                            "const": false,
+                                            "type": "boolean"
+                                        },
+                                        "error": {
+                                            "type": "object",
+                                            "required": [
+                                                "code",
+                                                "message",
+                                                "details"
+                                            ],
+                                            "properties": {
+                                                "code": {
+                                                    "description": "Machine-readable error code",
+                                                    "type": "string"
+                                                },
+                                                "message": {
+                                                    "description": "Human-readable error message",
+                                                    "type": "string"
+                                                },
+                                                "details": {
+                                                    "nullable": true,
+                                                    "anyOf": [
+                                                        {
+                                                            "description": "Additional error details, if any"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "required": [
+                                                "requestId",
+                                                "timestamp"
+                                            ],
+                                            "properties": {
+                                                "requestId": {
+                                                    "type": "string"
+                                                },
+                                                "timestamp": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - the requester lacks the required permission.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "Forbidden - the requester lacks the required permission.",
+                                    "type": "object",
+                                    "required": [
+                                        "success",
+                                        "error",
+                                        "meta"
+                                    ],
+                                    "properties": {
+                                        "success": {
+                                            "const": false,
+                                            "type": "boolean"
+                                        },
+                                        "error": {
+                                            "type": "object",
+                                            "required": [
+                                                "code",
+                                                "message",
+                                                "details"
+                                            ],
+                                            "properties": {
+                                                "code": {
+                                                    "description": "Machine-readable error code",
+                                                    "type": "string"
+                                                },
+                                                "message": {
+                                                    "description": "Human-readable error message",
+                                                    "type": "string"
+                                                },
+                                                "details": {
+                                                    "nullable": true,
+                                                    "anyOf": [
+                                                        {
+                                                            "description": "Additional error details, if any"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "required": [
+                                                "requestId",
+                                                "timestamp"
+                                            ],
+                                            "properties": {
+                                                "requestId": {
+                                                    "type": "string"
+                                                },
+                                                "timestamp": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found - the species does not exist.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "Not found - the species does not exist.",
+                                    "type": "object",
+                                    "required": [
+                                        "success",
+                                        "error",
+                                        "meta"
+                                    ],
+                                    "properties": {
+                                        "success": {
+                                            "const": false,
+                                            "type": "boolean"
+                                        },
+                                        "error": {
+                                            "type": "object",
+                                            "required": [
+                                                "code",
+                                                "message",
+                                                "details"
+                                            ],
+                                            "properties": {
+                                                "code": {
+                                                    "description": "Machine-readable error code",
+                                                    "type": "string"
+                                                },
+                                                "message": {
+                                                    "description": "Human-readable error message",
+                                                    "type": "string"
+                                                },
+                                                "details": {
+                                                    "nullable": true,
+                                                    "anyOf": [
+                                                        {
+                                                            "description": "Additional error details, if any"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "required": [
+                                                "requestId",
+                                                "timestamp"
+                                            ],
+                                            "properties": {
+                                                "requestId": {
+                                                    "type": "string"
+                                                },
+                                                "timestamp": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict - duplicate species code, or the species is in use.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "Conflict - duplicate species code, or the species is in use.",
+                                    "type": "object",
+                                    "required": [
+                                        "success",
+                                        "error",
+                                        "meta"
+                                    ],
+                                    "properties": {
+                                        "success": {
+                                            "const": false,
+                                            "type": "boolean"
+                                        },
+                                        "error": {
+                                            "type": "object",
+                                            "required": [
+                                                "code",
+                                                "message",
+                                                "details"
+                                            ],
+                                            "properties": {
+                                                "code": {
+                                                    "description": "Machine-readable error code",
+                                                    "type": "string"
+                                                },
+                                                "message": {
+                                                    "description": "Human-readable error message",
+                                                    "type": "string"
+                                                },
+                                                "details": {
+                                                    "nullable": true,
+                                                    "anyOf": [
+                                                        {
+                                                            "description": "Additional error details, if any"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "required": [
+                                                "requestId",
+                                                "timestamp"
+                                            ],
+                                            "properties": {
+                                                "requestId": {
+                                                    "type": "string"
+                                                },
+                                                "timestamp": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "operationId": "deleteApiV1AdminSpeciesById"
+            }
+        },
         "/api/v1/admin/audit-logs/": {
             "get": {
                 "tags": [

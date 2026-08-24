@@ -13,6 +13,7 @@ const DESTINATIONS: [key: string, href: string, label: string][] = [
   ['f', '/admin/farmers', 'Farmers'],
   ['m', '/admin/gis', 'GIS Map'],
   ['a', '/admin/announcements', 'Announcements'],
+  ['e', '/admin/species', 'Species'],
   ['s', '/admin/settings', 'Settings'],
   ['l', '/admin/audit-log', 'Audit Log'],
   ['u', '/admin/admin-users', 'Admin Users'],
