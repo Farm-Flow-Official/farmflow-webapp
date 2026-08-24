@@ -3,6 +3,8 @@
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useTransition } from 'react'
 import { Filter } from 'lucide-react'
+import { ImageWithSkeleton } from '@/components/ui/image-with-skeleton'
+import { projectCoverUrl, projectPattern } from '@/lib/project-cover'
 import type { ProjectOption } from '@/features/executive/types'
 
 /**
@@ -19,6 +21,7 @@ export function ProjectScopePicker({ options }: { options: ProjectOption[] }) {
   const [pending, startTransition] = useTransition()
 
   const current = params.get('project') ?? ''
+  const selected = options.find((p) => p.id === current)
 
   function select(projectId: string) {
     const next = new URLSearchParams(params.toString())
@@ -56,6 +59,12 @@ export function ProjectScopePicker({ options }: { options: ProjectOption[] }) {
         ))}
       </select>
 
+      {/* The picture rides ALONGSIDE the control, never inside it. A native
+          <select> gives us the OS picker on iPad and iPhone, keyboard type-ahead
+          and correct screen-reader semantics for free; a custom dropdown that
+          could show images inline would mean rebuilding all three by hand. */}
+      {selected && <SelectedThumb option={selected} />}
+
       {current && (
         <button
           type="button"
@@ -66,5 +75,27 @@ export function ProjectScopePicker({ options }: { options: ProjectOption[] }) {
         </button>
       )}
     </div>
+  )
+}
+
+function SelectedThumb({ option }: { option: ProjectOption }) {
+  const url = projectCoverUrl(option.coverPhotoFileId)
+  return (
+    <span className="flex items-center gap-2 rounded-lg border border-line bg-panel py-1 pl-1 pr-2.5">
+      <span
+        className="relative block h-7 w-7 shrink-0 overflow-hidden rounded-md"
+        style={url ? undefined : projectPattern(option.code)}
+        aria-hidden="true"
+      >
+        {url && (
+          <ImageWithSkeleton
+            src={url}
+            alt=""
+            className="h-full w-full object-cover transition-opacity"
+          />
+        )}
+      </span>
+      <span className="max-w-[18ch] truncate text-[12px] font-medium text-ink">{option.name}</span>
+    </span>
   )
 }

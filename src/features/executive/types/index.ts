@@ -4,8 +4,8 @@
  * Every figure here is aggregated in the API from real rows — there is no mock
  * behind this file. What is deliberately ABSENT matters as much as what is
  * present: no sold volume, no realised revenue, no retirements. Those statuses
- * exist in the credit enum but nothing in the system writes them, so the page
- * says so out loud (`UnbackedNotice`) rather than rendering a permanent zero.
+ * exist in the credit enum but nothing in the system writes them, so the funnel
+ * draws them as hollow stages rather than rendering a permanent zero.
  *
  * See ADR 0025 for why "certified" here is not "issued by the registry".
  */
@@ -74,6 +74,8 @@ export type ProjectOption = {
   id: string
   code: string
   name: string
+  /** Decoration; null falls back to the code-derived pattern. */
+  coverPhotoFileId: string | null
   farms: number
 }
 
@@ -112,6 +114,8 @@ export type ProjectRow = {
   projectId: string
   projectCode: string
   projectName: string
+  /** Decoration; null falls back to the code-derived pattern. */
+  coverPhotoFileId: string | null
   tco2e: number
   farms: number
   areaRai: number
