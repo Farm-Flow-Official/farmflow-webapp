@@ -635,6 +635,80 @@ export interface paths {
         patch: operations["patchApiV1AdminSystemAvailabilityByDashboard"];
         trace?: never;
     };
+    "/api/v1/admin/species/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List species with usage counts
+         * @description Every species with how many farms grow it, how many projects allow it, and how many trees have had their carbon computed against it. Those counts are what the editor turns into a warning and what refuses a delete.
+         */
+        get: operations["getApiV1AdminSpecies"];
+        put?: never;
+        /**
+         * Create a species
+         * @description Creates a species and links it to the current T-VER constant.
+         *
+         *     **Derived, not accepted:** `requiresHeight`, `useD0NotDbh` and the measurement point come from the chosen equation family. Sending them has no effect — they describe the equation, and a row must never claim a measurement its own equation does not take.
+         *
+         *     **Errors:** **400 BAD_REQUEST** (equation family the engine does not implement — the response lists the supported ones) · **409 CONFLICT** (duplicate species code).
+         */
+        post: operations["postApiV1AdminSpecies"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/species/lookups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Pickers for the species editor
+         * @description Equation groups, forest categories, and **the equation families the carbon engine actually implements**. The family list comes from the engine itself — a species saved with anything else produces an error instead of carbon for every tree in it, so this is the only list a picker may offer.
+         */
+        get: operations["getApiV1AdminSpeciesLookups"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/species/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete an unused species
+         * @description For a species nobody has committed to yet — a code typed wrong, coefficients entered against the wrong tree. Once a farm plants it, a project allows it, or a tree has been computed against it, the row stops being an editable setting and becomes part of the record explaining numbers that already left the building: **409**, with the counts that blocked it.
+         */
+        delete: operations["deleteApiV1AdminSpeciesById"];
+        options?: never;
+        head?: never;
+        /**
+         * Update a species
+         * @description Partial update. Changing the equation family re-derives the measurement columns with it.
+         *
+         *     **Editing a species already in use is allowed** — T-VER methodology does get revised. It cannot rewrite history: `carbon_calculation_logs.formula_snapshot` froze the coefficients used for every tree already computed, so a change here moves future assessments only. Two trees of one species, measured identically either side of an edit, will carry different carbon. The web app states the blast radius in trees and farms before letting anyone touch a calculation field.
+         */
+        patch: operations["patchApiV1AdminSpeciesById"];
+        trace?: never;
+    };
     "/api/v1/admin/audit-logs/": {
         parameters: {
             query?: never;
@@ -6271,6 +6345,786 @@ export interface operations {
                 };
             };
             /** @description Validation error - e.g. price out of range. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    getApiV1AdminSpecies: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description All species with their usage counts */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            id: string;
+                            speciesCode: string;
+                            speciesNameTh: string;
+                            speciesNameEn: string | null;
+                            equationFormula: string | null;
+                            equationGroupId: string | null;
+                            equationGroupCode: (string | null) | null;
+                            forestCategoryId: string | null;
+                            forestCategoryNameTh: (string | null) | null;
+                            rValue: number | null;
+                            cfValue: number | null;
+                            tverReference: string | null;
+                            /** @enum {string} */
+                            equationStatus: "approved" | "provisional";
+                            requiresHeight: boolean;
+                            useD0NotDbh: boolean;
+                            measurementPointCode: (string | null) | null;
+                            createdAt: Record<string, never>;
+                            updatedAt: Record<string, never>;
+                            /** @description What is standing on this species — drives the edit warning and blocks delete */
+                            usage: {
+                                /** @description Active farms growing it (distinct farms, not subplots) */
+                                farms: number;
+                                /** @description Projects that allow it */
+                                projects: number;
+                                /** @description Trees whose carbon was computed with it */
+                                calculatedTrees: number;
+                            };
+                        }[];
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized - missing or invalid admin session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden - the requester lacks the required permission. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    postApiV1AdminSpecies: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Unique, e.g. OGW-TEAK */
+                    speciesCode: string;
+                    speciesNameTh: string;
+                    speciesNameEn?: (string | null) | null;
+                    /** @description Must be one of the families the carbon engine implements (GET /families) */
+                    equationFormula: string;
+                    equationGroupId?: (string | null) | null;
+                    forestCategoryId?: (string | null) | null;
+                    rValue?: (number | null) | null;
+                    cfValue?: (number | null) | null;
+                    tverReference?: (string | null) | null;
+                    /** @enum {string} */
+                    equationStatus?: "approved" | "provisional";
+                    /** @enum {string} */
+                    defaultCircumferenceUnit?: "cm" | "inch";
+                };
+                "application/x-www-form-urlencoded": {
+                    /** @description Unique, e.g. OGW-TEAK */
+                    speciesCode: string;
+                    speciesNameTh: string;
+                    speciesNameEn?: (string | null) | null;
+                    /** @description Must be one of the families the carbon engine implements (GET /families) */
+                    equationFormula: string;
+                    equationGroupId?: (string | null) | null;
+                    forestCategoryId?: (string | null) | null;
+                    rValue?: (number | null) | null;
+                    cfValue?: (number | null) | null;
+                    tverReference?: (string | null) | null;
+                    /** @enum {string} */
+                    equationStatus?: "approved" | "provisional";
+                    /** @enum {string} */
+                    defaultCircumferenceUnit?: "cm" | "inch";
+                };
+                "multipart/form-data": {
+                    /** @description Unique, e.g. OGW-TEAK */
+                    speciesCode: string;
+                    speciesNameTh: string;
+                    speciesNameEn?: (string | null) | null;
+                    /** @description Must be one of the families the carbon engine implements (GET /families) */
+                    equationFormula: string;
+                    equationGroupId?: (string | null) | null;
+                    forestCategoryId?: (string | null) | null;
+                    rValue?: (number | null) | null;
+                    cfValue?: (number | null) | null;
+                    tverReference?: (string | null) | null;
+                    /** @enum {string} */
+                    equationStatus?: "approved" | "provisional";
+                    /** @enum {string} */
+                    defaultCircumferenceUnit?: "cm" | "inch";
+                };
+            };
+        };
+        responses: {
+            /** @description The saved species row */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            id: string;
+                            speciesCode: string;
+                            speciesNameTh: string;
+                            speciesNameEn: string | null;
+                            equationFormula: string | null;
+                            equationGroupId: string | null;
+                            forestCategoryId: string | null;
+                            rValue: number | null;
+                            cfValue: number | null;
+                            tverReference: string | null;
+                            /** @enum {string} */
+                            equationStatus: "approved" | "provisional";
+                            requiresHeight: boolean;
+                            useD0NotDbh: boolean;
+                            createdAt: Record<string, never>;
+                            updatedAt: Record<string, never>;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Bad request - e.g. an equation the engine does not implement. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized - missing or invalid admin session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden - the requester lacks the required permission. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Conflict - duplicate species code, or the species is in use. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Validation error - the request failed schema validation. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    getApiV1AdminSpeciesLookups: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Pickers for the species editor */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            equationGroups: {
+                                id: string;
+                                code: string;
+                                nameEn: (string | null) | null;
+                            }[];
+                            forestCategories: {
+                                id: string;
+                                code: string;
+                                nameTh: string;
+                            }[];
+                            families: {
+                                formula: string;
+                                /** @description The T-VER citation recorded into every formula snapshot */
+                                reference: string;
+                                requiresHeight: boolean;
+                                useD0NotDbh: boolean;
+                                measurementPointCode: string;
+                                /** @description One line describing what this family measures */
+                                summaryTh: string;
+                            }[];
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized - missing or invalid admin session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden - the requester lacks the required permission. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    deleteApiV1AdminSpeciesById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deletion confirmation — only ever returned for an unused species */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            id: string;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized - missing or invalid admin session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden - the requester lacks the required permission. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Not found - the species does not exist. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Conflict - duplicate species code, or the species is in use. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    patchApiV1AdminSpeciesById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Unique, e.g. OGW-TEAK */
+                    speciesCode?: string;
+                    speciesNameTh?: string;
+                    speciesNameEn?: (string | null) | null;
+                    /** @description Must be one of the families the carbon engine implements (GET /families) */
+                    equationFormula?: string;
+                    equationGroupId?: (string | null) | null;
+                    forestCategoryId?: (string | null) | null;
+                    rValue?: (number | null) | null;
+                    cfValue?: (number | null) | null;
+                    tverReference?: (string | null) | null;
+                    /** @enum {string} */
+                    equationStatus?: "approved" | "provisional";
+                    /** @enum {string} */
+                    defaultCircumferenceUnit?: "cm" | "inch";
+                };
+                "application/x-www-form-urlencoded": {
+                    /** @description Unique, e.g. OGW-TEAK */
+                    speciesCode?: string;
+                    speciesNameTh?: string;
+                    speciesNameEn?: (string | null) | null;
+                    /** @description Must be one of the families the carbon engine implements (GET /families) */
+                    equationFormula?: string;
+                    equationGroupId?: (string | null) | null;
+                    forestCategoryId?: (string | null) | null;
+                    rValue?: (number | null) | null;
+                    cfValue?: (number | null) | null;
+                    tverReference?: (string | null) | null;
+                    /** @enum {string} */
+                    equationStatus?: "approved" | "provisional";
+                    /** @enum {string} */
+                    defaultCircumferenceUnit?: "cm" | "inch";
+                };
+                "multipart/form-data": {
+                    /** @description Unique, e.g. OGW-TEAK */
+                    speciesCode?: string;
+                    speciesNameTh?: string;
+                    speciesNameEn?: (string | null) | null;
+                    /** @description Must be one of the families the carbon engine implements (GET /families) */
+                    equationFormula?: string;
+                    equationGroupId?: (string | null) | null;
+                    forestCategoryId?: (string | null) | null;
+                    rValue?: (number | null) | null;
+                    cfValue?: (number | null) | null;
+                    tverReference?: (string | null) | null;
+                    /** @enum {string} */
+                    equationStatus?: "approved" | "provisional";
+                    /** @enum {string} */
+                    defaultCircumferenceUnit?: "cm" | "inch";
+                };
+            };
+        };
+        responses: {
+            /** @description The saved species row */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            id: string;
+                            speciesCode: string;
+                            speciesNameTh: string;
+                            speciesNameEn: string | null;
+                            equationFormula: string | null;
+                            equationGroupId: string | null;
+                            forestCategoryId: string | null;
+                            rValue: number | null;
+                            cfValue: number | null;
+                            tverReference: string | null;
+                            /** @enum {string} */
+                            equationStatus: "approved" | "provisional";
+                            requiresHeight: boolean;
+                            useD0NotDbh: boolean;
+                            createdAt: Record<string, never>;
+                            updatedAt: Record<string, never>;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Bad request - e.g. an equation the engine does not implement. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized - missing or invalid admin session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden - the requester lacks the required permission. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Not found - the species does not exist. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Conflict - duplicate species code, or the species is in use. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Validation error - the request failed schema validation. */
             422: {
                 headers: {
                     [name: string]: unknown;
