@@ -9,7 +9,8 @@
     "lint": "eslint",
     "api:types": "openapi-typescript docs/api-version-3.0.3.json -o src/lib/api/schema.d.ts",
     "api:types:live": "openapi-typescript \"${FARMFLOW_API_URL:-http://localhost:3000}/openapi/json\" -o src/lib/api/schema.d.ts",
-    "api:spec:pull": "node scripts/pull-spec.mjs"
+    "api:spec:pull": "node scripts/pull-spec.mjs",
+    "flowdee:sprites": "node scripts/build-flowdee-sprites.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.5.7",
@@ -34,6 +35,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
     "openapi-typescript": "^7.13.0",
+    "sharp": "^0.34.5",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
