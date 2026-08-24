@@ -9503,8 +9503,7 @@
                                                 }
                                             }
                                         }
-                                    },
-                                    "additionalProperties": false
+                                    }
                                 }
                             }
                         }
@@ -10224,8 +10223,7 @@
                                                 }
                                             }
                                         }
-                                    },
-                                    "additionalProperties": false
+                                    }
                                 }
                             }
                         }
@@ -10845,8 +10843,7 @@
                                                 }
                                             }
                                         }
-                                    },
-                                    "additionalProperties": false
+                                    }
                                 }
                             }
                         }
@@ -17908,8 +17905,7 @@
                                                 }
                                             }
                                         }
-                                    },
-                                    "additionalProperties": false
+                                    }
                                 }
                             }
                         }
@@ -17975,8 +17971,7 @@
                                                 }
                                             }
                                         }
-                                    },
-                                    "additionalProperties": false
+                                    }
                                 }
                             }
                         }
@@ -18123,8 +18118,7 @@
                                                 }
                                             }
                                         }
-                                    },
-                                    "additionalProperties": false
+                                    }
                                 }
                             }
                         }
@@ -18190,8 +18184,7 @@
                                                 }
                                             }
                                         }
-                                    },
-                                    "additionalProperties": false
+                                    }
                                 }
                             }
                         }
@@ -18257,8 +18250,7 @@
                                                 }
                                             }
                                         }
-                                    },
-                                    "additionalProperties": false
+                                    }
                                 }
                             }
                         }
@@ -18435,6 +18427,7 @@
                                                             "id",
                                                             "code",
                                                             "name",
+                                                            "coverPhotoFileId",
                                                             "farms"
                                                         ],
                                                         "properties": {
@@ -18446,6 +18439,17 @@
                                                             },
                                                             "name": {
                                                                 "type": "string"
+                                                            },
+                                                            "coverPhotoFileId": {
+                                                                "nullable": true,
+                                                                "anyOf": [
+                                                                    {
+                                                                        "type": "string"
+                                                                    },
+                                                                    {
+                                                                        "type": "null"
+                                                                    }
+                                                                ]
                                                             },
                                                             "farms": {
                                                                 "type": "number"
@@ -18726,6 +18730,7 @@
                                                                     "projectId",
                                                                     "projectCode",
                                                                     "projectName",
+                                                                    "coverPhotoFileId",
                                                                     "tco2e",
                                                                     "farms",
                                                                     "areaRai",
@@ -18741,6 +18746,17 @@
                                                                     },
                                                                     "projectName": {
                                                                         "type": "string"
+                                                                    },
+                                                                    "coverPhotoFileId": {
+                                                                        "nullable": true,
+                                                                        "anyOf": [
+                                                                            {
+                                                                                "type": "string"
+                                                                            },
+                                                                            {
+                                                                                "type": "null"
+                                                                            }
+                                                                        ]
                                                                     },
                                                                     "tco2e": {
                                                                         "type": "number"
@@ -18838,8 +18854,7 @@
                                                 }
                                             }
                                         }
-                                    },
-                                    "additionalProperties": false
+                                    }
                                 }
                             }
                         }
@@ -18905,8 +18920,7 @@
                                                 }
                                             }
                                         }
-                                    },
-                                    "additionalProperties": false
+                                    }
                                 }
                             }
                         }
@@ -18972,8 +18986,7 @@
                                                 }
                                             }
                                         }
-                                    },
-                                    "additionalProperties": false
+                                    }
                                 }
                             }
                         }
@@ -19025,6 +19038,7 @@
                                                     "projectCode",
                                                     "projectName",
                                                     "verifierOrgId",
+                                                    "coverPhotoFileId",
                                                     "pendingCount",
                                                     "totalCount"
                                                 ],
@@ -19051,6 +19065,18 @@
                                                         "nullable": true,
                                                         "anyOf": [
                                                             {
+                                                                "type": "string"
+                                                            },
+                                                            {
+                                                                "type": "null"
+                                                            }
+                                                        ]
+                                                    },
+                                                    "coverPhotoFileId": {
+                                                        "nullable": true,
+                                                        "anyOf": [
+                                                            {
+                                                                "description": "Decoration only; always null for the \"unassigned\" bucket",
                                                                 "type": "string"
                                                             },
                                                             {
@@ -23989,6 +24015,7 @@
                                                     "expectedReductionTco2eYr",
                                                     "verifierOrgId",
                                                     "verifierOrgName",
+                                                    "coverPhotoFileId",
                                                     "farmCount",
                                                     "createdAt",
                                                     "updatedAt"
@@ -24098,6 +24125,16 @@
                                                     },
                                                     "verifierOrgName": {
                                                         "nullable": true,
+                                                        "anyOf": [
+                                                            {
+                                                                "type": "string"
+                                                            },
+                                                            {
+                                                                "type": "null"
+                                                            }
+                                                        ]
+                                                    },
+                                                    "coverPhotoFileId": {
                                                         "anyOf": [
                                                             {
                                                                 "type": "string"
@@ -24876,6 +24913,7 @@
                                                 "effectiveAreaRai",
                                                 "verifierOrgId",
                                                 "verifierOrgName",
+                                                "coverPhotoFileId",
                                                 "allowedSpecies",
                                                 "farms",
                                                 "createdAt",
@@ -25053,6 +25091,16 @@
                                                 },
                                                 "verifierOrgName": {
                                                     "nullable": true,
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                },
+                                                "coverPhotoFileId": {
                                                     "anyOf": [
                                                         {
                                                             "type": "string"
@@ -25866,6 +25914,7 @@
                                                 "effectiveAreaRai",
                                                 "verifierOrgId",
                                                 "verifierOrgName",
+                                                "coverPhotoFileId",
                                                 "allowedSpecies",
                                                 "farms",
                                                 "createdAt",
@@ -26043,6 +26092,16 @@
                                                 },
                                                 "verifierOrgName": {
                                                     "nullable": true,
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                },
+                                                "coverPhotoFileId": {
                                                     "anyOf": [
                                                         {
                                                             "type": "string"
@@ -27092,6 +27151,7 @@
                                                 "effectiveAreaRai",
                                                 "verifierOrgId",
                                                 "verifierOrgName",
+                                                "coverPhotoFileId",
                                                 "allowedSpecies",
                                                 "farms",
                                                 "createdAt",
@@ -27269,6 +27329,16 @@
                                                 },
                                                 "verifierOrgName": {
                                                     "nullable": true,
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                },
+                                                "coverPhotoFileId": {
                                                     "anyOf": [
                                                         {
                                                             "type": "string"
@@ -28693,6 +28763,745 @@
                 "operationId": "putApiV1AdminProjectsByIdSpecies"
             }
         },
+        "/api/v1/admin/projects/{id}/cover-photo": {
+            "put": {
+                "tags": [
+                    "Projects"
+                ],
+                "summary": "Set the project cover picture",
+                "description": "Uploads a cover picture (multipart **file**) and links it to the project, replacing any previous one.\n\n**Accepted:** JPEG / PNG / WebP, max 2 MB. Nothing resizes the image server-side, so the file uploaded here is the file every screen downloads \u2014 the ceiling is the whole size control.\n\n**Side effects (one transaction, ADR 0002):** the new file is stored and the project's coverPhotoFileId is repointed **before** the previous picture is purged, so the project never references a file that is gone. Cover pictures are **public**.\n\n**Scope:** decoration and recognition only. This picture is not part of the PDD document and carries no caption or provenance \u2014 do not treat it as evidence, and do not upload images showing people's faces.",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "description": "Project id (cuid2)",
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "file"
+                                ],
+                                "properties": {
+                                    "file": {
+                                        "default": "File",
+                                        "type": "string",
+                                        "maxSize": "2m",
+                                        "description": "Project cover picture \u2014 landscape or site photo, no faces",
+                                        "extension": [
+                                            "image/jpeg",
+                                            "image/png",
+                                            "image/webp"
+                                        ],
+                                        "format": "binary"
+                                    }
+                                }
+                            }
+                        },
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "file"
+                                ],
+                                "properties": {
+                                    "file": {
+                                        "default": "File",
+                                        "type": "string",
+                                        "maxSize": "2m",
+                                        "description": "Project cover picture \u2014 landscape or site photo, no faces",
+                                        "extension": [
+                                            "image/jpeg",
+                                            "image/png",
+                                            "image/webp"
+                                        ],
+                                        "format": "binary"
+                                    }
+                                }
+                            }
+                        },
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "file"
+                                ],
+                                "properties": {
+                                    "file": {
+                                        "default": "File",
+                                        "type": "string",
+                                        "maxSize": "2m",
+                                        "description": "Project cover picture \u2014 landscape or site photo, no faces",
+                                        "extension": [
+                                            "image/jpeg",
+                                            "image/png",
+                                            "image/webp"
+                                        ],
+                                        "format": "binary"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Uploaded cover picture metadata",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "Uploaded cover picture metadata",
+                                    "type": "object",
+                                    "required": [
+                                        "success",
+                                        "message",
+                                        "data",
+                                        "meta"
+                                    ],
+                                    "properties": {
+                                        "success": {
+                                            "const": true,
+                                            "type": "boolean"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "required": [
+                                                "id",
+                                                "category",
+                                                "mimeType",
+                                                "sizeBytes",
+                                                "accessLevel",
+                                                "checksumHash",
+                                                "createdAt"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string"
+                                                },
+                                                "category": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "avatar",
+                                                        "cover_photo",
+                                                        "tree_snapshot",
+                                                        "pdd_attachment",
+                                                        "announcement_banner"
+                                                    ]
+                                                },
+                                                "mimeType": {
+                                                    "maxLength": 128,
+                                                    "type": "string"
+                                                },
+                                                "sizeBytes": {
+                                                    "minimum": -2147483648,
+                                                    "maximum": 2147483647,
+                                                    "type": "integer"
+                                                },
+                                                "accessLevel": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "public",
+                                                        "private"
+                                                    ]
+                                                },
+                                                "checksumHash": {
+                                                    "anyOf": [
+                                                        {
+                                                            "maxLength": 128,
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                },
+                                                "createdAt": {
+                                                    "format": "date-time",
+                                                    "type": "string"
+                                                }
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "required": [
+                                                "requestId",
+                                                "timestamp"
+                                            ],
+                                            "properties": {
+                                                "requestId": {
+                                                    "type": "string"
+                                                },
+                                                "timestamp": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - missing or invalid session.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "Unauthorized - missing or invalid session.",
+                                    "type": "object",
+                                    "required": [
+                                        "success",
+                                        "error",
+                                        "meta"
+                                    ],
+                                    "properties": {
+                                        "success": {
+                                            "const": false,
+                                            "type": "boolean"
+                                        },
+                                        "error": {
+                                            "type": "object",
+                                            "required": [
+                                                "code",
+                                                "message",
+                                                "details"
+                                            ],
+                                            "properties": {
+                                                "code": {
+                                                    "description": "Machine-readable error code",
+                                                    "type": "string"
+                                                },
+                                                "message": {
+                                                    "description": "Human-readable error message",
+                                                    "type": "string"
+                                                },
+                                                "details": {
+                                                    "nullable": true,
+                                                    "anyOf": [
+                                                        {
+                                                            "description": "Additional error details, if any"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "required": [
+                                                "requestId",
+                                                "timestamp"
+                                            ],
+                                            "properties": {
+                                                "requestId": {
+                                                    "type": "string"
+                                                },
+                                                "timestamp": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - the requester lacks the required permission.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "Forbidden - the requester lacks the required permission.",
+                                    "type": "object",
+                                    "required": [
+                                        "success",
+                                        "error",
+                                        "meta"
+                                    ],
+                                    "properties": {
+                                        "success": {
+                                            "const": false,
+                                            "type": "boolean"
+                                        },
+                                        "error": {
+                                            "type": "object",
+                                            "required": [
+                                                "code",
+                                                "message",
+                                                "details"
+                                            ],
+                                            "properties": {
+                                                "code": {
+                                                    "description": "Machine-readable error code",
+                                                    "type": "string"
+                                                },
+                                                "message": {
+                                                    "description": "Human-readable error message",
+                                                    "type": "string"
+                                                },
+                                                "details": {
+                                                    "nullable": true,
+                                                    "anyOf": [
+                                                        {
+                                                            "description": "Additional error details, if any"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "required": [
+                                                "requestId",
+                                                "timestamp"
+                                            ],
+                                            "properties": {
+                                                "requestId": {
+                                                    "type": "string"
+                                                },
+                                                "timestamp": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found - the project does not exist.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "Not found - the project does not exist.",
+                                    "type": "object",
+                                    "required": [
+                                        "success",
+                                        "error",
+                                        "meta"
+                                    ],
+                                    "properties": {
+                                        "success": {
+                                            "const": false,
+                                            "type": "boolean"
+                                        },
+                                        "error": {
+                                            "type": "object",
+                                            "required": [
+                                                "code",
+                                                "message",
+                                                "details"
+                                            ],
+                                            "properties": {
+                                                "code": {
+                                                    "description": "Machine-readable error code",
+                                                    "type": "string"
+                                                },
+                                                "message": {
+                                                    "description": "Human-readable error message",
+                                                    "type": "string"
+                                                },
+                                                "details": {
+                                                    "nullable": true,
+                                                    "anyOf": [
+                                                        {
+                                                            "description": "Additional error details, if any"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "required": [
+                                                "requestId",
+                                                "timestamp"
+                                            ],
+                                            "properties": {
+                                                "requestId": {
+                                                    "type": "string"
+                                                },
+                                                "timestamp": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error - the request failed schema validation.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "Validation error - the request failed schema validation.",
+                                    "type": "object",
+                                    "required": [
+                                        "success",
+                                        "error",
+                                        "meta"
+                                    ],
+                                    "properties": {
+                                        "success": {
+                                            "const": false,
+                                            "type": "boolean"
+                                        },
+                                        "error": {
+                                            "type": "object",
+                                            "required": [
+                                                "code",
+                                                "message",
+                                                "details"
+                                            ],
+                                            "properties": {
+                                                "code": {
+                                                    "description": "Machine-readable error code",
+                                                    "type": "string"
+                                                },
+                                                "message": {
+                                                    "description": "Human-readable error message",
+                                                    "type": "string"
+                                                },
+                                                "details": {
+                                                    "nullable": true,
+                                                    "anyOf": [
+                                                        {
+                                                            "description": "Additional error details, if any"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "required": [
+                                                "requestId",
+                                                "timestamp"
+                                            ],
+                                            "properties": {
+                                                "requestId": {
+                                                    "type": "string"
+                                                },
+                                                "timestamp": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "operationId": "putApiV1AdminProjectsByIdCover-photo"
+            },
+            "delete": {
+                "tags": [
+                    "Projects"
+                ],
+                "summary": "Remove the project cover picture",
+                "description": "Clears the link and destroys the stored bytes. Idempotent \u2014 a project with no cover returns `removed: false`. The screens fall back to a pattern derived from the project code, so having no picture is a presentable state rather than an empty box.",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "description": "Project id (cuid2)",
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Cover picture removed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "Cover picture removed",
+                                    "type": "object",
+                                    "required": [
+                                        "success",
+                                        "message",
+                                        "data",
+                                        "meta"
+                                    ],
+                                    "properties": {
+                                        "success": {
+                                            "const": true,
+                                            "type": "boolean"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "required": [
+                                                "removed"
+                                            ],
+                                            "properties": {
+                                                "removed": {
+                                                    "description": "False when there was no cover to remove",
+                                                    "type": "boolean"
+                                                }
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "required": [
+                                                "requestId",
+                                                "timestamp"
+                                            ],
+                                            "properties": {
+                                                "requestId": {
+                                                    "type": "string"
+                                                },
+                                                "timestamp": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - missing or invalid session.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "Unauthorized - missing or invalid session.",
+                                    "type": "object",
+                                    "required": [
+                                        "success",
+                                        "error",
+                                        "meta"
+                                    ],
+                                    "properties": {
+                                        "success": {
+                                            "const": false,
+                                            "type": "boolean"
+                                        },
+                                        "error": {
+                                            "type": "object",
+                                            "required": [
+                                                "code",
+                                                "message",
+                                                "details"
+                                            ],
+                                            "properties": {
+                                                "code": {
+                                                    "description": "Machine-readable error code",
+                                                    "type": "string"
+                                                },
+                                                "message": {
+                                                    "description": "Human-readable error message",
+                                                    "type": "string"
+                                                },
+                                                "details": {
+                                                    "nullable": true,
+                                                    "anyOf": [
+                                                        {
+                                                            "description": "Additional error details, if any"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "required": [
+                                                "requestId",
+                                                "timestamp"
+                                            ],
+                                            "properties": {
+                                                "requestId": {
+                                                    "type": "string"
+                                                },
+                                                "timestamp": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - the requester lacks the required permission.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "Forbidden - the requester lacks the required permission.",
+                                    "type": "object",
+                                    "required": [
+                                        "success",
+                                        "error",
+                                        "meta"
+                                    ],
+                                    "properties": {
+                                        "success": {
+                                            "const": false,
+                                            "type": "boolean"
+                                        },
+                                        "error": {
+                                            "type": "object",
+                                            "required": [
+                                                "code",
+                                                "message",
+                                                "details"
+                                            ],
+                                            "properties": {
+                                                "code": {
+                                                    "description": "Machine-readable error code",
+                                                    "type": "string"
+                                                },
+                                                "message": {
+                                                    "description": "Human-readable error message",
+                                                    "type": "string"
+                                                },
+                                                "details": {
+                                                    "nullable": true,
+                                                    "anyOf": [
+                                                        {
+                                                            "description": "Additional error details, if any"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "required": [
+                                                "requestId",
+                                                "timestamp"
+                                            ],
+                                            "properties": {
+                                                "requestId": {
+                                                    "type": "string"
+                                                },
+                                                "timestamp": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found - the project does not exist.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "Not found - the project does not exist.",
+                                    "type": "object",
+                                    "required": [
+                                        "success",
+                                        "error",
+                                        "meta"
+                                    ],
+                                    "properties": {
+                                        "success": {
+                                            "const": false,
+                                            "type": "boolean"
+                                        },
+                                        "error": {
+                                            "type": "object",
+                                            "required": [
+                                                "code",
+                                                "message",
+                                                "details"
+                                            ],
+                                            "properties": {
+                                                "code": {
+                                                    "description": "Machine-readable error code",
+                                                    "type": "string"
+                                                },
+                                                "message": {
+                                                    "description": "Human-readable error message",
+                                                    "type": "string"
+                                                },
+                                                "details": {
+                                                    "nullable": true,
+                                                    "anyOf": [
+                                                        {
+                                                            "description": "Additional error details, if any"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "required": [
+                                                "requestId",
+                                                "timestamp"
+                                            ],
+                                            "properties": {
+                                                "requestId": {
+                                                    "type": "string"
+                                                },
+                                                "timestamp": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "operationId": "deleteApiV1AdminProjectsByIdCover-photo"
+            }
+        },
         "/api/v1/admin/projects/{id}/farms": {
             "post": {
                 "tags": [
@@ -28806,6 +29615,7 @@
                                                 "effectiveAreaRai",
                                                 "verifierOrgId",
                                                 "verifierOrgName",
+                                                "coverPhotoFileId",
                                                 "allowedSpecies",
                                                 "farms",
                                                 "createdAt",
@@ -28983,6 +29793,16 @@
                                                 },
                                                 "verifierOrgName": {
                                                     "nullable": true,
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                },
+                                                "coverPhotoFileId": {
                                                     "anyOf": [
                                                         {
                                                             "type": "string"
@@ -29575,6 +30395,7 @@
                                                 "effectiveAreaRai",
                                                 "verifierOrgId",
                                                 "verifierOrgName",
+                                                "coverPhotoFileId",
                                                 "allowedSpecies",
                                                 "farms",
                                                 "createdAt",
@@ -29752,6 +30573,16 @@
                                                 },
                                                 "verifierOrgName": {
                                                     "nullable": true,
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                },
+                                                "coverPhotoFileId": {
                                                     "anyOf": [
                                                         {
                                                             "type": "string"
@@ -51653,8 +52484,7 @@
                                                 }
                                             }
                                         }
-                                    },
-                                    "additionalProperties": false
+                                    }
                                 }
                             }
                         }
@@ -51801,8 +52631,7 @@
                                                 }
                                             }
                                         }
-                                    },
-                                    "additionalProperties": false
+                                    }
                                 }
                             }
                         }
@@ -51868,8 +52697,7 @@
                                                 }
                                             }
                                         }
-                                    },
-                                    "additionalProperties": false
+                                    }
                                 }
                             }
                         }

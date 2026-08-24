@@ -1353,6 +1353,36 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/projects/{id}/cover-photo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Set the project cover picture
+         * @description Uploads a cover picture (multipart **file**) and links it to the project, replacing any previous one.
+         *
+         *     **Accepted:** JPEG / PNG / WebP, max 2 MB. Nothing resizes the image server-side, so the file uploaded here is the file every screen downloads — the ceiling is the whole size control.
+         *
+         *     **Side effects (one transaction, ADR 0002):** the new file is stored and the project's coverPhotoFileId is repointed **before** the previous picture is purged, so the project never references a file that is gone. Cover pictures are **public**.
+         *
+         *     **Scope:** decoration and recognition only. This picture is not part of the PDD document and carries no caption or provenance — do not treat it as evidence, and do not upload images showing people's faces.
+         */
+        put: operations["putApiV1AdminProjectsByIdCover-photo"];
+        post?: never;
+        /**
+         * Remove the project cover picture
+         * @description Clears the link and destroys the stored bytes. Idempotent — a project with no cover returns `removed: false`. The screens fall back to a pattern derived from the project code, so having no picture is a presentable state rather than an empty box.
+         */
+        delete: operations["deleteApiV1AdminProjectsByIdCover-photo"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/projects/{id}/farms": {
         parameters: {
             query?: never;
@@ -8350,6 +8380,7 @@ export interface operations {
                                 id: string;
                                 code: string;
                                 name: string;
+                                coverPhotoFileId: (string | null) | null;
                                 farms: number;
                             }[];
                             /** @description Declared intention from the PDD, not a commitment */
@@ -8435,6 +8466,7 @@ export interface operations {
                                     projectId: string;
                                     projectCode: string;
                                     projectName: string;
+                                    coverPhotoFileId: (string | null) | null;
                                     tco2e: number;
                                     farms: number;
                                     areaRai: number;
@@ -8534,6 +8566,7 @@ export interface operations {
                             projectCode: (string | null) | null;
                             projectName: string;
                             verifierOrgId: (string | null) | null;
+                            coverPhotoFileId: (string | null) | null;
                             /** @description Sessions awaiting a decision */
                             pendingCount: number;
                             /** @description All sessions in the queue for this project */
@@ -10089,6 +10122,7 @@ export interface operations {
                             expectedReductionTco2eYr: number | null;
                             verifierOrgId: string | null;
                             verifierOrgName: (string | null) | null;
+                            coverPhotoFileId: string | null;
                             /** @description Enrolled, non-deleted farms */
                             farmCount: number;
                             /** Format: date-time */
@@ -10304,6 +10338,7 @@ export interface operations {
                             effectiveAreaRai: (number | null) | null;
                             verifierOrgId: string | null;
                             verifierOrgName: (string | null) | null;
+                            coverPhotoFileId: string | null;
                             allowedSpecies: {
                                 speciesId: string;
                                 speciesNameTh: (string | null) | null;
@@ -10570,6 +10605,7 @@ export interface operations {
                             effectiveAreaRai: (number | null) | null;
                             verifierOrgId: string | null;
                             verifierOrgName: (string | null) | null;
+                            coverPhotoFileId: string | null;
                             allowedSpecies: {
                                 speciesId: string;
                                 speciesNameTh: (string | null) | null;
@@ -10962,6 +10998,7 @@ export interface operations {
                             effectiveAreaRai: (number | null) | null;
                             verifierOrgId: string | null;
                             verifierOrgName: (string | null) | null;
+                            coverPhotoFileId: string | null;
                             allowedSpecies: {
                                 speciesId: string;
                                 speciesNameTh: (string | null) | null;
@@ -11299,6 +11336,270 @@ export interface operations {
             };
         };
     };
+    "putApiV1AdminProjectsByIdCover-photo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * Format: binary
+                     * @description Project cover picture — landscape or site photo, no faces
+                     * @default File
+                     */
+                    file: string;
+                };
+                "application/x-www-form-urlencoded": {
+                    /**
+                     * Format: binary
+                     * @description Project cover picture — landscape or site photo, no faces
+                     * @default File
+                     */
+                    file: string;
+                };
+                "multipart/form-data": {
+                    /**
+                     * Format: binary
+                     * @description Project cover picture — landscape or site photo, no faces
+                     * @default File
+                     */
+                    file: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Uploaded cover picture metadata */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            id: string;
+                            /** @enum {string} */
+                            category: "avatar" | "cover_photo" | "tree_snapshot" | "pdd_attachment" | "announcement_banner";
+                            mimeType: string;
+                            sizeBytes: number;
+                            /** @enum {string} */
+                            accessLevel: "public" | "private";
+                            checksumHash: string | null;
+                            /** Format: date-time */
+                            createdAt: string;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized - missing or invalid session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden - the requester lacks the required permission. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Not found - the project does not exist. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Validation error - the request failed schema validation. */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "deleteApiV1AdminProjectsByIdCover-photo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Cover picture removed */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            /** @description False when there was no cover to remove */
+                            removed: boolean;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized - missing or invalid session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden - the requester lacks the required permission. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Not found - the project does not exist. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
     postApiV1AdminProjectsByIdFarms: {
         parameters: {
             query?: never;
@@ -11360,6 +11661,7 @@ export interface operations {
                             effectiveAreaRai: (number | null) | null;
                             verifierOrgId: string | null;
                             verifierOrgName: (string | null) | null;
+                            coverPhotoFileId: string | null;
                             allowedSpecies: {
                                 speciesId: string;
                                 speciesNameTh: (string | null) | null;
@@ -11555,6 +11857,7 @@ export interface operations {
                             effectiveAreaRai: (number | null) | null;
                             verifierOrgId: string | null;
                             verifierOrgName: (string | null) | null;
+                            coverPhotoFileId: string | null;
                             allowedSpecies: {
                                 speciesId: string;
                                 speciesNameTh: (string | null) | null;

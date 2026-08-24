@@ -55,11 +55,22 @@ export default async function ExecutivePage({ searchParams }: { searchParams: Se
   } = overview
 
   const activeProjectId = scope?.projectId
+  // The picture is not on `scope` — it rides in with the options the picker
+  // already needs, so scoping costs no extra field on the API response.
+  const scopedProject = scope ? projectOptions.find((p) => p.id === scope.projectId) : undefined
 
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-4">
-        <ExecutiveHeader asOf={asOf} scope={scope} />
+        <ExecutiveHeader
+          asOf={asOf}
+          scope={scope}
+          cover={
+            scopedProject
+              ? { fileId: scopedProject.coverPhotoFileId, code: scopedProject.code }
+              : undefined
+          }
+        />
         {/* One filter row, above everything it scopes — never inside a card. */}
         <ProjectScopePicker options={projectOptions} />
       </div>

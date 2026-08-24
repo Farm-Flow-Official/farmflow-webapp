@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Boxes, FolderTree, MapPinned, ChevronRight } from 'lucide-react'
 import { EmptyState } from '@/components/ui/empty-state'
+import { ImageWithSkeleton } from '@/components/ui/image-with-skeleton'
+import { projectCoverUrl, projectPattern } from '@/lib/project-cover'
 import {
   fetchVerifierProjects,
   type VerifierProject,
@@ -84,49 +86,71 @@ function ProjectCard({ project }: { project: VerifierProject }) {
   const isBucket = project.id === 'unassigned'
   const Icon = isBucket ? MapPinned : FolderTree
   const urgent = project.pendingCount > 0
+  const coverUrl = projectCoverUrl(project.coverPhotoFileId)
+  const pattern = projectPattern(project.projectCode)
 
   return (
     <Link
       href={`/verifier/projects/${project.id}/sessions`}
-      className="group flex h-full flex-col justify-between gap-4 rounded-xl border border-line bg-panel p-5 shadow-sm transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+      className="group flex h-full flex-col overflow-hidden rounded-xl border border-line bg-panel shadow-sm transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
     >
-      <div className="flex items-start gap-3">
-        <span
-          className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${
-            isBucket ? 'bg-sunken text-ink-secondary' : 'bg-info-bg text-info'
-          }`}
+      {/* The bucket gets no band: it is not a project, so it has no picture and
+          no code to derive a pattern from — its icon is the whole identity. */}
+      {!isBucket && (
+        <div
+          className="relative h-24 shrink-0 overflow-hidden"
+          style={coverUrl ? undefined : pattern}
         >
-          <Icon className="h-5 w-5" strokeWidth={1.75} />
-        </span>
-        <div className="min-w-0">
-          <p className="truncate font-semibold text-ink">{project.projectName}</p>
-          <p className="mt-0.5 truncate text-xs text-ink-muted">
-            {project.projectCode ?? 'ไม่สังกัดโครงการ'}
-          </p>
+          {coverUrl && (
+            <ImageWithSkeleton
+              src={coverUrl}
+              alt=""
+              loading="lazy"
+              className="h-full w-full object-cover transition-opacity"
+            />
+          )}
         </div>
-      </div>
+      )}
 
-      <div className="flex items-end justify-between">
-        <div>
-          <p className="flex items-baseline gap-1.5">
-            <span
-              className={`text-2xl font-semibold tracking-tight ${
-                urgent ? 'text-warning' : 'text-ink'
-              }`}
-            >
-              {project.pendingCount}
-            </span>
-            <span className="text-xs text-ink-secondary">รอตรวจ</span>
-          </p>
-          <p className="mt-0.5 flex items-center gap-1 text-xs text-ink-muted">
-            <Boxes className="h-3.5 w-3.5" strokeWidth={1.75} />
-            ทั้งหมด {project.totalCount} session
-          </p>
+      <div className="flex flex-1 flex-col justify-between gap-4 p-5">
+        <div className="flex items-start gap-3">
+          <span
+            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${
+              isBucket ? 'bg-sunken text-ink-secondary' : 'bg-info-bg text-info'
+            }`}
+          >
+            <Icon className="h-5 w-5" strokeWidth={1.75} />
+          </span>
+          <div className="min-w-0">
+            <p className="truncate font-semibold text-ink">{project.projectName}</p>
+            <p className="mt-0.5 truncate text-xs text-ink-muted">
+              {project.projectCode ?? 'ไม่สังกัดโครงการ'}
+            </p>
+          </div>
         </div>
-        <ChevronRight
-          className="h-5 w-5 text-ink-disabled transition-transform group-hover:translate-x-0.5 group-hover:text-ink-secondary"
-          strokeWidth={2}
-        />
+
+        <div className="flex items-end justify-between">
+          <div>
+            <p className="flex items-baseline gap-1.5">
+              <span
+                className={`text-2xl font-semibold tracking-tight ${
+                  urgent ? 'text-warning' : 'text-ink'
+                }`}
+              >
+                {project.pendingCount}
+              </span>
+              <span className="text-xs text-ink-secondary">รอตรวจ</span>
+            </p>
+            <p className="mt-0.5 flex items-center gap-1 text-xs text-ink-muted">
+              <Boxes className="h-3.5 w-3.5" strokeWidth={1.75} />
+              ทั้งหมด {project.totalCount} session
+            </p>
+          </div>
+          <ChevronRight
+            className="h-5 w-5 text-ink-disabled transition-transform group-hover:translate-x-0.5 group-hover:text-ink-secondary"
+            strokeWidth={2}
+          />
+      </div>
       </div>
     </Link>
   )

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 /**
  * Raw `<img>` (served via the file/cover proxy routes, so Next's `<Image>` is
@@ -31,6 +31,16 @@ export function ImageWithSkeleton({
   skeleton?: boolean
 }) {
   const [loaded, setLoaded] = useState(false)
+  const ref = useRef<HTMLImageElement>(null)
+
+  // An image the browser already has — from cache, or simply decoded faster than
+  // this component could hydrate — fires `load` on the DOM node before React
+  // attaches its handler. React never hears it, and the image stays at
+  // `opacity-0` forever while the caller's fallback shows through. `complete`
+  // is the only way to ask after the fact whether that happened.
+  useEffect(() => {
+    if (ref.current?.complete) setLoaded(true)
+  }, [src])
 
   return (
     <>
@@ -39,6 +49,7 @@ export function ImageWithSkeleton({
       )}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
+        ref={ref}
         src={src}
         alt={alt}
         loading={loading}

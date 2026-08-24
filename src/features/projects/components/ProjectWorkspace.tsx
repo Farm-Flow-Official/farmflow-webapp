@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge'
 import { Modal } from '@/components/ui/modal'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { Toast, useToast } from '@/components/ui/toast'
+import { ProjectCoverPanel } from '@/features/projects/components/ProjectCoverPanel'
 import type { ProjectDetail, ProjectMemberFarm } from '@/features/projects/types'
 import type { ProjectLookups } from '@/features/projects/types/lookups'
 import {
@@ -182,6 +183,14 @@ export function ProjectWorkspace({ project: initial, lookups, canWrite }: Props)
 
   return (
     <div className="flex flex-col gap-6">
+      <ProjectCoverPanel
+        projectId={project.id}
+        projectCode={project.projectCode}
+        projectName={project.nameTh}
+        coverPhotoFileId={project.coverPhotoFileId}
+        canWrite={canWrite}
+      />
+
       <section className="grid gap-4 sm:grid-cols-3">
         <StatCard
           label="พื้นที่ที่ประกาศไว้"

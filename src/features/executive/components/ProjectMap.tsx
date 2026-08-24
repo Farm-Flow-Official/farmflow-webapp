@@ -32,6 +32,8 @@ export function ProjectMap({
     .map((r) => ({
       id: r.projectId,
       name: r.projectName,
+      code: r.projectCode,
+      coverPhotoFileId: r.coverPhotoFileId,
       tco2e: r.tco2e,
       lat: r.lat,
       lng: r.lng,
