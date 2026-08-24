@@ -13,6 +13,7 @@ import {
   LifeBuoy,
   Settings,
   ScrollText,
+  TreePine,
   UserCog,
   BookOpen,
 } from 'lucide-react'
@@ -104,6 +105,15 @@ const NAV: NavSection[] = [
   {
     heading: 'System',
     items: [
+      {
+        href: '/admin/species',
+        label: 'ชนิดพันธุ์ไม้',
+        icon: TreePine,
+        key: 'E',
+        // Reading is open to anyone who can see system settings; changing the
+        // coefficients needs species:write, which the API enforces.
+        permission: 'settings:read',
+      },
       {
         href: '/admin/settings',
         label: 'Settings',
