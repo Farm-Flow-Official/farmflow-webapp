@@ -4,10 +4,13 @@ import 'leaflet/dist/leaflet.css'
 import { useEffect } from 'react'
 import { MapContainer, TileLayer, CircleMarker, Tooltip, useMap } from 'react-leaflet'
 import type { LatLngExpression } from 'leaflet'
+import { projectCoverUrl, projectPattern } from '@/lib/project-cover'
 
 export type ProjectPin = {
   id: string
   name: string
+  code: string
+  coverPhotoFileId: string | null
   tco2e: number
   lat: number
   lng: number
@@ -101,7 +104,28 @@ export default function ProjectMapCanvas({ pins }: { pins: ProjectPin[] }) {
             }}
           >
             <Tooltip direction="top" offset={[0, -4]} permanent={p.active}>
-              {p.name}
+              <span className="flex items-center gap-2">
+                {/* A plain <img>, not ImageWithSkeleton: Leaflet renders the
+                    tooltip into its own DOM layer outside React's tree, so a
+                    component that fades itself in on load has nothing to fade
+                    over. */}
+                <span
+                  className="block h-6 w-6 shrink-0 overflow-hidden rounded"
+                  style={coverOf(p) ? undefined : projectPattern(p.code)}
+                >
+                  {coverOf(p) && (
+                    // Same reason as ImageWithSkeleton: these bytes come from
+                    // the cover proxy, not a loader next/image can optimise.
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={coverOf(p) as string}
+                      alt=""
+                      className="h-full w-full object-cover"
+                    />
+                  )}
+                </span>
+                {p.name}
+              </span>
             </Tooltip>
           </CircleMarker>
         )
@@ -110,4 +134,9 @@ export default function ProjectMapCanvas({ pins }: { pins: ProjectPin[] }) {
       <Resizer />
     </MapContainer>
   )
+}
+
+/** The pin's picture URL, or null when it has none and the pattern takes over. */
+function coverOf(pin: ProjectPin): string | null {
+  return projectCoverUrl(pin.coverPhotoFileId)
 }

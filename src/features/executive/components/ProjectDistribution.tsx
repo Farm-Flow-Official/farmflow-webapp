@@ -5,6 +5,8 @@ import { useTransition } from 'react'
 import { FolderTree } from 'lucide-react'
 import { EmptyState } from '@/components/ui/empty-state'
 import { formatNumber } from '@/lib/utils/format'
+import { ImageWithSkeleton } from '@/components/ui/image-with-skeleton'
+import { projectCoverUrl, projectPattern } from '@/lib/project-cover'
 import { formatTonnes } from '@/features/executive/lib'
 import type { ProjectDistribution as Distribution } from '@/features/executive/types'
 
@@ -91,15 +93,22 @@ export function ProjectDistribution({
                         type="button"
                         onClick={() => scopeTo(r.projectId)}
                         aria-pressed={active}
-                        className="block w-full min-w-0 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                        className="flex w-full min-w-0 items-center gap-2.5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                       >
-                        <span
-                          className={`block truncate font-medium ${active ? 'text-primary' : 'text-ink'}`}
-                        >
-                          {r.projectName}
-                        </span>
-                        <span className="font-mono text-[11px] text-ink-muted">
-                          {r.projectCode}
+                        <ProjectThumb
+                          fileId={r.coverPhotoFileId}
+                          code={r.projectCode}
+                          name={r.projectName}
+                        />
+                        <span className="min-w-0">
+                          <span
+                            className={`block truncate font-medium ${active ? 'text-primary' : 'text-ink'}`}
+                          >
+                            {r.projectName}
+                          </span>
+                          <span className="font-mono text-[11px] text-ink-muted">
+                            {r.projectCode}
+                          </span>
                         </span>
                       </button>
                     </td>
@@ -152,5 +161,38 @@ export function ProjectDistribution({
         </div>
       )}
     </section>
+  )
+}
+
+/**
+ * A 32px mark for one project — its picture, or the pattern its code derives.
+ * Never an empty square: every project has one of the two from the day it
+ * exists, so the column reads as a column rather than a row of holes.
+ */
+function ProjectThumb({
+  fileId,
+  code,
+  name,
+}: {
+  fileId: string | null
+  code: string
+  name: string
+}) {
+  const url = projectCoverUrl(fileId)
+  return (
+    <span
+      className="relative block h-8 w-8 shrink-0 overflow-hidden rounded-md border border-line"
+      style={url ? undefined : projectPattern(code)}
+      aria-hidden="true"
+    >
+      {url && (
+        <ImageWithSkeleton
+          src={url}
+          alt={name}
+          loading="lazy"
+          className="h-full w-full object-cover transition-opacity"
+        />
+      )}
+    </span>
   )
 }

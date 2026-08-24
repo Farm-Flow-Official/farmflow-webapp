@@ -56,6 +56,11 @@ export function ProjectScopePicker({ options }: { options: ProjectOption[] }) {
         ))}
       </select>
 
+      {/* No thumbnail here: when a project is selected its picture is already
+          the banner directly above, and repeating it 40px lower is noise. The
+          control stays a native <select> — that is what gives us the OS picker
+          on iPad and iPhone, keyboard type-ahead and correct screen-reader
+          semantics without building any of them. */}
       {current && (
         <button
           type="button"
