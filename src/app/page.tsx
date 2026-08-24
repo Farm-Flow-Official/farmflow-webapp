@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { LayoutDashboard, ShieldCheck, LayoutGrid, ArrowRight, QrCode } from 'lucide-react'
 import { Logo } from '@/components/ui/logo'
+import { SdgStrip } from '@/components/ui/sdg-strip'
 import { getVerifierSession } from '@/features/verifier/auth/session'
 import { getAdminSession } from '@/features/auth/services/adminSession'
 
@@ -123,6 +124,8 @@ export default async function PortalLandingPage() {
             />
           </span>
         </Link>
+
+        <SdgStrip className="mt-10" />
 
         <p className="mt-6 text-center text-xs text-ink-muted">
           FarmFlow Carbon Platform

@@ -3,7 +3,7 @@ import { ConfidenceRing } from '@/features/verifier/components/ConfidenceRing'
 import { aiFlagLabel, aiFlagIcon } from '@/features/verifier/lib/aiFlags'
 
 /**
- * Redesigned "AI Vision" assessment panel (ADR 0022) — the confidence ring is
+ * The "Flowdee AI" assessment panel (ADR 0022) — the confidence ring is
  * the hero, with the model's rationale as a callout and each anomaly flag shown
  * as an icon chip. Server-renderable. Anomalies get a red frame + soft glow.
  */
@@ -31,19 +31,31 @@ export function AiAssessmentCard({
         anomaly ? 'border-error/50 animate-soft-glow' : 'border-line'
       }`}
     >
-      {/* Header — brand-green gradient wash behind the "AI Vision" mark. */}
+      {/* Header — brand-green gradient wash behind the "Flowdee AI" mark. */}
       <div
-        className="flex items-center justify-between px-5 py-3"
+        className="flex items-center justify-between gap-3 px-5 py-3"
         style={{ background: 'linear-gradient(90deg, var(--color-primary-subtle), var(--color-panel))' }}
       >
-        <h2 className="flex items-center gap-2 text-sm font-semibold text-primary">
-          <span className="flex h-6 w-6 items-center justify-center rounded-md bg-primary/10">
+        <div className="flex items-center gap-2">
+          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
             <Sparkles className="h-3.5 w-3.5" strokeWidth={2} />
           </span>
-          AI Vision Assessment
-        </h2>
+          <div className="min-w-0">
+            <h2 className="text-sm font-semibold text-primary">Flowdee AI</h2>
+            {/* Says what it judges, because the old name never did — and in a
+                verification context a reviewer must not come away thinking this
+                produced the carbon figure. It did not: carbon-engine.ts computes
+                it and formula_snapshot freezes it. This only reads the photo
+                against the numbers that were measured. */}
+            <p className="text-[11px] leading-tight text-ink-muted">
+              ตรวจความสอดคล้องของภาพกับค่าที่วัด
+            </p>
+          </div>
+        </div>
         {anomaly && (
-          <span className="inline-flex items-center gap-1 rounded-full bg-error-bg px-2 py-0.5 text-[11px] font-semibold text-error">
+          // shrink-0 because the name now stacks two lines beside it — without
+          // it a narrow phone squeezes the badge until its label wraps.
+          <span className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full bg-error-bg px-2 py-0.5 text-[11px] font-semibold text-error">
             <TriangleAlert className="h-3 w-3" strokeWidth={2} />
             พบความผิดปกติ
           </span>

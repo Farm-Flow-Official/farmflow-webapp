@@ -17,6 +17,7 @@ import { CarbonFunnelBar } from '@/features/executive/components/CarbonFunnelBar
 import { ProjectDistribution } from '@/features/executive/components/ProjectDistribution'
 import { ProjectMap } from '@/features/executive/components/ProjectMap'
 import { GovernancePanel } from '@/features/executive/components/GovernancePanel'
+import { SdgStrip } from '@/components/ui/sdg-strip'
 
 export const metadata: Metadata = {
   title: 'Flow Decide — FarmFlow',
@@ -175,6 +176,8 @@ export default async function ExecutivePage({ searchParams }: { searchParams: Se
       <EsgSection pillar="governance">
         <GovernancePanel governance={governance} />
       </EsgSection>
+
+      <SdgStrip className="pb-2 pt-4" />
     </div>
   )
 }
