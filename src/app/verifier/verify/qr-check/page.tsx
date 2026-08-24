@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { CircleCheck, CircleX, ShieldCheck, Search } from 'lucide-react'
 import { BackToPortals } from '@/components/ui/back-to-portals'
+import { SdgStrip } from '@/components/ui/sdg-strip'
 import { verifySession } from '@/features/verifier/services/verifySession'
 import { formatDate } from '@/lib/utils/format'
 
@@ -112,6 +113,12 @@ export default async function QrCheckPage({
         <p className="mt-5 text-center text-xs text-ink-muted">
           ตรวจสอบเฉพาะความถูกต้องของเอกสาร · ไม่เปิดเผยข้อมูลส่วนบุคคล
         </p>
+
+        {/* Ruled off on purpose. This page answers exactly one question — is this
+            certificate real — and a row of UN goals sitting flush against that
+            answer invites the reader to think the UN had a hand in issuing it.
+            The rule makes it read as the foot of a website instead. */}
+        <SdgStrip size="sm" className="mt-6 border-t border-line pt-6" />
       </div>
     </main>
   )
