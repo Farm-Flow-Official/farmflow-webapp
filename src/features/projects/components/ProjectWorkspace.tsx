@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge'
 import { Modal } from '@/components/ui/modal'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { Toast, useToast } from '@/components/ui/toast'
+import { SdgStrip } from '@/components/ui/sdg-strip'
 import { ProjectCoverPanel } from '@/features/projects/components/ProjectCoverPanel'
 import type { ProjectDetail, ProjectMemberFarm } from '@/features/projects/types'
 import type { ProjectLookups } from '@/features/projects/types/lookups'
@@ -285,6 +286,10 @@ export function ProjectWorkspace({ project: initial, lookups, canWrite }: Props)
           onClose={() => setRemoving(null)}
         />
       )}
+
+      {/* Last in the column so it decorates the page without ever sitting
+          between an admin and the work they came here to do. */}
+      <SdgStrip size="sm" className="pt-2" />
 
       <Toast message={message} />
     </div>
