@@ -1,24 +1,11 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { Kbd } from '@/components/ui/kbd'
 import { useHotkeys } from '@/lib/hooks/useHotkeys'
 import { useLeaderHotkeys } from '@/lib/hooks/useLeaderHotkeys'
-
-/** `g` + letter → destination. Letters follow the page name, not the URL. */
-const DESTINATIONS: [key: string, href: string, label: string][] = [
-  ['d', '/admin', 'Dashboard'],
-  ['p', '/admin/projects', 'Projects'],
-  ['f', '/admin/farmers', 'Farmers'],
-  ['m', '/admin/gis', 'GIS Map'],
-  ['a', '/admin/announcements', 'Announcements'],
-  ['e', '/admin/species', 'Species'],
-  ['s', '/admin/settings', 'Settings'],
-  ['l', '/admin/audit-log', 'Audit Log'],
-  ['u', '/admin/admin-users', 'Admin Users'],
-  ['t', '/admin/support', 'Support'],
-]
+import { ADMIN_DESTINATIONS, navItemAllowed } from '@/features/admin/lib/adminNav'
 
 /**
  * Keyboard layer for the admin console. Renders only the "waiting for the
@@ -28,21 +15,37 @@ const DESTINATIONS: [key: string, href: string, label: string][] = [
  * navigational (`g` + initial) rather than action keys — see `useLeaderHotkeys`
  * for why a leader beats bare letters here. `/` jumps to the page's search box,
  * which is where a list-page session actually starts.
+ *
+ * Destinations and the hint both come from `ADMIN_NAV`, the same list the
+ * sidebar paints its key caps from. They used to be written out by hand here,
+ * which is how `g q` and `g n` ended up advertised but bound to nothing.
  */
-export function AdminKeyboardNav() {
+export function AdminKeyboardNav({ permissions }: { permissions?: string[] }) {
   const router = useRouter()
 
-  const armed = useLeaderHotkeys(
-    'g',
-    Object.fromEntries(DESTINATIONS.map(([key, href]) => [key, () => router.push(href)])),
+  // A shortcut to a page this role cannot open would land on the server's
+  // refusal — the sidebar already hides those entries, so hide the key too.
+  const destinations = useMemo(
+    () => ADMIN_DESTINATIONS.filter((item) => navItemAllowed(item, permissions)),
+    [permissions],
   )
+
+  const bindings = useMemo(
+    () =>
+      Object.fromEntries(
+        destinations.map((item) => [item.key.toLowerCase(), () => router.push(item.href)]),
+      ),
+    [destinations, router],
+  )
+
+  const armed = useLeaderHotkeys('g', bindings)
 
   // Prefetch every destination once the leader is armed — by the time the second
   // key lands the route is usually already there.
   useEffect(() => {
     if (!armed) return
-    for (const [, href] of DESTINATIONS) router.prefetch(href)
-  }, [armed, router])
+    for (const item of destinations) router.prefetch(item.href)
+  }, [armed, destinations, router])
 
   useHotkeys({
     '/': () => {
@@ -69,11 +72,12 @@ export function AdminKeyboardNav() {
   return (
     <div
       role="status"
-      className="fixed bottom-5 left-1/2 z-[900] flex -translate-x-1/2 items-center gap-2 rounded-full border border-line bg-panel px-3 py-2 shadow-lg"
+      className="fixed bottom-5 left-1/2 z-[900] flex max-w-[calc(100vw-2rem)] -translate-x-1/2 items-center gap-2 rounded-full border border-line bg-panel px-3 py-2 shadow-lg"
     >
       <Kbd>G</Kbd>
       <span className="text-[12px] text-ink-secondary">
-        กดตัวอักษรปลายทาง · <span className="text-ink-muted">D P F M A S L U T</span>
+        กดตัวอักษรปลายทาง ·{' '}
+        <span className="text-ink-muted">{destinations.map((d) => d.key).join(' ')}</span>
       </span>
     </div>
   )
