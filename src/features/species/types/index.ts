@@ -11,7 +11,15 @@ import type { Ok } from '@/lib/api/types'
 export type SpeciesRow = Ok<'/api/v1/admin/species/', 'get'>[number]
 export type SpeciesLookups = Ok<'/api/v1/admin/species/lookups', 'get'>
 export type EquationFamily = SpeciesLookups['families'][number]
+export type GrowthIncrementGroup = SpeciesLookups['growthIncrementGroups'][number]
 export type SpeciesUsage = SpeciesRow['usage']
+
+/** The ex-ante ten-year projection for one species. */
+export type SpeciesGrowthForecast = Ok<'/api/v1/admin/species/{id}/growth-forecast', 'get'>
+export type GrowthForecastYear = Extract<
+  SpeciesGrowthForecast['forecast'],
+  { supported: true }
+>['years'][number]
 
 /** What the create/edit form produces; the API derives the rest from the family. */
 export type SpeciesInput = {
@@ -20,6 +28,7 @@ export type SpeciesInput = {
   speciesNameEn?: string | null
   equationFormula: string
   equationGroupId?: string | null
+  growthIncrementGroupId?: string | null
   forestCategoryId?: string | null
   rValue?: number | null
   cfValue?: number | null
@@ -33,6 +42,10 @@ export type SpeciesInput = {
  * Editing one of these on a species that is already in use is what the typed
  * confirmation guards. Renaming is not: making someone type a project name to
  * fix a spelling is how a confirmation stops being read.
+ *
+ * The growth group is deliberately absent. It only feeds the ex-ante forecast —
+ * a projection nobody issues credits from — so no assessed tree's carbon moves
+ * when it changes.
  */
 export const CALCULATION_FIELDS = ['equationFormula', 'rValue', 'cfValue'] as const
 

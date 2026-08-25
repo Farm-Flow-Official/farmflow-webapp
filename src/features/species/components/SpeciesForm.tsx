@@ -45,6 +45,7 @@ export function SpeciesForm({
     speciesNameEn: initial?.speciesNameEn ?? '',
     equationFormula: initial?.equationFormula ?? lookups.families[0]?.formula ?? '',
     equationGroupId: initial?.equationGroupId ?? '',
+    growthIncrementGroupId: initial?.growthIncrementGroupId ?? '',
     forestCategoryId: initial?.forestCategoryId ?? '',
     rValue: initial?.rValue ?? null,
     cfValue: initial?.cfValue ?? null,
@@ -56,8 +57,28 @@ export function SpeciesForm({
     (f) => f.formula === form.equationFormula,
   )
 
+  const growth = lookups.growthIncrementGroups.find((g) => g.id === form.growthIncrementGroupId)
+
   const set = <K extends keyof SpeciesInput>(key: K, value: SpeciesInput[K]) =>
     setForm((f) => ({ ...f, [key]: value }))
+
+  /**
+   * Switch family, and offer its group's published R / CF.
+   *
+   * Only into empty fields. Overwriting a value someone typed would silently
+   * undo a deliberate choice — R and CF are per-species data precisely because
+   * the group default is not always right.
+   */
+  const setFamily = (formula: string) =>
+    setForm((f) => {
+      const picked = lookups.families.find((x) => x.formula === formula)
+      return {
+        ...f,
+        equationFormula: formula,
+        rValue: f.rValue ?? picked?.defaultRValue ?? null,
+        cfValue: f.cfValue ?? picked?.defaultCfValue ?? null,
+      }
+    })
 
   const numeric = (raw: string) => (raw.trim() === '' ? null : Number(raw))
 
@@ -70,6 +91,7 @@ export function SpeciesForm({
           speciesNameEn: form.speciesNameEn?.trim() || null,
           tverReference: form.tverReference?.trim() || null,
           equationGroupId: form.equationGroupId || null,
+          growthIncrementGroupId: form.growthIncrementGroupId || null,
           forestCategoryId: form.forestCategoryId || null,
         })
       }}
@@ -134,12 +156,12 @@ export function SpeciesForm({
           id={`${ids}-formula`}
           required
           value={form.equationFormula}
-          onChange={(e) => set('equationFormula', e.target.value)}
+          onChange={(e) => setFamily(e.target.value)}
           className={FIELD}
         >
           {lookups.families.map((f) => (
             <option key={f.formula} value={f.formula}>
-              {f.formula}
+              {f.formula} · {f.nameTh}
             </option>
           ))}
         </select>
@@ -176,7 +198,9 @@ export function SpeciesForm({
           id={`${ids}-group`}
           label="กลุ่มสมการ"
           optional
-          hint="ป้ายอ้างอิง ไม่ผูกกับตระกูลสมการ — ป่าชายเลนใช้ D2H_OGW แต่อยู่กลุ่ม MNG"
+          hint={`ป้ายอ้างอิงในรายงาน ระบบไม่ได้ใช้คำนวณ — ปกติเลือกให้ตรงกับตระกูลสมการ${
+            family ? ` (${family.groupCode})` : ''
+          }`}
         >
           <select
             id={`${ids}-group`}
@@ -208,6 +232,32 @@ export function SpeciesForm({
           </select>
         </Field>
       </div>
+
+      <Field
+        id={`${ids}-growth`}
+        label="กลุ่มอัตราการเติบโต (ΔDBH / ΔH)"
+        optional
+        hint="ใช้กับค่าพยากรณ์ 10 ปีเท่านั้น ไม่กระทบคาร์บอนของต้นไม้ที่วัดจริง — เว้นว่างได้ถ้ายังไม่มีข้อมูล"
+      >
+        <select
+          id={`${ids}-growth`}
+          value={form.growthIncrementGroupId ?? ''}
+          onChange={(e) => set('growthIncrementGroupId', e.target.value)}
+          className={FIELD}
+        >
+          <option value="">— ยังไม่กำหนด (พยากรณ์ไม่ได้)</option>
+          {lookups.growthIncrementGroups.map((g) => (
+            <option key={g.id} value={g.id}>
+              {g.nameTh} · {g.dbhCmPerYear} ซม./ปี · {g.heightMPerYear} ม./ปี
+              {g.isPublished ? '' : ' (ค่าสมมติ)'}
+            </option>
+          ))}
+        </select>
+      </Field>
+
+      {growth?.note && (
+        <p className="-mt-2 text-[11px] leading-relaxed text-warning">{growth.note}</p>
+      )}
 
       <Field id={`${ids}-ref`} label="อ้างอิง T-VER" optional>
         <input
