@@ -115,6 +115,30 @@ h3 {
   font-family: var(--font-display);
 }
 
+/**
+ * Touch devices get 16px form controls, whatever the utility class says.
+ *
+ * Safari on iOS silently zooms the page when a control smaller than 16px takes
+ * focus, and it does not zoom back out. The page is then pannable — blank space
+ * to the right of every screen, with the fixed topbar riding along — which reads
+ * exactly like a broken responsive layout even though nothing overflows:
+ * `scrollWidth` still equals `clientWidth`, because the zoom is the whole story.
+ * Tapping the search box on a list page was enough to trigger it.
+ *
+ * `maximum-scale=1` on the viewport would also stop it, by taking pinch-zoom
+ * away from everyone — not a trade worth making. The `:not()` pair is here to
+ * out-specify Tailwind's `text-sm` (0,1,0) without `!important`; checkboxes and
+ * radios are excluded because font-size sets their box size in some browsers.
+ * Pointer-based, so desktop keeps the 14px scale the design is drawn at.
+ */
+@media (pointer: coarse) {
+  input:not([type='checkbox']):not([type='radio']),
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
+
 /* Indeterminate sweep for the navigation progress bar (NavProgressBar). */
 @keyframes nav-progress {
   0%   { transform: translateX(-100%); }
