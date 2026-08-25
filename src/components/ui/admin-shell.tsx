@@ -70,7 +70,9 @@ export function AdminShell({
           {children}
         </main>
 
-        <AdminKeyboardNav />
+        {/* Same permission list the sidebar filters on, so a hidden menu has
+            no live shortcut either. */}
+        <AdminKeyboardNav permissions={admin.permissions} />
       </div>
     </AdminGuideProvider>
   )
