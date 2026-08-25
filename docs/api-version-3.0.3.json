@@ -12305,6 +12305,11 @@
                                                     "equationFormula",
                                                     "equationGroupId",
                                                     "equationGroupCode",
+                                                    "growthIncrementGroupId",
+                                                    "growthIncrementCode",
+                                                    "growthIncrementNameTh",
+                                                    "growthDbhCmPerYear",
+                                                    "growthHeightMPerYear",
                                                     "forestCategoryId",
                                                     "forestCategoryNameTh",
                                                     "rValue",
@@ -12367,6 +12372,62 @@
                                                         "anyOf": [
                                                             {
                                                                 "type": "string"
+                                                            },
+                                                            {
+                                                                "type": "null"
+                                                            }
+                                                        ]
+                                                    },
+                                                    "growthIncrementGroupId": {
+                                                        "anyOf": [
+                                                            {
+                                                                "type": "string"
+                                                            },
+                                                            {
+                                                                "type": "null"
+                                                            }
+                                                        ]
+                                                    },
+                                                    "growthIncrementCode": {
+                                                        "nullable": true,
+                                                        "anyOf": [
+                                                            {
+                                                                "type": "string"
+                                                            },
+                                                            {
+                                                                "type": "null"
+                                                            }
+                                                        ]
+                                                    },
+                                                    "growthIncrementNameTh": {
+                                                        "nullable": true,
+                                                        "anyOf": [
+                                                            {
+                                                                "type": "string"
+                                                            },
+                                                            {
+                                                                "type": "null"
+                                                            }
+                                                        ]
+                                                    },
+                                                    "growthDbhCmPerYear": {
+                                                        "nullable": true,
+                                                        "anyOf": [
+                                                            {
+                                                                "description": "\u0394DBH cm/yr, for the ex-ante forecast",
+                                                                "type": "number"
+                                                            },
+                                                            {
+                                                                "type": "null"
+                                                            }
+                                                        ]
+                                                    },
+                                                    "growthHeightMPerYear": {
+                                                        "nullable": true,
+                                                        "anyOf": [
+                                                            {
+                                                                "description": "\u0394H m/yr, for the ex-ante forecast",
+                                                                "type": "number"
                                                             },
                                                             {
                                                                 "type": "null"
@@ -12701,6 +12762,18 @@
                                             }
                                         ]
                                     },
+                                    "growthIncrementGroupId": {
+                                        "nullable": true,
+                                        "anyOf": [
+                                            {
+                                                "description": "\u0394DBH/\u0394H group driving the ex-ante forecast. Null is legitimate \u2014 nobody published a growth rate for every species.",
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
+                                    },
                                     "forestCategoryId": {
                                         "nullable": true,
                                         "anyOf": [
@@ -12805,6 +12878,18 @@
                                         "nullable": true,
                                         "anyOf": [
                                             {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
+                                    },
+                                    "growthIncrementGroupId": {
+                                        "nullable": true,
+                                        "anyOf": [
+                                            {
+                                                "description": "\u0394DBH/\u0394H group driving the ex-ante forecast. Null is legitimate \u2014 nobody published a growth rate for every species.",
                                                 "type": "string"
                                             },
                                             {
@@ -12923,6 +13008,18 @@
                                             }
                                         ]
                                     },
+                                    "growthIncrementGroupId": {
+                                        "nullable": true,
+                                        "anyOf": [
+                                            {
+                                                "description": "\u0394DBH/\u0394H group driving the ex-ante forecast. Null is legitimate \u2014 nobody published a growth rate for every species.",
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
+                                    },
                                     "forestCategoryId": {
                                         "nullable": true,
                                         "anyOf": [
@@ -13020,6 +13117,7 @@
                                                 "speciesNameEn",
                                                 "equationFormula",
                                                 "equationGroupId",
+                                                "growthIncrementGroupId",
                                                 "forestCategoryId",
                                                 "rValue",
                                                 "cfValue",
@@ -13065,6 +13163,16 @@
                                                     ]
                                                 },
                                                 "equationGroupId": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                },
+                                                "growthIncrementGroupId": {
                                                     "anyOf": [
                                                         {
                                                             "type": "string"
@@ -13500,7 +13608,7 @@
                     "Admin Species"
                 ],
                 "summary": "Pickers for the species editor",
-                "description": "Equation groups, forest categories, and **the equation families the carbon engine actually implements**. The family list comes from the engine itself \u2014 a species saved with anything else produces an error instead of carbon for every tree in it, so this is the only list a picker may offer.",
+                "description": "Equation groups, growth-increment groups, forest categories, and **the equation families the carbon engine actually implements**. The family list comes from the engine itself \u2014 a species saved with anything else produces an error instead of carbon for every tree in it, so this is the only list a picker may offer. Each family carries the manual's `defaultRValue` / `defaultCfValue` for its group, to pre-fill the two coefficients the form does let a person set.",
                 "security": [
                     {
                         "bearerAuth": []
@@ -13532,6 +13640,7 @@
                                             "type": "object",
                                             "required": [
                                                 "equationGroups",
+                                                "growthIncrementGroups",
                                                 "forestCategories",
                                                 "families"
                                             ],
@@ -13553,6 +13662,53 @@
                                                                 "type": "string"
                                                             },
                                                             "nameEn": {
+                                                                "nullable": true,
+                                                                "anyOf": [
+                                                                    {
+                                                                        "type": "string"
+                                                                    },
+                                                                    {
+                                                                        "type": "null"
+                                                                    }
+                                                                ]
+                                                            }
+                                                        }
+                                                    }
+                                                },
+                                                "growthIncrementGroups": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "required": [
+                                                            "id",
+                                                            "code",
+                                                            "nameTh",
+                                                            "dbhCmPerYear",
+                                                            "heightMPerYear",
+                                                            "isPublished",
+                                                            "note"
+                                                        ],
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string"
+                                                            },
+                                                            "code": {
+                                                                "type": "string"
+                                                            },
+                                                            "nameTh": {
+                                                                "type": "string"
+                                                            },
+                                                            "dbhCmPerYear": {
+                                                                "type": "number"
+                                                            },
+                                                            "heightMPerYear": {
+                                                                "type": "number"
+                                                            },
+                                                            "isPublished": {
+                                                                "description": "False = a FarmFlow assumption, not a figure from the 2554 manual",
+                                                                "type": "boolean"
+                                                            },
+                                                            "note": {
                                                                 "nullable": true,
                                                                 "anyOf": [
                                                                     {
@@ -13594,7 +13750,11 @@
                                                         "type": "object",
                                                         "required": [
                                                             "formula",
+                                                            "groupCode",
+                                                            "nameTh",
                                                             "reference",
+                                                            "defaultRValue",
+                                                            "defaultCfValue",
                                                             "requiresHeight",
                                                             "useD0NotDbh",
                                                             "measurementPointCode",
@@ -13604,9 +13764,24 @@
                                                             "formula": {
                                                                 "type": "string"
                                                             },
+                                                            "groupCode": {
+                                                                "description": "The \u0e2d\u0e1a\u0e01. plant group this family implements",
+                                                                "type": "string"
+                                                            },
+                                                            "nameTh": {
+                                                                "type": "string"
+                                                            },
                                                             "reference": {
                                                                 "description": "The T-VER citation recorded into every formula snapshot",
                                                                 "type": "string"
+                                                            },
+                                                            "defaultRValue": {
+                                                                "description": "The manual's R for this group \u2014 a pre-fill, not a rule",
+                                                                "type": "number"
+                                                            },
+                                                            "defaultCfValue": {
+                                                                "description": "The manual's CF for this group \u2014 a pre-fill, not a rule",
+                                                                "type": "number"
                                                             },
                                                             "requiresHeight": {
                                                                 "type": "boolean"
@@ -13782,6 +13957,673 @@
                 "operationId": "getApiV1AdminSpeciesLookups"
             }
         },
+        "/api/v1/admin/species/{id}/growth-forecast": {
+            "get": {
+                "tags": [
+                    "Admin Species"
+                ],
+                "summary": "Ten-year projection for one species",
+                "description": "Grows one tree of this species forward \u2014 `Dt = D\u2081 + \u0394DBH\u00b7(t\u22121)`, `Ht = H\u2081 + \u0394H\u00b7(t\u22121)` \u2014 and re-runs the ex-post carbon engine at each size, so the projection and the eventual measurement are the same maths on different inputs. `deltaTco2e` is carbon above the registration year, which is the part a project can sell.\n\n**Ex-ante and not TGO-verified.** The increments are group means from \u0e04\u0e39\u0e48\u0e21\u0e37\u0e2d\u0e28\u0e31\u0e01\u0e22\u0e20\u0e32\u0e1e\u0e02\u0e2d\u0e07\u0e1e\u0e23\u0e23\u0e13\u0e44\u0e21\u0e49 (2554); for bamboo they are a FarmFlow assumption, flagged by `incrementIsPublished: false`. Real credits require measuring real trees at every verification cycle.\n\nA species with no growth group, no R/CF, or no equation returns `forecast.supported: false` with the reason \u2014 never a zero curve.",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "description": "Species id (cuid2)",
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "dbhCm",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "minimum": 0.1,
+                            "description": "DBH at registration, cm (default 10)",
+                            "type": "number"
+                        }
+                    },
+                    {
+                        "name": "heightM",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "minimum": 0.1,
+                            "description": "Height at registration, m (default 8)",
+                            "type": "number"
+                        }
+                    },
+                    {
+                        "name": "years",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "minimum": 1,
+                            "maximum": 50,
+                            "description": "Years to project (default 10)",
+                            "anyOf": [
+                                {
+                                    "format": "integer",
+                                    "default": 0,
+                                    "type": "string"
+                                },
+                                {
+                                    "minimum": 1,
+                                    "maximum": 50,
+                                    "description": "Years to project (default 10)",
+                                    "type": "integer"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Ex-ante ten-year projection for one species \u2014 not TGO-verified",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "Ex-ante ten-year projection for one species \u2014 not TGO-verified",
+                                    "type": "object",
+                                    "required": [
+                                        "success",
+                                        "message",
+                                        "data",
+                                        "meta"
+                                    ],
+                                    "properties": {
+                                        "success": {
+                                            "const": true,
+                                            "type": "boolean"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "required": [
+                                                "speciesId",
+                                                "speciesCode",
+                                                "speciesNameTh",
+                                                "equationFormula",
+                                                "incrementCode",
+                                                "incrementNameTh",
+                                                "incrementIsPublished",
+                                                "incrementNote",
+                                                "dbhCmPerYear",
+                                                "heightMPerYear",
+                                                "carbonPriceThb",
+                                                "forecast"
+                                            ],
+                                            "properties": {
+                                                "speciesId": {
+                                                    "type": "string"
+                                                },
+                                                "speciesCode": {
+                                                    "type": "string"
+                                                },
+                                                "speciesNameTh": {
+                                                    "type": "string"
+                                                },
+                                                "equationFormula": {
+                                                    "nullable": true,
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                },
+                                                "incrementCode": {
+                                                    "nullable": true,
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                },
+                                                "incrementNameTh": {
+                                                    "nullable": true,
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                },
+                                                "incrementIsPublished": {
+                                                    "nullable": true,
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "boolean"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                },
+                                                "incrementNote": {
+                                                    "nullable": true,
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                },
+                                                "dbhCmPerYear": {
+                                                    "nullable": true,
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "number"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                },
+                                                "heightMPerYear": {
+                                                    "nullable": true,
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "number"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                },
+                                                "carbonPriceThb": {
+                                                    "nullable": true,
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "number"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                },
+                                                "forecast": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "object",
+                                                            "required": [
+                                                                "supported",
+                                                                "years",
+                                                                "baselineTco2e",
+                                                                "totalDeltaTco2e",
+                                                                "formulaSnapshot"
+                                                            ],
+                                                            "properties": {
+                                                                "supported": {
+                                                                    "const": true,
+                                                                    "type": "boolean"
+                                                                },
+                                                                "years": {
+                                                                    "type": "array",
+                                                                    "items": {
+                                                                        "type": "object",
+                                                                        "required": [
+                                                                            "year",
+                                                                            "dbhCm",
+                                                                            "heightM",
+                                                                            "cumulativeTco2e",
+                                                                            "deltaTco2e",
+                                                                            "valueThb"
+                                                                        ],
+                                                                        "properties": {
+                                                                            "year": {
+                                                                                "description": "1-based; year 1 is registration, where \u0394C is zero by definition",
+                                                                                "type": "number"
+                                                                            },
+                                                                            "dbhCm": {
+                                                                                "nullable": true,
+                                                                                "anyOf": [
+                                                                                    {
+                                                                                        "type": "number"
+                                                                                    },
+                                                                                    {
+                                                                                        "type": "null"
+                                                                                    }
+                                                                                ]
+                                                                            },
+                                                                            "heightM": {
+                                                                                "nullable": true,
+                                                                                "anyOf": [
+                                                                                    {
+                                                                                        "type": "number"
+                                                                                    },
+                                                                                    {
+                                                                                        "type": "null"
+                                                                                    }
+                                                                                ]
+                                                                            },
+                                                                            "cumulativeTco2e": {
+                                                                                "description": "Total stored carbon at this size",
+                                                                                "type": "number"
+                                                                            },
+                                                                            "deltaTco2e": {
+                                                                                "description": "Carbon above the year-1 baseline \u2014 the sellable part",
+                                                                                "type": "number"
+                                                                            },
+                                                                            "valueThb": {
+                                                                                "nullable": true,
+                                                                                "anyOf": [
+                                                                                    {
+                                                                                        "type": "number"
+                                                                                    },
+                                                                                    {
+                                                                                        "type": "null"
+                                                                                    }
+                                                                                ]
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                },
+                                                                "baselineTco2e": {
+                                                                    "type": "number"
+                                                                },
+                                                                "totalDeltaTco2e": {
+                                                                    "type": "number"
+                                                                },
+                                                                "formulaSnapshot": {
+                                                                    "type": "object",
+                                                                    "patternProperties": {
+                                                                        "^(.*)$": {}
+                                                                    }
+                                                                }
+                                                            }
+                                                        },
+                                                        {
+                                                            "type": "object",
+                                                            "required": [
+                                                                "supported",
+                                                                "reason"
+                                                            ],
+                                                            "properties": {
+                                                                "supported": {
+                                                                    "const": false,
+                                                                    "type": "boolean"
+                                                                },
+                                                                "reason": {
+                                                                    "type": "string"
+                                                                }
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "required": [
+                                                "requestId",
+                                                "timestamp"
+                                            ],
+                                            "properties": {
+                                                "requestId": {
+                                                    "type": "string"
+                                                },
+                                                "timestamp": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - e.g. an equation the engine does not implement.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "Bad request - e.g. an equation the engine does not implement.",
+                                    "type": "object",
+                                    "required": [
+                                        "success",
+                                        "error",
+                                        "meta"
+                                    ],
+                                    "properties": {
+                                        "success": {
+                                            "const": false,
+                                            "type": "boolean"
+                                        },
+                                        "error": {
+                                            "type": "object",
+                                            "required": [
+                                                "code",
+                                                "message",
+                                                "details"
+                                            ],
+                                            "properties": {
+                                                "code": {
+                                                    "description": "Machine-readable error code",
+                                                    "type": "string"
+                                                },
+                                                "message": {
+                                                    "description": "Human-readable error message",
+                                                    "type": "string"
+                                                },
+                                                "details": {
+                                                    "nullable": true,
+                                                    "anyOf": [
+                                                        {
+                                                            "description": "Additional error details, if any"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "required": [
+                                                "requestId",
+                                                "timestamp"
+                                            ],
+                                            "properties": {
+                                                "requestId": {
+                                                    "type": "string"
+                                                },
+                                                "timestamp": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - missing or invalid admin session.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "Unauthorized - missing or invalid admin session.",
+                                    "type": "object",
+                                    "required": [
+                                        "success",
+                                        "error",
+                                        "meta"
+                                    ],
+                                    "properties": {
+                                        "success": {
+                                            "const": false,
+                                            "type": "boolean"
+                                        },
+                                        "error": {
+                                            "type": "object",
+                                            "required": [
+                                                "code",
+                                                "message",
+                                                "details"
+                                            ],
+                                            "properties": {
+                                                "code": {
+                                                    "description": "Machine-readable error code",
+                                                    "type": "string"
+                                                },
+                                                "message": {
+                                                    "description": "Human-readable error message",
+                                                    "type": "string"
+                                                },
+                                                "details": {
+                                                    "nullable": true,
+                                                    "anyOf": [
+                                                        {
+                                                            "description": "Additional error details, if any"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "required": [
+                                                "requestId",
+                                                "timestamp"
+                                            ],
+                                            "properties": {
+                                                "requestId": {
+                                                    "type": "string"
+                                                },
+                                                "timestamp": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - the requester lacks the required permission.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "Forbidden - the requester lacks the required permission.",
+                                    "type": "object",
+                                    "required": [
+                                        "success",
+                                        "error",
+                                        "meta"
+                                    ],
+                                    "properties": {
+                                        "success": {
+                                            "const": false,
+                                            "type": "boolean"
+                                        },
+                                        "error": {
+                                            "type": "object",
+                                            "required": [
+                                                "code",
+                                                "message",
+                                                "details"
+                                            ],
+                                            "properties": {
+                                                "code": {
+                                                    "description": "Machine-readable error code",
+                                                    "type": "string"
+                                                },
+                                                "message": {
+                                                    "description": "Human-readable error message",
+                                                    "type": "string"
+                                                },
+                                                "details": {
+                                                    "nullable": true,
+                                                    "anyOf": [
+                                                        {
+                                                            "description": "Additional error details, if any"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "required": [
+                                                "requestId",
+                                                "timestamp"
+                                            ],
+                                            "properties": {
+                                                "requestId": {
+                                                    "type": "string"
+                                                },
+                                                "timestamp": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not found - the species does not exist.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "Not found - the species does not exist.",
+                                    "type": "object",
+                                    "required": [
+                                        "success",
+                                        "error",
+                                        "meta"
+                                    ],
+                                    "properties": {
+                                        "success": {
+                                            "const": false,
+                                            "type": "boolean"
+                                        },
+                                        "error": {
+                                            "type": "object",
+                                            "required": [
+                                                "code",
+                                                "message",
+                                                "details"
+                                            ],
+                                            "properties": {
+                                                "code": {
+                                                    "description": "Machine-readable error code",
+                                                    "type": "string"
+                                                },
+                                                "message": {
+                                                    "description": "Human-readable error message",
+                                                    "type": "string"
+                                                },
+                                                "details": {
+                                                    "nullable": true,
+                                                    "anyOf": [
+                                                        {
+                                                            "description": "Additional error details, if any"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "required": [
+                                                "requestId",
+                                                "timestamp"
+                                            ],
+                                            "properties": {
+                                                "requestId": {
+                                                    "type": "string"
+                                                },
+                                                "timestamp": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error - the request failed schema validation.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "description": "Validation error - the request failed schema validation.",
+                                    "type": "object",
+                                    "required": [
+                                        "success",
+                                        "error",
+                                        "meta"
+                                    ],
+                                    "properties": {
+                                        "success": {
+                                            "const": false,
+                                            "type": "boolean"
+                                        },
+                                        "error": {
+                                            "type": "object",
+                                            "required": [
+                                                "code",
+                                                "message",
+                                                "details"
+                                            ],
+                                            "properties": {
+                                                "code": {
+                                                    "description": "Machine-readable error code",
+                                                    "type": "string"
+                                                },
+                                                "message": {
+                                                    "description": "Human-readable error message",
+                                                    "type": "string"
+                                                },
+                                                "details": {
+                                                    "nullable": true,
+                                                    "anyOf": [
+                                                        {
+                                                            "description": "Additional error details, if any"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "required": [
+                                                "requestId",
+                                                "timestamp"
+                                            ],
+                                            "properties": {
+                                                "requestId": {
+                                                    "type": "string"
+                                                },
+                                                "timestamp": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "operationId": "getApiV1AdminSpeciesByIdGrowth-forecast"
+            }
+        },
         "/api/v1/admin/species/{id}": {
             "patch": {
                 "tags": [
@@ -13843,6 +14685,18 @@
                                         "nullable": true,
                                         "anyOf": [
                                             {
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
+                                    },
+                                    "growthIncrementGroupId": {
+                                        "nullable": true,
+                                        "anyOf": [
+                                            {
+                                                "description": "\u0394DBH/\u0394H group driving the ex-ante forecast. Null is legitimate \u2014 nobody published a growth rate for every species.",
                                                 "type": "string"
                                             },
                                             {
@@ -13956,6 +14810,18 @@
                                             }
                                         ]
                                     },
+                                    "growthIncrementGroupId": {
+                                        "nullable": true,
+                                        "anyOf": [
+                                            {
+                                                "description": "\u0394DBH/\u0394H group driving the ex-ante forecast. Null is legitimate \u2014 nobody published a growth rate for every species.",
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
+                                    },
                                     "forestCategoryId": {
                                         "nullable": true,
                                         "anyOf": [
@@ -14062,6 +14928,18 @@
                                             }
                                         ]
                                     },
+                                    "growthIncrementGroupId": {
+                                        "nullable": true,
+                                        "anyOf": [
+                                            {
+                                                "description": "\u0394DBH/\u0394H group driving the ex-ante forecast. Null is legitimate \u2014 nobody published a growth rate for every species.",
+                                                "type": "string"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
+                                    },
                                     "forestCategoryId": {
                                         "nullable": true,
                                         "anyOf": [
@@ -14159,6 +15037,7 @@
                                                 "speciesNameEn",
                                                 "equationFormula",
                                                 "equationGroupId",
+                                                "growthIncrementGroupId",
                                                 "forestCategoryId",
                                                 "rValue",
                                                 "cfValue",
@@ -14204,6 +15083,16 @@
                                                     ]
                                                 },
                                                 "equationGroupId": {
+                                                    "anyOf": [
+                                                        {
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "type": "null"
+                                                        }
+                                                    ]
+                                                },
+                                                "growthIncrementGroupId": {
                                                     "anyOf": [
                                                         {
                                                             "type": "string"
@@ -52676,7 +53565,8 @@
                                                 }
                                             }
                                         }
-                                    }
+                                    },
+                                    "additionalProperties": false
                                 }
                             }
                         }
@@ -52742,7 +53632,8 @@
                                                 }
                                             }
                                         }
-                                    }
+                                    },
+                                    "additionalProperties": false
                                 }
                             }
                         }
@@ -52808,7 +53699,8 @@
                                                 }
                                             }
                                         }
-                                    }
+                                    },
+                                    "additionalProperties": false
                                 }
                             }
                         }
@@ -52874,7 +53766,8 @@
                                                 }
                                             }
                                         }
-                                    }
+                                    },
+                                    "additionalProperties": false
                                 }
                             }
                         }
@@ -52943,7 +53836,8 @@
                                                 }
                                             }
                                         }
-                                    }
+                                    },
+                                    "additionalProperties": false
                                 }
                             }
                         }
@@ -53009,7 +53903,8 @@
                                                 }
                                             }
                                         }
-                                    }
+                                    },
+                                    "additionalProperties": false
                                 }
                             }
                         }
@@ -53075,7 +53970,8 @@
                                                 }
                                             }
                                         }
-                                    }
+                                    },
+                                    "additionalProperties": false
                                 }
                             }
                         }
@@ -53221,7 +54117,8 @@
                                                 }
                                             }
                                         }
-                                    }
+                                    },
+                                    "additionalProperties": false
                                 }
                             }
                         }
@@ -53287,7 +54184,8 @@
                                                 }
                                             }
                                         }
-                                    }
+                                    },
+                                    "additionalProperties": false
                                 }
                             }
                         }
@@ -53437,7 +54335,8 @@
                                                 }
                                             }
                                         }
-                                    }
+                                    },
+                                    "additionalProperties": false
                                 }
                             }
                         }
@@ -53503,7 +54402,8 @@
                                                 }
                                             }
                                         }
-                                    }
+                                    },
+                                    "additionalProperties": false
                                 }
                             }
                         }
@@ -53704,7 +54604,8 @@
                                                 }
                                             }
                                         }
-                                    }
+                                    },
+                                    "additionalProperties": false
                                 }
                             }
                         }
@@ -53770,7 +54671,8 @@
                                                 }
                                             }
                                         }
-                                    }
+                                    },
+                                    "additionalProperties": false
                                 }
                             }
                         }
@@ -54076,7 +54978,8 @@
                                                 }
                                             }
                                         }
-                                    }
+                                    },
+                                    "additionalProperties": false
                                 }
                             }
                         }
@@ -54142,7 +55045,8 @@
                                                 }
                                             }
                                         }
-                                    }
+                                    },
+                                    "additionalProperties": false
                                 }
                             }
                         }
@@ -54208,7 +55112,8 @@
                                                 }
                                             }
                                         }
-                                    }
+                                    },
+                                    "additionalProperties": false
                                 }
                             }
                         }
@@ -54274,7 +55179,8 @@
                                                 }
                                             }
                                         }
-                                    }
+                                    },
+                                    "additionalProperties": false
                                 }
                             }
                         }
@@ -54343,7 +55249,8 @@
                                                 }
                                             }
                                         }
-                                    }
+                                    },
+                                    "additionalProperties": false
                                 }
                             }
                         }
@@ -54409,7 +55316,8 @@
                                                 }
                                             }
                                         }
-                                    }
+                                    },
+                                    "additionalProperties": false
                                 }
                             }
                         }
@@ -54475,7 +55383,8 @@
                                                 }
                                             }
                                         }
-                                    }
+                                    },
+                                    "additionalProperties": false
                                 }
                             }
                         }
@@ -54621,7 +55530,8 @@
                                                 }
                                             }
                                         }
-                                    }
+                                    },
+                                    "additionalProperties": false
                                 }
                             }
                         }
@@ -54687,7 +55597,8 @@
                                                 }
                                             }
                                         }
-                                    }
+                                    },
+                                    "additionalProperties": false
                                 }
                             }
                         }
@@ -54837,7 +55748,8 @@
                                                 }
                                             }
                                         }
-                                    }
+                                    },
+                                    "additionalProperties": false
                                 }
                             }
                         }
@@ -54903,7 +55815,8 @@
                                                 }
                                             }
                                         }
-                                    }
+                                    },
+                                    "additionalProperties": false
                                 }
                             }
                         }
@@ -55104,7 +56017,8 @@
                                                 }
                                             }
                                         }
-                                    }
+                                    },
+                                    "additionalProperties": false
                                 }
                             }
                         }
@@ -55170,7 +56084,8 @@
                                                 }
                                             }
                                         }
-                                    }
+                                    },
+                                    "additionalProperties": false
                                 }
                             }
                         }
