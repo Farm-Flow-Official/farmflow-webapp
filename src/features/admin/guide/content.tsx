@@ -11,6 +11,7 @@ import {
 import { Kbd } from '@/components/ui/kbd'
 import { P, Steps, Note, Topic, Key, KeyGroup } from '@/components/ui/guide-parts'
 import type { GuideSection } from '@/components/ui/guide-book'
+import { ADMIN_DESTINATIONS } from '@/features/admin/lib/adminNav'
 
 export type AdminGuideSectionId =
   | 'overview'
@@ -338,15 +339,15 @@ export const ADMIN_GUIDE_SECTIONS: GuideSection[] = [
           (มีป้ายเล็ก ๆ ขึ้นมุมจอบอกว่ากำลังรอปุ่มที่สอง)
         </P>
 
+        {/* Generated from the menu itself. The hand-written version of this
+            list was missing Projects and ชนิดพันธุ์ไม้, and taught G N for a
+            shortcut that was never bound. */}
         <KeyGroup title="ไปยังหน้า (กด G ก่อน)">
-          <Key keys={['G', 'D']}>Dashboard</Key>
-          <Key keys={['G', 'F']}>Farmer Management</Key>
-          <Key keys={['G', 'M']}>GIS Map</Key>
-          <Key keys={['G', 'A']}>Announcements</Key>
-          <Key keys={['G', 'S']}>System Settings</Key>
-          <Key keys={['G', 'L']}>Audit Log</Key>
-          <Key keys={['G', 'U']}>Admin Users</Key>
-          <Key keys={['G', 'T']}>Support Tickets</Key>
+          {ADMIN_DESTINATIONS.map((d) => (
+            <Key key={d.href} keys={['G', d.key]}>
+              {d.label}
+            </Key>
+          ))}
         </KeyGroup>
 
         <KeyGroup title="ในหน้าที่มีตาราง">
