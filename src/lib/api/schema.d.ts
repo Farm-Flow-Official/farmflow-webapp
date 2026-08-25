@@ -672,9 +672,33 @@ export interface paths {
         };
         /**
          * Pickers for the species editor
-         * @description Equation groups, forest categories, and **the equation families the carbon engine actually implements**. The family list comes from the engine itself — a species saved with anything else produces an error instead of carbon for every tree in it, so this is the only list a picker may offer.
+         * @description Equation groups, growth-increment groups, forest categories, and **the equation families the carbon engine actually implements**. The family list comes from the engine itself — a species saved with anything else produces an error instead of carbon for every tree in it, so this is the only list a picker may offer. Each family carries the manual's `defaultRValue` / `defaultCfValue` for its group, to pre-fill the two coefficients the form does let a person set.
          */
         get: operations["getApiV1AdminSpeciesLookups"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/species/{id}/growth-forecast": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Ten-year projection for one species
+         * @description Grows one tree of this species forward — `Dt = D₁ + ΔDBH·(t−1)`, `Ht = H₁ + ΔH·(t−1)` — and re-runs the ex-post carbon engine at each size, so the projection and the eventual measurement are the same maths on different inputs. `deltaTco2e` is carbon above the registration year, which is the part a project can sell.
+         *
+         *     **Ex-ante and not TGO-verified.** The increments are group means from คู่มือศักยภาพของพรรณไม้ (2554); for bamboo they are a FarmFlow assumption, flagged by `incrementIsPublished: false`. Real credits require measuring real trees at every verification cycle.
+         *
+         *     A species with no growth group, no R/CF, or no equation returns `forecast.supported: false` with the reason — never a zero curve.
+         */
+        get: operations["getApiV1AdminSpeciesByIdGrowth-forecast"];
         put?: never;
         post?: never;
         delete?: never;
@@ -6396,6 +6420,11 @@ export interface operations {
                             equationFormula: string | null;
                             equationGroupId: string | null;
                             equationGroupCode: (string | null) | null;
+                            growthIncrementGroupId: string | null;
+                            growthIncrementCode: (string | null) | null;
+                            growthIncrementNameTh: (string | null) | null;
+                            growthDbhCmPerYear: (number | null) | null;
+                            growthHeightMPerYear: (number | null) | null;
                             forestCategoryId: string | null;
                             forestCategoryNameTh: (string | null) | null;
                             rValue: number | null;
@@ -6490,6 +6519,7 @@ export interface operations {
                     /** @description Must be one of the families the carbon engine implements (GET /families) */
                     equationFormula: string;
                     equationGroupId?: (string | null) | null;
+                    growthIncrementGroupId?: (string | null) | null;
                     forestCategoryId?: (string | null) | null;
                     rValue?: (number | null) | null;
                     cfValue?: (number | null) | null;
@@ -6507,6 +6537,7 @@ export interface operations {
                     /** @description Must be one of the families the carbon engine implements (GET /families) */
                     equationFormula: string;
                     equationGroupId?: (string | null) | null;
+                    growthIncrementGroupId?: (string | null) | null;
                     forestCategoryId?: (string | null) | null;
                     rValue?: (number | null) | null;
                     cfValue?: (number | null) | null;
@@ -6524,6 +6555,7 @@ export interface operations {
                     /** @description Must be one of the families the carbon engine implements (GET /families) */
                     equationFormula: string;
                     equationGroupId?: (string | null) | null;
+                    growthIncrementGroupId?: (string | null) | null;
                     forestCategoryId?: (string | null) | null;
                     rValue?: (number | null) | null;
                     cfValue?: (number | null) | null;
@@ -6553,6 +6585,7 @@ export interface operations {
                             speciesNameEn: string | null;
                             equationFormula: string | null;
                             equationGroupId: string | null;
+                            growthIncrementGroupId: string | null;
                             forestCategoryId: string | null;
                             rValue: number | null;
                             cfValue: number | null;
@@ -6713,6 +6746,16 @@ export interface operations {
                                 code: string;
                                 nameEn: (string | null) | null;
                             }[];
+                            growthIncrementGroups: {
+                                id: string;
+                                code: string;
+                                nameTh: string;
+                                dbhCmPerYear: number;
+                                heightMPerYear: number;
+                                /** @description False = a FarmFlow assumption, not a figure from the 2554 manual */
+                                isPublished: boolean;
+                                note: (string | null) | null;
+                            }[];
                             forestCategories: {
                                 id: string;
                                 code: string;
@@ -6720,8 +6763,15 @@ export interface operations {
                             }[];
                             families: {
                                 formula: string;
+                                /** @description The อบก. plant group this family implements */
+                                groupCode: string;
+                                nameTh: string;
                                 /** @description The T-VER citation recorded into every formula snapshot */
                                 reference: string;
+                                /** @description The manual's R for this group — a pre-fill, not a rule */
+                                defaultRValue: number;
+                                /** @description The manual's CF for this group — a pre-fill, not a rule */
+                                defaultCfValue: number;
                                 requiresHeight: boolean;
                                 useD0NotDbh: boolean;
                                 measurementPointCode: string;
@@ -6761,6 +6811,192 @@ export interface operations {
             };
             /** @description Forbidden - the requester lacks the required permission. */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "getApiV1AdminSpeciesByIdGrowth-forecast": {
+        parameters: {
+            query?: {
+                dbhCm?: number;
+                heightM?: number;
+                years?: string | number;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Ex-ante ten-year projection for one species — not TGO-verified */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
+                        message: string;
+                        data: {
+                            speciesId: string;
+                            speciesCode: string;
+                            speciesNameTh: string;
+                            equationFormula: (string | null) | null;
+                            incrementCode: (string | null) | null;
+                            incrementNameTh: (string | null) | null;
+                            incrementIsPublished: (boolean | null) | null;
+                            incrementNote: (string | null) | null;
+                            dbhCmPerYear: (number | null) | null;
+                            heightMPerYear: (number | null) | null;
+                            carbonPriceThb: (number | null) | null;
+                            forecast: {
+                                /** @constant */
+                                supported: true;
+                                years: {
+                                    /** @description 1-based; year 1 is registration, where ΔC is zero by definition */
+                                    year: number;
+                                    dbhCm: (number | null) | null;
+                                    heightM: (number | null) | null;
+                                    /** @description Total stored carbon at this size */
+                                    cumulativeTco2e: number;
+                                    /** @description Carbon above the year-1 baseline — the sellable part */
+                                    deltaTco2e: number;
+                                    valueThb: (number | null) | null;
+                                }[];
+                                baselineTco2e: number;
+                                totalDeltaTco2e: number;
+                                formulaSnapshot: {
+                                    [key: string]: unknown;
+                                };
+                            } | {
+                                /** @constant */
+                                supported: false;
+                                reason: string;
+                            };
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Bad request - e.g. an equation the engine does not implement. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Unauthorized - missing or invalid admin session. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Forbidden - the requester lacks the required permission. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Not found - the species does not exist. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: {
+                            /** @description Machine-readable error code */
+                            code: string;
+                            /** @description Human-readable error message */
+                            message: string;
+                            details: (unknown | null) | null;
+                        };
+                        meta: {
+                            requestId: string;
+                            timestamp: string;
+                        };
+                    };
+                };
+            };
+            /** @description Validation error - the request failed schema validation. */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -6928,6 +7164,7 @@ export interface operations {
                     /** @description Must be one of the families the carbon engine implements (GET /families) */
                     equationFormula?: string;
                     equationGroupId?: (string | null) | null;
+                    growthIncrementGroupId?: (string | null) | null;
                     forestCategoryId?: (string | null) | null;
                     rValue?: (number | null) | null;
                     cfValue?: (number | null) | null;
@@ -6945,6 +7182,7 @@ export interface operations {
                     /** @description Must be one of the families the carbon engine implements (GET /families) */
                     equationFormula?: string;
                     equationGroupId?: (string | null) | null;
+                    growthIncrementGroupId?: (string | null) | null;
                     forestCategoryId?: (string | null) | null;
                     rValue?: (number | null) | null;
                     cfValue?: (number | null) | null;
@@ -6962,6 +7200,7 @@ export interface operations {
                     /** @description Must be one of the families the carbon engine implements (GET /families) */
                     equationFormula?: string;
                     equationGroupId?: (string | null) | null;
+                    growthIncrementGroupId?: (string | null) | null;
                     forestCategoryId?: (string | null) | null;
                     rValue?: (number | null) | null;
                     cfValue?: (number | null) | null;
@@ -6991,6 +7230,7 @@ export interface operations {
                             speciesNameEn: string | null;
                             equationFormula: string | null;
                             equationGroupId: string | null;
+                            growthIncrementGroupId: string | null;
                             forestCategoryId: string | null;
                             rValue: number | null;
                             cfValue: number | null;
