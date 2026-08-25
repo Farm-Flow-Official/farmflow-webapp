@@ -1,5 +1,6 @@
 import { Sparkles, TriangleAlert, Quote } from 'lucide-react'
 import { ConfidenceRing } from '@/features/verifier/components/ConfidenceRing'
+import { FlowdeeMascot, flowdeePose } from '@/features/verifier/components/FlowdeeMascot'
 import { aiFlagLabel, aiFlagIcon } from '@/features/verifier/lib/aiFlags'
 
 /**
@@ -24,22 +25,36 @@ export function AiAssessmentCard({
   const waiting = status === 'waiting'
   const ringState = failed ? 'failed' : waiting ? 'waiting' : undefined
   const hasResult = !failed && !waiting && confidenceScore != null
+  const pose = flowdeePose(confidenceScore, ringState)
 
   return (
     <section
-      className={`overflow-hidden rounded-2xl border bg-panel shadow-sm ${
+      // Flowdee stands on the header's bottom edge, so it pokes 22px above the
+      // card (80px sprite against a ~58px header). The parent column's `gap-4`
+      // gives 16px, which would put a robot through the section label above —
+      // `mt-4` takes the clearance to 32px. No `overflow-hidden` here for the
+      // same reason; the top corners are rounded on the header instead.
+      className={`mt-4 rounded-2xl border bg-panel shadow-sm ${
         anomaly ? 'border-error/50 animate-soft-glow' : 'border-line'
       }`}
     >
-      {/* Header — brand-green gradient wash behind the "Flowdee AI" mark. */}
+      {/* Header — brand-green gradient wash behind the "Flowdee AI" mark.
+          `relative` is what Flowdee anchors to. */}
       <div
-        className="flex items-center justify-between gap-3 px-5 py-3"
+        className="relative flex items-center justify-between gap-3 rounded-t-2xl px-5 py-3"
         style={{ background: 'linear-gradient(90deg, var(--color-primary-subtle), var(--color-panel))' }}
       >
         <div className="flex items-center gap-2">
-          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
-            <Sparkles className="h-3.5 w-3.5" strokeWidth={2} />
-          </span>
+          {/* Flowdee is the mark when it has a verdict. When it has none — the
+              AI failed, or has not been asked — the plain icon takes over, so
+              the header keeps a mark without the mascot implying a judgement. */}
+          {pose ? (
+            <FlowdeeMascot pose={pose} />
+          ) : (
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-primary/10 text-primary">
+              <Sparkles className="h-3.5 w-3.5" strokeWidth={2} />
+            </span>
+          )}
           <div className="min-w-0">
             <h2 className="text-sm font-semibold text-primary">Flowdee AI</h2>
             {/* Says what it judges, because the old name never did — and in a
@@ -115,6 +130,23 @@ export function AiAssessmentCard({
           )}
         </div>
       </div>
+
+      {hasResult && (
+        // Only where there is a number to misread. The score is an
+        // evidence-consistency measure (ADR 0022), and the reading it has to
+        // stop is "31% means 69% likely fraud" — it does not; a shadow or an
+        // odd camera angle lands there too. Phrased as scope + whose call it
+        // is, matching `ReviewPanel`, rather than a generic "AI can be wrong":
+        // the verifier already has canned reasons for overruling a flag in
+        // `TreeReviewActions`, so what they need is the meaning, not a hedge.
+        // Shown on every band, high scores included — a caveat that appears
+        // only next to bad news is the one an auditor asks about, and a
+        // confident-looking 87% is where a reviewer is likeliest to skim.
+        <p className="border-t border-line px-5 py-2.5 text-[11px] leading-relaxed text-ink-muted">
+          คะแนนนี้บอกความสอดคล้องของหลักฐาน ไม่ใช่ความน่าจะเป็นของการทุจริต —
+          การตัดสินเป็นดุลพินิจของผู้ตรวจสอบ
+        </p>
+      )}
     </section>
   )
 }
