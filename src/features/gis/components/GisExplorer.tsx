@@ -18,10 +18,13 @@ const GisMap = dynamic(() => import('@/features/gis/components/GisMap'), {
   ),
 })
 
-const LEGEND: { label: string; color: string }[] = [
-  { label: 'ผ่านการตรวจ', color: '#22C55E' },
-  { label: 'รอตรวจสอบ', color: '#F59E0B' },
-  { label: 'ทับซ้อน', color: '#EF4444' },
+/* Plain DOM swatches, so these carry the --gis-* roles as utility classes
+   rather than resolved values — the map itself reads the same roles at runtime
+   (see GisMap). */
+const LEGEND: { label: string; swatch: string }[] = [
+  { label: 'ผ่านการตรวจ', swatch: 'bg-gis-verified' },
+  { label: 'รอตรวจสอบ', swatch: 'bg-gis-pending' },
+  { label: 'ทับซ้อน', swatch: 'bg-gis-flagged' },
 ]
 
 export function GisExplorer({
@@ -127,7 +130,7 @@ export function GisExplorer({
               }`}
             >
               <span
-                className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform ${
+                className={`inline-block h-5 w-5 transform rounded-full bg-panel shadow transition-transform ${
                   flaggedOnly ? 'translate-x-[22px]' : 'translate-x-0.5'
                 }`}
               />
@@ -167,10 +170,7 @@ export function GisExplorer({
             <ul className="flex flex-col gap-1">
               {LEGEND.map((l) => (
                 <li key={l.label} className="flex items-center gap-2 text-xs text-ink-secondary">
-                  <span
-                    className="h-2.5 w-2.5 rounded-full"
-                    style={{ backgroundColor: l.color }}
-                  />
+                  <span className={`h-2.5 w-2.5 rounded-full ${l.swatch}`} />
                   {l.label}
                 </li>
               ))}

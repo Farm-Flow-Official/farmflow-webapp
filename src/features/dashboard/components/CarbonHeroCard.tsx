@@ -25,18 +25,21 @@ export function CarbonHeroCard({
   return (
     <section
       className="relative overflow-hidden rounded-2xl p-6 shadow-sm sm:p-7"
-      style={{ background: 'linear-gradient(135deg, #004C22 0%, #003A1A 100%)' }}
+      style={{
+        background:
+          'linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%)',
+      }}
     >
       {/* Oversized leaf watermark */}
       <Leaf
-        className="pointer-events-none absolute -right-6 -top-6 h-40 w-40 text-white/[0.06]"
+        className="pointer-events-none absolute -right-6 -top-6 h-40 w-40 text-on-primary/[0.06]"
         strokeWidth={1}
         aria-hidden
       />
 
       <div className="relative">
         <div className="flex items-center gap-2">
-          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/10">
+          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-on-primary/10">
             <Leaf className="h-4 w-4 text-primary-muted" strokeWidth={2} />
           </span>
           <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-muted">
@@ -45,7 +48,7 @@ export function CarbonHeroCard({
         </div>
 
         <p className="mt-4 flex items-baseline gap-2">
-          <span className="font-mono text-4xl font-bold tracking-tight tabular-nums text-white sm:text-5xl">
+          <span className="font-mono text-4xl font-bold tracking-tight tabular-nums text-on-primary sm:text-5xl">
             {(totalCarbonKgco2e / 1000).toLocaleString('en-US', {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
@@ -53,7 +56,7 @@ export function CarbonHeroCard({
           </span>
           <span className="text-sm font-medium text-primary-muted">tCO₂e</span>
         </p>
-        <p className="mt-1 font-mono text-sm tabular-nums text-white/50">
+        <p className="mt-1 font-mono text-sm tabular-nums text-on-primary/50">
           {formatCarbonKg(totalCarbonKgco2e)}
         </p>
 
@@ -61,16 +64,16 @@ export function CarbonHeroCard({
           {estimatedValueThb != null ? (
             <div className="flex items-center gap-2">
               <TrendingUp className="h-4 w-4 text-primary-muted" strokeWidth={2} />
-              <span className="text-sm text-white/70">มูลค่าตลาดโดยประมาณ</span>
-              <span className="font-mono text-sm font-semibold tabular-nums text-white">
+              <span className="text-sm text-on-primary/70">มูลค่าตลาดโดยประมาณ</span>
+              <span className="font-mono text-sm font-semibold tabular-nums text-on-primary">
                 ฿{formatNumber(estimatedValueThb)}
               </span>
             </div>
           ) : (
-            <span className="text-sm text-white/50">ยังไม่มีราคาตลาดอ้างอิง</span>
+            <span className="text-sm text-on-primary/50">ยังไม่มีราคาตลาดอ้างอิง</span>
           )}
           {marketPriceThb != null && (
-            <span className="text-xs text-white/50">
+            <span className="text-xs text-on-primary/50">
               @ ฿{formatNumber(marketPriceThb)} / tCO₂e
             </span>
           )}

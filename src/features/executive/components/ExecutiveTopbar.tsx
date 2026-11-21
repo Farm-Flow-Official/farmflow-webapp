@@ -26,6 +26,12 @@ export function ExecutiveTopbar({
 
   return (
     <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b border-line bg-panel/90 px-4 backdrop-blur sm:px-8">
+      {/* Portal identity, 3px on the top edge (DESIGN.md §4.5, §9.7). Absolute
+          and overlapping the header's own top edge rather than a border, so the
+          header stays exactly 64px and pt-16 / top-16 / --topbar-height all
+          keep meaning. `fixed`/`sticky` already position the header, so no
+          `relative` (which would fight it for the `position` property). */}
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-[3px] bg-portal-accent" />
       <div className="flex items-center gap-2.5">
         <Logo size={26} />
         <div className="leading-none">
@@ -40,7 +46,7 @@ export function ExecutiveTopbar({
         <NotificationBell announcements={announcements} />
 
         <div className="flex items-center gap-2">
-          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-semibold text-white">
+          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-semibold text-on-primary">
             {initial}
           </span>
           <span className="hidden text-sm font-medium text-ink sm:inline">{profile.username}</span>

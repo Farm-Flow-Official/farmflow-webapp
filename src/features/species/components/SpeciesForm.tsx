@@ -279,7 +279,7 @@ export function SpeciesForm({
         <button
           type="submit"
           disabled={pending}
-          className="h-10 rounded-lg bg-primary px-4 text-sm font-semibold text-white transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:opacity-50"
+          className="h-10 rounded-lg bg-primary px-4 text-sm font-semibold text-on-primary transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:opacity-50"
         >
           {pending ? 'กำลังบันทึก…' : 'บันทึก'}
         </button>

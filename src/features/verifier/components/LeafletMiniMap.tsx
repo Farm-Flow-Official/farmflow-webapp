@@ -4,6 +4,7 @@ import 'leaflet/dist/leaflet.css'
 import { useEffect } from 'react'
 import { MapContainer, TileLayer, Polygon, CircleMarker, useMap } from 'react-leaflet'
 import type { LatLngExpression } from 'leaflet'
+import { token } from '@/styles/token'
 
 function Fit({ positions }: { positions: [number, number][] }) {
   const map = useMap()
@@ -45,12 +46,18 @@ function Resizer() {
 export default function LeafletMiniMap({
   polygon,
   pin,
-  pinColor = '#C8000E',
+  pinToken = 'gis-flagged',
   interactive = false,
 }: {
   polygon: [number, number][]
   pin?: [number, number]
-  pinColor?: string
+  /**
+   * Semantic token name for the pin fill (e.g. 'primary', 'gis-flagged') —
+   * resolved here rather than passed as a colour, because the callers are
+   * server components and Leaflet cannot take a `var(--token)` (DESIGN.md
+   * Appendix B).
+   */
+  pinToken?: string
   /**
    * When false (default) the map is a fully locked reference thumbnail — no
    * pan/zoom, so a stray finger on iPad can't move it. When true (the expand
@@ -86,13 +93,13 @@ export default function LeafletMiniMap({
       />
       <Polygon
         positions={positions}
-        pathOptions={{ color: '#22C55E', weight: 2, fillColor: '#22C55E', fillOpacity: 0.25 }}
+        pathOptions={{ color: token('gis-verified'), weight: 2, fillColor: token('gis-verified'), fillOpacity: 0.25 }}
       />
       {pinLatLng && (
         <CircleMarker
           center={pinLatLng}
           radius={7}
-          pathOptions={{ color: '#ffffff', weight: 2, fillColor: pinColor, fillOpacity: 1 }}
+          pathOptions={{ color: token('on-imagery'), weight: 2, fillColor: token(pinToken), fillOpacity: 1 }}
         />
       )}
       <Fit positions={pinLatLng ? [...positions, pinLatLng] : positions} />

@@ -35,7 +35,7 @@ export function BusinessShell({
   }, [open])
 
   return (
-    <div className="min-h-screen bg-surface">
+    <div data-portal="business" className="min-h-screen bg-surface">
       <BusinessTopbar
         profile={profile}
         menuOpen={open}

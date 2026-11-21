@@ -156,7 +156,7 @@ export function SlipReviewModal({ slip, reviewerName, onClose, onResolve }: Prop
                   type="button"
                   onClick={approve}
                   disabled={needsAck && !acked}
-                  className="inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-lg bg-primary px-4 text-sm font-semibold text-white transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40"
+                  className="inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-lg bg-primary px-4 text-sm font-semibold text-on-primary transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   <Check className="h-4 w-4" strokeWidth={2.5} />
                   อนุมัติ + ลงนาม

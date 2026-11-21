@@ -5,6 +5,7 @@ import { useEffect } from 'react'
 import { MapContainer, TileLayer, CircleMarker, Tooltip, useMap } from 'react-leaflet'
 import type { LatLngExpression } from 'leaflet'
 import { projectCoverUrl, projectPattern } from '@/lib/project-cover'
+import { token } from '@/styles/token'
 
 export type ProjectPin = {
   id: string
@@ -96,9 +97,9 @@ export default function ProjectMapCanvas({ pins }: { pins: ProjectPin[] }) {
             // exaggerates the biggest project by its square.
             radius={(6 + Math.sqrt(p.tco2e / maxTonnes) * 10) * (p.active ? 1.35 : 1)}
             pathOptions={{
-              color: '#ffffff',
+              color: token('on-imagery'),
               weight: p.active ? 3 : 2,
-              fillColor: '#1F7A46',
+              fillColor: token('gis-verified'),
               fillOpacity: muted ? 0.3 : 0.9,
               opacity: muted ? 0.4 : 1,
             }}

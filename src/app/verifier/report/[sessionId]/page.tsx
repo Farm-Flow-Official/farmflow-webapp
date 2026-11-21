@@ -161,9 +161,9 @@ export default async function SessionReportPage({
                 >
                   <polygon
                     points={overlay.points}
-                    fill="#FACC15"
+                    fill="var(--color-gis-pending)"
                     fillOpacity={0.18}
-                    stroke="#FACC15"
+                    stroke="var(--color-gis-pending)"
                     strokeWidth={2}
                     strokeLinejoin="round"
                     vectorEffect="non-scaling-stroke"

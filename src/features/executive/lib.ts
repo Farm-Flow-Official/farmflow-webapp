@@ -40,17 +40,21 @@ export function monthLabel(month: string): string {
  * Categorical slots for series identity, in the order they must be consumed.
  *
  * The ORDER is the colourblind-safety mechanism, not a preference — the set was
- * validated all-pairs (dataviz `validate_palette.js`), so any subset in any
- * arrangement stays distinguishable, including a donut whose last segment wraps
- * round to touch the first. Never cycle past the end: the tail folds into
- * `CHART_OTHER_COLOR`.
+ * validated all-pairs (dataviz validator, Machado CVD simulation), so any
+ * subset in any arrangement stays distinguishable, including a donut whose last
+ * segment wraps round to touch the first. Never cycle past the end: the tail
+ * folds into `CHART_OTHER_COLOR`.
+ *
+ * THREE slots, down from five in FarmFlow v1 (DESIGN.md §4.6). With the CI's
+ * Moss and Sea fixed in slots 1–2, every fourth hue tested either collided
+ * under colour-blindness (purple vs Sea ΔE 1–4, amber vs Moss ΔE 1.0) or read
+ * as a status. `MAX_SLICES` in SpeciesDonut is tied to this length — a shorter
+ * array with a larger cap would hand species #4 the same colour as #1.
  */
 export const CHART_SERIES_COLORS = [
   'var(--color-chart-1)',
   'var(--color-chart-2)',
   'var(--color-chart-3)',
-  'var(--color-chart-4)',
-  'var(--color-chart-5)',
 ]
 
 export const CHART_OTHER_COLOR = 'var(--color-chart-other)'

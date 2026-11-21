@@ -18,10 +18,10 @@ export function LoginForm() {
       {state?.error && (
         <div
           role="alert"
-          className="mb-5 flex items-start gap-3 rounded-md border border-[#FECACA] bg-[#FEF2F2] px-4 py-3"
+          className="mb-5 flex items-start gap-3 rounded-md border border-error-border bg-error-bg px-4 py-3"
         >
           <svg
-            className="mt-0.5 size-4 shrink-0 text-[#991B1B]"
+            className="mt-0.5 size-4 shrink-0 text-error"
             viewBox="0 0 16 16"
             fill="none"
             aria-hidden="true"
@@ -34,7 +34,7 @@ export function LoginForm() {
               strokeLinecap="round"
             />
           </svg>
-          <p className="text-sm font-medium text-[#991B1B]">{state.error}</p>
+          <p className="text-sm font-medium text-error">{state.error}</p>
         </div>
       )}
 
@@ -42,7 +42,7 @@ export function LoginForm() {
         <div>
           <label
             htmlFor="username"
-            className="mb-1.5 block text-[13px] font-medium text-[#374151]"
+            className="mb-1.5 block text-[13px] font-medium text-ink-secondary"
           >
             ชื่อผู้ใช้
           </label>
@@ -53,14 +53,14 @@ export function LoginForm() {
             autoComplete="username"
             required
             placeholder="admin"
-            className="h-11 w-full rounded-md border border-[#E4E7EB] bg-white px-3.5 text-sm text-[#111827] placeholder:text-[#9CA3AF] outline-none transition-shadow focus:border-[#004C22] focus:ring-[3px] focus:ring-[#004C22]/8 disabled:cursor-not-allowed disabled:opacity-50"
+            className="h-11 w-full rounded-md border border-line-input bg-panel px-3.5 text-sm text-ink placeholder:text-ink-muted outline-none transition-shadow focus:border-primary focus:ring-[3px] focus:ring-primary/8 disabled:cursor-not-allowed disabled:opacity-50"
           />
         </div>
 
         <div>
           <label
             htmlFor="password"
-            className="mb-1.5 block text-[13px] font-medium text-[#374151]"
+            className="mb-1.5 block text-[13px] font-medium text-ink-secondary"
           >
             รหัสผ่าน
           </label>
@@ -70,7 +70,7 @@ export function LoginForm() {
             autoComplete="current-password"
             required
             placeholder="••••••••"
-            className="h-11 w-full rounded-md border border-[#E4E7EB] bg-white px-3.5 text-sm text-[#111827] placeholder:text-[#9CA3AF] outline-none transition-shadow focus:border-[#004C22] focus:ring-[3px] focus:ring-[#004C22]/8 disabled:cursor-not-allowed disabled:opacity-50"
+            className="h-11 w-full rounded-md border border-line-input bg-panel px-3.5 text-sm text-ink placeholder:text-ink-muted outline-none transition-shadow focus:border-primary focus:ring-[3px] focus:ring-primary/8 disabled:cursor-not-allowed disabled:opacity-50"
           />
         </div>
       </div>
@@ -78,7 +78,7 @@ export function LoginForm() {
       <button
         type="submit"
         disabled={pending}
-        className="mt-6 flex h-11 w-full items-center justify-center rounded-md bg-[#C8000E] px-6 text-sm font-semibold text-white transition-all hover:-translate-y-px hover:bg-[#A80009] focus:outline-none focus:ring-2 focus:ring-[#C8000E] focus:ring-offset-2 active:bg-[#8C0008] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
+        className="mt-6 flex h-11 w-full items-center justify-center rounded-md bg-primary px-6 text-sm font-semibold text-on-primary transition-all hover:-translate-y-px hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 active:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
       >
         {pending ? (
           <span className="flex items-center gap-2">
@@ -114,13 +114,13 @@ export function LoginForm() {
         route to a human. Secondary weight on purpose: it must be findable when
         sign-in fails, not compete with the sign-in button when it works.
       */}
-      <p className="mt-5 text-center text-[13px] text-[#6B7280]">
+      <p className="mt-5 text-center text-[13px] text-ink-muted">
         เข้าสู่ระบบไม่ได้?{' '}
         <a
           href={LINE_OA_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-1 font-medium text-[#004C22] underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#004C22] focus-visible:ring-offset-2"
+          className="inline-flex items-center gap-1 font-medium text-primary underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
         >
           ติดต่อผู้ดูแลระบบ
           <ExternalLink className="h-3 w-3" strokeWidth={2} aria-hidden />

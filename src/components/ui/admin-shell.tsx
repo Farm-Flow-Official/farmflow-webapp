@@ -44,7 +44,10 @@ export function AdminShell({
   return (
     // The guide provider wraps the chrome too — topbar and sidebar both open it.
     <AdminGuideProvider>
-      <div className="min-h-screen bg-surface">
+      {/* data-portal drives --portal-accent for the 3px topbar bar (DESIGN.md
+          §4.5). It sits on the shell root rather than in layout.tsx because that
+          layout returns this component directly — same portal root, no extra DOM. */}
+      <div data-portal="control" className="min-h-screen bg-surface">
         <AdminTopbar
           admin={admin}
           menuOpen={open}

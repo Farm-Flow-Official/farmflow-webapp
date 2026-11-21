@@ -10,7 +10,7 @@ import type { PaymentSlip } from '@/features/business/payments/types'
  */
 export function MockSlip({ slip }: { slip: PaymentSlip }) {
   return (
-    <div className="relative overflow-hidden rounded-xl border border-line bg-white">
+    <div className="relative overflow-hidden rounded-xl border border-line bg-panel">
       {/* mock watermark */}
       <span className="absolute right-2 top-2 rounded bg-surface px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-ink-muted">
         ตัวอย่าง · mock

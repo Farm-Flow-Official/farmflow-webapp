@@ -1,6 +1,6 @@
 import { formatNumber } from '@/lib/utils/format'
 
-type Segment = { key: string; label: string; count: number; color: string }
+type Segment = { key: string; label: string; count: number; swatch: string }
 
 /**
  * Review throughput as a single stacked proportional bar (pending / approved /
@@ -17,9 +17,9 @@ export function ReviewDistributionBar({
   rejected: number
 }) {
   const segments: Segment[] = [
-    { key: 'approved', label: 'อนุมัติ', count: approved, color: '#22C55E' },
-    { key: 'pending', label: 'รอตรวจ', count: pending, color: '#F59E0B' },
-    { key: 'rejected', label: 'ปฏิเสธ', count: rejected, color: '#EF4444' },
+    { key: 'approved', label: 'อนุมัติ', count: approved, swatch: 'bg-success' },
+    { key: 'pending', label: 'รอตรวจ', count: pending, swatch: 'bg-warning' },
+    { key: 'rejected', label: 'ปฏิเสธ', count: rejected, swatch: 'bg-error' },
   ]
   const total = segments.reduce((sum, s) => sum + s.count, 0)
 
@@ -39,7 +39,8 @@ export function ReviewDistributionBar({
             s.count > 0 ? (
               <div
                 key={s.key}
-                style={{ width: `${(s.count / total) * 100}%`, backgroundColor: s.color }}
+                className={s.swatch}
+                style={{ width: `${(s.count / total) * 100}%` }}
                 title={`${s.label}: ${formatNumber(s.count)}`}
               />
             ) : null,
@@ -53,7 +54,7 @@ export function ReviewDistributionBar({
           return (
             <li key={s.key} className="flex flex-col gap-1">
               <span className="flex items-center gap-1.5">
-                <span className="h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: s.color }} />
+                <span className={`h-2.5 w-2.5 rounded-sm ${s.swatch}`} />
                 <span className="text-[12px] text-ink-secondary">{s.label}</span>
               </span>
               <span className="font-mono text-lg font-bold tabular-nums text-ink">

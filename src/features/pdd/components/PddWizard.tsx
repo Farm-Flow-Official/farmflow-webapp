@@ -171,7 +171,7 @@ export function PddWizard({
                         done
                           ? 'bg-success text-white'
                           : current
-                            ? 'bg-primary text-white'
+                            ? 'bg-primary text-on-primary'
                             : 'bg-sunken text-ink-muted'
                       }`}
                     >

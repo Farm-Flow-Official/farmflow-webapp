@@ -62,7 +62,7 @@ export default async function ProjectDetailPage({
         <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
           <Link
             href={`/admin/projects/${id}/pdd`}
-            className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+            className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-on-primary transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
             <FileText className="h-4 w-4" strokeWidth={2} />
             เปิด PDD Wizard

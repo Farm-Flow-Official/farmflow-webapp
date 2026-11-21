@@ -1,98 +1,127 @@
 @import "tailwindcss";
+@import "../styles/brand.css";
+@import "../styles/theme.css";
 
-@theme {
-  /* ── Brand ─────────────────────────────── */
-  --color-primary:          #004C22;
-  --color-primary-hover:    #003A1A;
-  --color-primary-subtle:   #F0FFF4;
-  --color-primary-muted:    #D1FAE5;
-  --color-accent:           #C8000E;
-  --color-accent-hover:     #A80009;
+/* The `dark:` variant follows data-theme rather than the OS media query. Per
+   DESIGN.md §0 rule 4 it must never be used to fix a COLOUR — semantic tokens
+   already switch with the theme — only for non-colour differences such as
+   swapping a map tile URL or an illustration asset. */
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
-  /* ── Surfaces ───────────────────────────── */
-  --color-surface:          #F7F8F9;
-  --color-panel:            #FFFFFF;
-  --color-sunken:           #F0F2F4;
+/* ── Layer 3: Tailwind utility mapping ────────────────────────────────────
+   DESIGN.md v1.0.0 §3.1 / Appendix A.3. `inline` makes each utility emit
+   var(--token), so utilities follow the active theme at runtime instead of
+   being frozen at build time.
 
-  /* ── Borders ────────────────────────────── */
-  --color-line:             #E4E7EB;
-  --color-line-strong:      #C9CDD3;
-  --color-line-focus:       #004C22;
+   Utility NAMES are unchanged from FarmFlow v1 on purpose (surface, panel,
+   sunken, line, ink-*, primary*, success*, chart-*, esg-*, gis-*), which is
+   why most components re-skinned with zero edits.
+   ───────────────────────────────────────────────────────────────────────── */
+@theme inline {
+  /* Phase 4 (DESIGN.md §15): uncomment to delete Tailwind's default palette
+     entirely, so a default-palette utility generates nothing and is caught in
+     review. */
+  /* --color-*: initial; */
 
-  /* ── Text ───────────────────────────────── */
-  --color-ink:              #111827;
-  --color-ink-secondary:    #4B5563;
-  --color-ink-muted:        #9CA3AF;
-  --color-ink-disabled:     #D1D5DB;
+  --color-surface: var(--surface);
+  --color-panel: var(--panel);
+  --color-raised: var(--raised);
+  --color-sunken: var(--sunken);
+  --color-highlight: var(--highlight);
+  --color-overlay: var(--overlay);
 
-  /* ── Status ─────────────────────────────── */
-  --color-success:          #166534;
-  --color-success-bg:       #F0FFF4;
-  --color-warning:          #92400E;
-  --color-warning-bg:       #FFFBEB;
-  --color-error:            #991B1B;
-  --color-error-bg:         #FEF2F2;
-  --color-error-border:     #FECACA;
-  --color-info:             #1E40AF;
-  --color-info-bg:          #EFF6FF;
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-line-input: var(--line-input);
+  --color-line-focus: var(--ring);
+  --color-ring: var(--ring);
 
-  /* ── Charts ─────────────────────────────── */
-  /* Categorical slots for series identity (donut segments, multi-line charts).
-     The ORDER is the colourblind-safety mechanism, not a preference: this set
-     clears every all-pairs gate (CVD ΔE >= 8, normal-vision ΔE >= 15) so any
-     subset in any arrangement — including a donut where the last segment wraps
-     round to touch the first — stays distinguishable. Verified with the dataviz
-     skill's validate_palette.js; re-run it before changing a single value.
+  --color-ink: var(--ink);
+  --color-ink-secondary: var(--ink-secondary);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-disabled: var(--ink-disabled);
+  --color-brand: var(--brand);
 
-     chart-1 is green so a one-series chart still reads as FarmFlow. Orange is
-     deliberately ABSENT: against this green it scores ΔE 3.2 under protanopia,
-     i.e. the same colour. Yellow and pink fall under 3:1 on white, so any chart
-     using them must label its segments in text (all of ours do). */
-  --color-chart-1:          #008300;
-  --color-chart-2:          #2a78d6;
-  --color-chart-3:          #eda100;
-  --color-chart-4:          #e87ba4;
-  --color-chart-5:          #4a3aa7;
-  /* The tail bucket. Never a sixth identity — past five, series fold into it. */
-  --color-chart-other:      #9CA3AF;
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-on-primary: var(--on-primary);
+  --color-primary-subtle: var(--primary-subtle);
+  --color-primary-muted: var(--primary-muted);
 
-  /* Ordinal ramp for ORDERED categories (the carbon funnel). One hue, monotone
-     lightness, visible steps — a category ramp here would burn hue on
-     information the bar length already carries. */
-  --color-funnel-1:         #43B77A;
-  --color-funnel-2:         #2E9E63;
-  --color-funnel-3:         #1F7A46;
-  /* A stage that exists in the lifecycle but has no data behind it yet — drawn,
-     never filled, so "not built" never reads as "measured zero". */
-  --color-chart-ghost:      #D8DDE3;
+  --color-carbon: var(--carbon);
+  --color-carbon-ink: var(--carbon-ink);
+  --color-carbon-subtle: var(--carbon-subtle);
 
-  /* ── ESG pillars ────────────────────────── */
-  /* A navigational encoding, not decoration: a card's accent says which pillar
-     it belongs to. Green/blue/amber sit in the validator's 6–8 CVD warn band,
-     which is legal only alongside secondary encoding — every pillar heading
-     carries its own name in text and its own icon, so colour is never the sole
-     signal. (Violet was the first choice and was rejected: against this blue it
-     scores ΔE 0.3 under deuteranopia — literally the same colour.) */
-  --color-esg-e:            #1F7A46;
-  --color-esg-e-bg:         #ECF7F0;
-  --color-esg-s:            #1D4ED8;
-  --color-esg-s-bg:         #EFF4FF;
-  --color-esg-g:            #B45309;
-  --color-esg-g-bg:         #FDF5E9;
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-ink: var(--sidebar-ink);
+  --color-sidebar-ink-muted: var(--sidebar-ink-muted);
+  --color-sidebar-active: var(--sidebar-active);
+  --color-sidebar-indicator: var(--sidebar-indicator);
 
-  /* ── GIS Map ────────────────────────────── */
-  --color-gis-verified:     #22C55E;
-  --color-gis-flagged:      #EF4444;
-  --color-gis-pending:      #F59E0B;
+  --color-success: var(--success);   --color-success-bg: var(--success-bg);
+  --color-warning: var(--warning);   --color-warning-bg: var(--warning-bg);
+  --color-danger: var(--danger);     --color-danger-bg: var(--danger-bg);
+  --color-danger-solid: var(--danger-solid);
+  --color-info: var(--info);         --color-info-bg: var(--info-bg);
+  --color-neutral: var(--neutral);   --color-neutral-bg: var(--neutral-bg);
+  --color-danger-border: var(--danger-border);
+  --color-warning-border: var(--warning-border);
 
-  /* ── Typography ─────────────────────────── */
-  /* Headings → Montserrat (Latin) + Prompt (Thai glyphs). */
-  --font-display: var(--font-montserrat), var(--font-prompt), system-ui, sans-serif;
-  /* Body → Open Sans (Latin) + Prompt (Thai). */
-  --font-sans: var(--font-open-sans), var(--font-prompt), system-ui, -apple-system, sans-serif;
-  /* IDs & numeric data → Inter (use with tabular-nums). The `font-mono` utility
-     is intentionally mapped to Inter per the design system (not a monospace). */
-  --font-mono: var(--font-inter), var(--font-prompt), system-ui, sans-serif;
+  /* Migration aliases — delete in Phase 4 (DESIGN.md §15). `accent` was the
+     retired True Red CTA; red now means only danger, so the CTA alias points
+     at `primary`. `error` is the v1 name for `danger`. */
+  --color-accent: var(--primary);
+  --color-accent-hover: var(--primary-hover);
+  --color-error: var(--danger);
+  --color-error-bg: var(--danger-bg);
+  --color-error-border: var(--danger-border);
+
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-other: var(--chart-other);
+  --color-chart-ghost: var(--chart-ghost);
+  --color-funnel-1: var(--funnel-1);
+  --color-funnel-2: var(--funnel-2);
+  --color-funnel-3: var(--funnel-3);
+  --color-funnel-4: var(--funnel-4);
+
+  --color-esg-e: var(--esg-e);  --color-esg-e-bg: var(--esg-e-bg);
+  --color-esg-s: var(--esg-s);  --color-esg-s-bg: var(--esg-s-bg);
+  --color-esg-g: var(--esg-g);  --color-esg-g-bg: var(--esg-g-bg);
+
+  --color-gis-verified: var(--gis-verified);
+  --color-gis-pending: var(--gis-pending);
+  --color-gis-flagged: var(--gis-flagged);
+  --color-gis-boundary: var(--gis-boundary);
+  --color-on-imagery: var(--on-imagery);
+
+  --color-portal-accent: var(--portal-accent);
+
+  --color-white: var(--treva-white);
+  --color-black: var(--treva-black);
+
+  /* Third-party, deliberately outside the theme (see brand.css) */
+  --color-vendor-line: var(--vendor-line);
+
+  /* ── Typography ───────────────────────────────────────────────────────────
+     Headings -> Montserrat (Latin) + Prompt (Thai glyphs); body -> Open Sans
+     + Prompt; IDs & numeric data -> Inter (use with tabular-nums). The
+     `font-mono` utility is intentionally mapped to Inter per the design
+     system, not to a monospace. Re-pointed through the Layer 2 role vars so
+     the Sarabun swap in DESIGN.md §7.1 stays a one-place change. */
+  --font-sans: var(--font-role-sans);
+  --font-display: var(--font-role-display);
+  --font-mono: var(--font-role-numeric);
+
+  /* Elevation. Kelp-tinted rather than pure black (DESIGN.md §8.3).
+     NOTE: --radius-* from Appendix A.3 is deliberately NOT applied here. It
+     would move rounded-lg 8->12px at 297 sites and rounded-xl 12->20px at 93,
+     while rounded-2xl stayed 16px — a geometry change, out of scope for a
+     colour re-skin, and it would leave the radius ramp non-monotonic. */
+  --shadow-sm: var(--elev-sm);
+  --shadow-md: var(--elev-md);
+  --shadow-lg: var(--elev-lg);
 
   /* ── Layout ─────────────────────────────── */
   --sidebar-width:   240px;
@@ -101,9 +130,9 @@
 
 /* ── Base ─────────────────────────────────── */
 body {
-  background-color: var(--color-surface);
-  color: var(--color-ink);
-  font-family: var(--font-sans);
+  background-color: var(--surface);
+  color: var(--ink);
+  font-family: var(--font-role-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -112,7 +141,7 @@ body {
 h1,
 h2,
 h3 {
-  font-family: var(--font-display);
+  font-family: var(--font-role-display);
 }
 
 /**
@@ -189,8 +218,8 @@ h3 {
 
 /* Soft attention glow for anomaly cards (pulses gently, never harsh). */
 @keyframes soft-glow {
-  0%, 100% { box-shadow: 0 0 0 0 rgb(239 68 68 / 0.0); }
-  50%      { box-shadow: 0 0 0 4px rgb(239 68 68 / 0.12); }
+  0%, 100% { box-shadow: 0 0 0 0 transparent; }
+  50%      { box-shadow: 0 0 0 4px color-mix(in oklab, var(--danger) 12%, transparent); }
 }
 .animate-soft-glow {
   animation: soft-glow 2.4s ease-in-out infinite;
