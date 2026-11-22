@@ -45,7 +45,7 @@ export function VerifierShell({
   return (
     // The guide provider wraps the chrome too — topbar and sidebar both open it.
     <VerifierGuideProvider>
-      <div className="min-h-screen bg-surface">
+      <div data-portal="verify" className="min-h-screen bg-surface">
         <VerifierTopbar
           verifier={verifier}
           projects={projects}

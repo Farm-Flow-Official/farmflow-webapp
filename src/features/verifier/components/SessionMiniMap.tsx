@@ -16,7 +16,7 @@ const Map = dynamic(() => import('@/features/verifier/components/LeafletMiniMap'
 type Props = {
   polygon: [number, number][]
   pin?: [number, number]
-  pinColor?: string
+  pinToken?: string
   /**
    * Adds an "ขยาย" button over the locked thumbnail that opens a full, pan/zoom
    * enabled map in a modal. The inline map stays locked (iPad-safe) either way.
@@ -24,7 +24,7 @@ type Props = {
   expandable?: boolean
 }
 
-export function SessionMiniMap({ polygon, pin, pinColor, expandable = false }: Props) {
+export function SessionMiniMap({ polygon, pin, pinToken, expandable = false }: Props) {
   const [open, setOpen] = useState(false)
 
   useEffect(() => {
@@ -42,12 +42,12 @@ export function SessionMiniMap({ polygon, pin, pinColor, expandable = false }: P
   }, [open])
 
   if (!expandable) {
-    return <Map polygon={polygon} pin={pin} pinColor={pinColor} />
+    return <Map polygon={polygon} pin={pin} pinToken={pinToken} />
   }
 
   return (
     <div className="relative h-full w-full">
-      <Map polygon={polygon} pin={pin} pinColor={pinColor} />
+      <Map polygon={polygon} pin={pin} pinToken={pinToken} />
       <button
         type="button"
         onClick={() => setOpen(true)}
@@ -77,7 +77,7 @@ export function SessionMiniMap({ polygon, pin, pinColor, expandable = false }: P
               </button>
             </div>
             <div className="min-h-0 flex-1">
-              <Map polygon={polygon} pin={pin} pinColor={pinColor} interactive />
+              <Map polygon={polygon} pin={pin} pinToken={pinToken} interactive />
             </div>
           </div>
         </div>

@@ -131,7 +131,7 @@ export function AnnouncementBanner({
         <button
           type="button"
           onClick={close}
-          className="h-10 w-full rounded-lg bg-primary text-sm font-semibold text-white transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+          className="h-10 w-full rounded-lg bg-primary text-sm font-semibold text-on-primary transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
         >
           รับทราบ
         </button>

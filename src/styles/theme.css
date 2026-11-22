@@ -1,0 +1,225 @@
+/* ── Layer 2: semantic roles ───────────────────────────────────────────────
+   DESIGN.md v1.0.0 §4.3. Components never read --treva-* directly — they read
+   the Tailwind utilities that globals.css maps onto these roles, so a role can
+   be re-pointed here and the whole product follows.
+
+   Light is the only mode wired up today (<html data-theme="light"> is pinned in
+   layout.tsx). The [data-theme="dark"] block below is complete and inert — it
+   is here so Phase 3 is "ship the toggle", not "re-derive every colour".
+   ───────────────────────────────────────────────────────────────────────── */
+:root,
+[data-theme="light"] {
+  color-scheme: light;
+
+  /* Surfaces */
+  --surface:   var(--treva-kelp-50);
+  --panel:     var(--treva-white);
+  --raised:    var(--treva-white);
+  --sunken:    var(--treva-kelp-100);
+  --highlight: var(--treva-lime-50);
+  --overlay:   rgb(28 30 22 / 0.48);
+
+  /* Lines */
+  --line:        var(--treva-kelp-200);
+  --line-strong: var(--treva-kelp-300);
+  --line-input:  var(--treva-kelp-500);
+  --ring:        var(--treva-sea-700);
+
+  /* Text. The v1 muted gray was 2.5:1 and failed AA; --ink-muted is
+     5.0:1 here, so it may now carry real (if secondary) information. */
+  --ink:           var(--treva-kelp-950);
+  --ink-secondary: var(--treva-kelp-700);
+  --ink-muted:     var(--treva-kelp-600);
+  --ink-disabled:  var(--treva-kelp-400);
+  --brand:         var(--treva-eggplant-800);
+
+  /* Action (Sea Blue) — one primary action per view (DESIGN.md §4.4) */
+  --primary:        var(--treva-sea-700);
+  --primary-hover:  var(--treva-sea-800);
+  --on-primary:     var(--treva-white);
+  --primary-subtle: var(--treva-sea-50);
+  --primary-muted:  var(--treva-sea-100);
+
+  /* Carbon (Mossy Leaf). --carbon is for marks and display numerals >= 24px;
+     normal-size carbon TEXT uses --carbon-ink, which clears AA. */
+  --carbon:        var(--treva-moss-600);
+  --carbon-ink:    var(--treva-moss-700);
+  --carbon-subtle: var(--treva-moss-50);
+
+  /* Sidebar (Eggplant) — §8.4 */
+  --sidebar:           var(--treva-eggplant-800);
+  --sidebar-ink:       var(--treva-eggplant-200);
+  --sidebar-ink-muted: var(--treva-eggplant-300);
+  --sidebar-active:    var(--treva-eggplant-700);
+  --sidebar-indicator: var(--treva-lime-50);
+
+  /* Status */
+  --success: var(--treva-moss-700);   --success-bg: var(--treva-moss-50);
+  --warning: var(--treva-amber-700);  --warning-bg: var(--treva-amber-50);
+  --danger:  var(--treva-red-700);    --danger-bg:  var(--treva-red-50);
+  --danger-solid: var(--treva-red-700);
+  --info:    var(--treva-sea-700);    --info-bg:    var(--treva-sea-50);
+  --neutral: var(--treva-kelp-700);   --neutral-bg: var(--treva-kelp-100);
+
+  /* Status BORDERS. Not in DESIGN.md Appendix A, but `error-border` is used at
+     24 call sites and `warning-border` at one (where it has been silently
+     falling back to currentColor, because the v1 @theme never defined it).
+     Mixed rather than hard-coded: §16 records that Marketing has not signed
+     off the danger/warning hues, so adding --treva-red-200 would be setting CI
+     on their behalf. The mix also tracks the theme for free. */
+  --danger-border:  color-mix(in oklab, var(--danger) 32%, var(--panel));
+  --warning-border: color-mix(in oklab, var(--warning) 32%, var(--panel));
+
+  /* Charts — categorical, max 3 slots, consumed IN THIS ORDER. The order is
+     the colourblind-safety mechanism, not a preference: the set was validated
+     all-pairs so any subset in any arrangement stays distinguishable,
+     including a donut whose last segment wraps round to touch the first.
+     Never cycle past slot 3 — the tail folds into --chart-other. */
+  --chart-1: var(--treva-moss-600);
+  --chart-2: var(--treva-sea-700);
+  --chart-3: var(--treva-chart-orchid);
+  --chart-other: var(--treva-kelp-400);
+  /* A stage that exists in the lifecycle but has no data behind it yet —
+     drawn, never filled, so "not built" never reads as "measured zero". */
+  --chart-ghost: var(--treva-kelp-200);
+  /* Ordinal ramp for ORDERED categories (the carbon funnel, package tiers).
+     One hue, monotone lightness — a categorical ramp here would burn hue on
+     information the bar length already carries. */
+  --funnel-1: var(--treva-moss-400);
+  --funnel-2: var(--treva-moss-600);
+  --funnel-3: var(--treva-moss-700);
+  --funnel-4: var(--treva-moss-900);
+
+  /* ESG pillars — a navigational encoding, never colour alone: every pillar
+     heading carries its own name and icon (DESIGN.md §0 rule 7). */
+  --esg-e: var(--treva-moss-700);     --esg-e-bg: var(--treva-moss-50);
+  --esg-s: var(--treva-sea-700);      --esg-s-bg: var(--treva-sea-50);
+  --esg-g: var(--treva-eggplant-800); --esg-g-bg: var(--treva-eggplant-50);
+
+  /* GIS — status markers pair colour with SHAPE (● verified, ◆ pending,
+     ▲ flagged); polygon fill is the stroke colour at 16% alpha (§4.7). */
+  --gis-verified: var(--treva-moss-600);
+  --gis-pending:  var(--treva-amber-600);
+  --gis-flagged:  var(--treva-red-600);
+  --gis-boundary: var(--treva-sea-700);
+  /* Marks drawn ON satellite imagery, which is dark in BOTH themes, so this
+     role does not flip: a boundary casing reads as the dark half of the
+     light-line-over-dark-outline pair road labels use on aerial basemaps.
+     DESIGN.md §4.7 does not cover it — flagged for review. */
+  --on-imagery: var(--treva-white);
+
+  /* Portal accent — identity only, overridden per [data-portal] below. Default
+     is transparent so a surface with no portal (login, print) shows no bar. */
+  --portal-accent: transparent;
+
+  /* Elevation. Kelp-tinted, never pure black, in light mode. */
+  --elev-sm: 0 1px 2px rgb(28 30 22 / 0.06);
+  --elev-md: 0 4px 12px rgb(28 30 22 / 0.08);
+  --elev-lg: 0 12px 32px rgb(28 30 22 / 0.12);
+}
+
+/* Dark is DESIGNED, not inverted: every role has its own value, validated
+   against the dark surface. Elevation in dark = lighter surface + 1px line,
+   not a bigger shadow. Not reachable yet (DESIGN.md §15 Phase 3). */
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --surface:   var(--treva-kelp-dark-canvas);
+  --panel:     var(--treva-kelp-dark-panel);
+  --raised:    var(--treva-kelp-dark-raised);
+  --sunken:    var(--treva-kelp-dark-sunken);
+  --highlight: var(--treva-lime-dark-surface);
+  --overlay:   rgb(0 0 0 / 0.64);
+
+  --line:        var(--treva-kelp-dark-line);
+  --line-strong: var(--treva-kelp-dark-line-2);
+  --line-input:  var(--treva-kelp-dark-input);
+  --ring:        var(--treva-sea-dark-400);
+
+  --ink:           var(--treva-kelp-50);
+  --ink-secondary: var(--treva-kelp-300);
+  --ink-muted:     var(--treva-kelp-400);
+  --ink-disabled:  var(--treva-kelp-dark-disabled);
+  --brand:         var(--treva-eggplant-dark-300);
+
+  --primary:        var(--treva-sea-dark-400);
+  --primary-hover:  var(--treva-sea-dark-300);
+  --on-primary:     var(--treva-kelp-950);
+  --primary-subtle: var(--treva-sea-dark-subtle);
+  --primary-muted:  var(--treva-sea-dark-muted);
+
+  --carbon:        var(--treva-moss-dark-400);
+  --carbon-ink:    var(--treva-moss-300);
+  --carbon-subtle: var(--treva-moss-dark-subtle);
+
+  --sidebar:           var(--treva-eggplant-dark-950);
+  --sidebar-ink:       var(--treva-eggplant-200);
+  --sidebar-ink-muted: var(--treva-eggplant-400);
+  --sidebar-active:    var(--treva-eggplant-dark-900);
+  --sidebar-indicator: var(--treva-lime-dark-300);
+
+  --success: var(--treva-moss-300);        --success-bg: var(--treva-moss-dark-subtle);
+  --warning: var(--treva-amber-dark-300);  --warning-bg: var(--treva-amber-dark-bg);
+  --danger:  var(--treva-red-dark-300);    --danger-bg:  var(--treva-red-dark-bg);
+  --danger-solid: var(--treva-red-600);
+  --info:    var(--treva-sea-dark-300);    --info-bg:    var(--treva-sea-dark-muted);
+  --neutral: var(--treva-kelp-300);        --neutral-bg: var(--treva-kelp-dark-raised);
+
+  --danger-border:  color-mix(in oklab, var(--danger) 32%, var(--panel));
+  --warning-border: color-mix(in oklab, var(--warning) 32%, var(--panel));
+
+  --chart-1: var(--treva-chart-dark-moss);
+  --chart-2: var(--treva-chart-dark-sea);
+  --chart-3: var(--treva-chart-dark-orchid);
+  --chart-other: var(--treva-kelp-dark-input);
+  --chart-ghost: var(--treva-kelp-dark-line);
+  --funnel-1: var(--treva-moss-700);
+  --funnel-2: var(--treva-moss-600);
+  --funnel-3: var(--treva-moss-400);
+  --funnel-4: var(--treva-moss-300);
+
+  --esg-e: var(--treva-moss-300);           --esg-e-bg: var(--treva-moss-dark-subtle);
+  --esg-s: var(--treva-sea-dark-300);       --esg-s-bg: var(--treva-sea-dark-muted);
+  --esg-g: var(--treva-eggplant-dark-300);  --esg-g-bg: var(--treva-eggplant-950);
+
+  --gis-verified: var(--treva-moss-dark-400);
+  --gis-pending:  var(--treva-amber-dark-300);
+  --gis-flagged:  var(--treva-red-dark-300);
+  --gis-boundary: var(--treva-sea-dark-400);
+  --on-imagery: var(--treva-white);
+
+  --elev-sm: none;
+  --elev-md: 0 4px 12px rgb(0 0 0 / 0.4);
+  --elev-lg: 0 12px 32px rgb(0 0 0 / 0.5);
+}
+
+/* Portal accents — thin identity only (DESIGN.md §4.5): a 3px bar on the top
+   edge of the topbar and the portal chip. Buttons, links and statuses are
+   identical across portals so a user moving between them never relearns
+   colours. Both selector forms are needed because data-theme lives on <html>
+   while data-portal is set on a portal's own root layout. */
+[data-portal="control"]  { --portal-accent: var(--treva-eggplant-800); }
+[data-portal="verify"]   { --portal-accent: var(--treva-sea-700); }
+[data-portal="decide"]   { --portal-accent: var(--treva-kelp-800); }
+[data-portal="business"] { --portal-accent: var(--treva-moss-600); }
+[data-theme="dark"] [data-portal="control"],  [data-theme="dark"][data-portal="control"]  { --portal-accent: var(--treva-eggplant-dark-300); }
+[data-theme="dark"] [data-portal="verify"],   [data-theme="dark"][data-portal="verify"]   { --portal-accent: var(--treva-sea-dark-400); }
+[data-theme="dark"] [data-portal="decide"],   [data-theme="dark"][data-portal="decide"]   { --portal-accent: var(--treva-lime-dark-300); }
+[data-theme="dark"] [data-portal="business"], [data-theme="dark"][data-portal="business"] { --portal-accent: var(--treva-moss-dark-400); }
+
+/* Typography roles — one-place font swap (DESIGN.md §3.1).
+   DEVIATION FROM APPENDIX A.2: §7.1 calls for Sarabun everywhere, but the font
+   swap is explicitly out of scope for this colour-only pass, so these roles
+   point at the fonts already loaded in layout.tsx. Moving to Sarabun later is
+   a three-line change here plus the next/font loader — no component edits.
+   `font-mono` is mapped to Inter by design, not to a monospace: it marks IDs
+   and numeric data. */
+:root {
+  --font-role-sans:    var(--font-open-sans), var(--font-prompt), system-ui, -apple-system, sans-serif;
+  --font-role-display: var(--font-montserrat), var(--font-prompt), system-ui, sans-serif;
+  --font-role-numeric: var(--font-inter), var(--font-prompt), system-ui, sans-serif;
+}
+
+/* Focus Mode hook — reserved, DESIGN.md §6. Nothing sets data-focus yet; the
+   rule is here so marking chrome as aux is all a later sprint has to do. */
+[data-focus="on"] [data-chrome="aux"] { display: none !important; }

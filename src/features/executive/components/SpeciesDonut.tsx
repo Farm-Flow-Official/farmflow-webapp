@@ -4,8 +4,12 @@ import { formatNumber } from '@/lib/utils/format'
 import { CHART_OTHER_COLOR, CHART_SERIES_COLORS, formatTonnes } from '@/features/executive/lib'
 import type { SpeciesSlice } from '@/features/executive/types'
 
-/** Past this many species the tail folds into one grey bucket — never a 6th hue. */
-const MAX_SLICES = 5
+/**
+ * Past this many species the tail folds into one grey bucket — never a 4th hue.
+ * Must equal CHART_SERIES_COLORS.length: the colour lookup below wraps with `%`,
+ * so a larger cap would repeat slot 1 inside the same donut (DESIGN.md §4.6).
+ */
+const MAX_SLICES = CHART_SERIES_COLORS.length
 
 /**
  * What the portfolio actually grows — farms per tree species.

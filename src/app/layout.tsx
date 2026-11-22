@@ -43,8 +43,12 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
+    // Light is pinned for now. DESIGN.md §5 wants light|dark|system resolved by
+    // a blocking inline script before first paint; that (and the toggle) is
+    // Phase 3. CSS only ever reads data-theme, so switching later is additive.
     <html
       lang="th"
+      data-theme="light"
       className={`${montserrat.variable} ${openSans.variable} ${inter.variable} ${prompt.variable}`}
     >
       <body>{children}</body>

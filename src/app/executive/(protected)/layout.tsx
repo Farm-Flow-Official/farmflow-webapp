@@ -45,7 +45,7 @@ export default async function ExecutiveLayout({
   ])
 
   return (
-    <div className="min-h-dvh bg-surface">
+    <div data-portal="decide" className="min-h-dvh bg-surface">
       <ExecutiveTopbar profile={executive} announcements={bell} />
       <AnnouncementBanner announcements={banner} surface="executive" />
       {/* 1440 to match the admin and verifier shells — the ESG layout runs three

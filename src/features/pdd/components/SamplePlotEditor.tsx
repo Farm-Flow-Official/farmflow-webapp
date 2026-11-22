@@ -157,7 +157,7 @@ export function SamplePlotEditor({
     <button
       type="button"
       onClick={startDrawing}
-      className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+      className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-on-primary transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
     >
       <Pencil className="h-4 w-4" strokeWidth={2} />
       วาดแปลงใหม่
@@ -209,7 +209,7 @@ export function SamplePlotEditor({
               onClick={savePlot}
               disabled={!canClose || busy}
               title={canClose ? undefined : 'ต้องมีอย่างน้อย 3 จุดจึงจะเป็นรูปปิดได้'}
-              className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-primary px-4 text-sm font-semibold text-white transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-primary px-4 text-sm font-semibold text-on-primary transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {busy ? (
                 <Loader2 className="h-4 w-4 animate-spin" strokeWidth={2} />
@@ -355,18 +355,18 @@ function Legend({ hasDeclared, inDialog = false }: { hasDeclared: boolean; inDia
         <span className="flex items-center gap-1.5">
           {/* White dashes on a dark bar — the swatch has to read the way the
               line does on imagery, or the legend stops matching the map. */}
-          <span className="flex h-3 w-5 items-center justify-center rounded-sm bg-[#0F172A]/70">
-            <span className="h-0 w-full border-t-2 border-dashed border-white" />
+          <span className="flex h-3 w-5 items-center justify-center rounded-sm bg-ink/70">
+            <span className="h-0 w-full border-t-2 border-dashed border-on-imagery" />
           </span>
           ขอบเขตโครงการที่ประกาศ
         </span>
       )}
       <span className="flex items-center gap-1.5">
-        <span className="h-2.5 w-2.5 rounded-sm bg-[#F59E0B]/40 ring-1 ring-[#F59E0B]" />
+        <span className="h-2.5 w-2.5 rounded-sm bg-gis-pending/40 ring-1 ring-gis-pending" />
         แปลงตัวอย่าง
       </span>
       <span className="flex items-center gap-1.5">
-        <span className="h-2.5 w-2.5 rounded-full bg-[#0EA5E9]" />
+        <span className="h-2.5 w-2.5 rounded-full bg-primary" />
         จุดที่กำลังวาด
       </span>
     </div>

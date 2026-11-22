@@ -4,6 +4,7 @@ import 'leaflet/dist/leaflet.css'
 import { useEffect, useMemo } from 'react'
 import { MapContainer, TileLayer, Polygon, Polyline, CircleMarker, useMap, useMapEvents } from 'react-leaflet'
 import type { LatLngExpression, LatLngTuple } from 'leaflet'
+import { token } from '@/styles/token'
 
 /** GeoJSON position, [lng, lat]. */
 export type Position = [number, number]
@@ -174,7 +175,7 @@ export default function SamplePlotMap({
           <Polygon
             positions={toLatLng(declaredBoundary)}
             pathOptions={{
-              color: '#0F172A',
+              color: token('ink'),
               weight: 6,
               opacity: 0.55,
               fill: false,
@@ -184,7 +185,7 @@ export default function SamplePlotMap({
           <Polygon
             positions={toLatLng(declaredBoundary)}
             pathOptions={{
-              color: '#FFFFFF',
+              color: token('on-imagery'),
               weight: 2.5,
               fill: false,
               dashArray: '10 7',
@@ -202,9 +203,9 @@ export default function SamplePlotMap({
             key={plot.id}
             positions={toLatLng(plot.ring)}
             pathOptions={{
-              color: '#F59E0B',
+              color: token('gis-pending'),
               weight: selected ? 3.5 : 2,
-              fillColor: '#F59E0B',
+              fillColor: token('gis-pending'),
               fillOpacity: selected ? 0.4 : 0.2,
             }}
             eventHandlers={{ click: () => onSelectPlot(plot.id) }}
@@ -216,7 +217,7 @@ export default function SamplePlotMap({
       {draftLatLng.length > 1 && (
         <Polyline
           positions={draftLatLng as LatLngExpression[]}
-          pathOptions={{ color: '#0EA5E9', weight: 3, dashArray: '6 4' }}
+          pathOptions={{ color: token('primary'), weight: 3, dashArray: '6 4' }}
         />
       )}
 
@@ -228,9 +229,9 @@ export default function SamplePlotMap({
             center={position}
             radius={isFirst ? 7 : 5}
             pathOptions={{
-              color: '#0EA5E9',
+              color: token('primary'),
               weight: 2,
-              fillColor: isFirst ? '#0EA5E9' : '#fff',
+              fillColor: isFirst ? token('primary') : token('on-imagery'),
               fillOpacity: 1,
             }}
             eventHandlers={

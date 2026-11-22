@@ -92,7 +92,7 @@ export function GeneratedPasswordDialog({
           type="button"
           onClick={onClose}
           disabled={!copied}
-          className="h-9 rounded-lg bg-primary px-4 text-sm font-semibold text-white transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
+          className="h-9 rounded-lg bg-primary px-4 text-sm font-semibold text-on-primary transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {copied ? 'เรียบร้อย' : 'กรุณาคัดลอกก่อน'}
         </button>

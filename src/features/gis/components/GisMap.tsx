@@ -5,13 +5,16 @@ import { useEffect } from 'react'
 import { MapContainer, TileLayer, Polygon, useMap } from 'react-leaflet'
 import type { LatLngExpression } from 'leaflet'
 import { farmMapState, type FarmGeo, type FarmMapState } from '@/features/gis/types'
+import { token } from '@/styles/token'
 
-/** Hex values mirror the --color-gis-* design tokens (Leaflet draws via JS, not CSS). */
-const STATE_COLOR: Record<FarmMapState, string> = {
-  flagged: '#EF4444',
-  pending: '#F59E0B',
-  verified: '#22C55E',
-}
+/**
+ * Leaflet draws through a JS API, so it cannot take a `var(--token)`. The
+ * --gis-* roles are read at render time instead (DESIGN.md Appendix B) — not at
+ * module scope, which also runs on the server for a client component.
+ *
+ * The state names line up with the token names by design.
+ */
+const stateColor = (state: FarmMapState) => token(`gis-${state}`)
 
 /** GeoJSON [lng, lat] → Leaflet [lat, lng]. */
 function toLatLng(poly: FarmGeo['polygon']): LatLngExpression[] {
@@ -91,7 +94,7 @@ export default function GisMap({
         maxZoom={19}
       />
       {farms.map((f) => {
-        const color = STATE_COLOR[farmMapState(f)]
+        const color = stateColor(farmMapState(f))
         const selected = f.id === selectedId
         return (
           <Polygon

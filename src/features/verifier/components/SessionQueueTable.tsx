@@ -216,7 +216,7 @@ export function SessionQueueTable({ sessions }: { sessions: VerificationSession[
               }`}
             >
               <span
-                className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform ${
+                className={`inline-block h-5 w-5 transform rounded-full bg-panel shadow transition-transform ${
                   anomalyOnly ? 'translate-x-[22px]' : 'translate-x-0.5'
                 }`}
               />

@@ -28,14 +28,18 @@ const BADGE: Record<ConfidenceTone, string> = {
 }
 
 /**
- * Vivid hex per tone for SVG gauges (stroke/conic) — the GIS status ramp, which
- * reads brighter on a ring than the muted `text-*` tokens. Kept in sync with the
- * tone bands so a passing score always draws green.
+ * The GIS status ramp per tone, for SVG gauges (stroke/conic) — it reads
+ * brighter on a ring than the muted `text-*` tokens. Kept in sync with the tone
+ * bands so a passing score always draws green.
+ *
+ * CSS variables rather than resolved colours: this module is imported by server
+ * components, so it cannot read the document, and both consumers feed the value
+ * to a CSS property or an SVG presentation attribute, where `var()` resolves.
  */
-const HEX: Record<ConfidenceTone, string> = {
-  ok: '#22C55E', // --color-gis-verified
-  watch: '#F59E0B', // --color-gis-pending
-  critical: '#EF4444', // --color-gis-flagged
+const RAMP: Record<ConfidenceTone, string> = {
+  ok: 'var(--color-gis-verified)',
+  watch: 'var(--color-gis-pending)',
+  critical: 'var(--color-gis-flagged)',
 }
 
 const TONE_LABEL: Record<ConfidenceTone, string> = {
@@ -54,9 +58,9 @@ export function confidenceBadgeClass(score: number): string {
   return BADGE[confidenceTone(score)]
 }
 
-/** Vivid hex for a confidence score — for gauge strokes / conic fills. */
+/** Ramp colour for a confidence score — for gauge strokes / conic fills. */
 export function confidenceHex(score: number): string {
-  return HEX[confidenceTone(score)]
+  return RAMP[confidenceTone(score)]
 }
 
 /** Short Thai tone label ('เชื่อมั่นสูง' / 'ควรตรวจซ้ำ' / 'ความเชื่อมั่นต่ำ'). */

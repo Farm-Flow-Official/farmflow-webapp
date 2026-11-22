@@ -88,14 +88,14 @@ export function BusinessSidebar({ open = false, onNavigate }: Props) {
 
   return (
     <aside
-      className={`fixed bottom-0 left-0 top-16 z-40 flex w-60 flex-col border-r border-line bg-panel shadow-xl transition-transform duration-200 lg:translate-x-0 lg:shadow-none ${
+      className={`fixed bottom-0 left-0 top-16 z-40 flex w-60 flex-col bg-sidebar shadow-xl transition-transform duration-200 lg:translate-x-0 lg:shadow-none ${
         open ? 'translate-x-0' : '-translate-x-full'
       }`}
     >
       <nav className="flex-1 overflow-y-auto px-3 py-4">
         {NAV.map((section) => (
           <div key={section.heading} className="mb-1.5">
-            <p className="px-3 pb-1 pt-3 text-[10px] font-bold uppercase tracking-[0.12em] text-ink-muted">
+            <p className="px-3 pb-1 pt-3 text-[10px] font-bold uppercase tracking-[0.12em] text-sidebar-ink-muted">
               {section.heading}
             </p>
             {section.items.map((item) => {
@@ -107,11 +107,11 @@ export function BusinessSidebar({ open = false, onNavigate }: Props) {
                     key={item.href}
                     aria-disabled
                     title="เร็ว ๆ นี้"
-                    className="mb-0.5 flex h-10 cursor-default items-center gap-3 rounded-lg px-3 text-sm font-medium text-ink-disabled"
+                    className="mb-0.5 flex h-10 cursor-default items-center gap-3 rounded-lg border-l-[3px] border-transparent px-3 text-sm font-medium text-sidebar-ink/45"
                   >
-                    <Icon className="h-[18px] w-[18px] shrink-0 text-ink-disabled" strokeWidth={1.75} />
+                    <Icon className="h-[18px] w-[18px] shrink-0 text-sidebar-ink/45" strokeWidth={1.75} />
                     {item.label}
-                    <span className="ml-auto rounded bg-surface px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-ink-muted">
+                    <span className="ml-auto rounded bg-sidebar-active px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-sidebar-ink-muted">
                       Soon
                     </span>
                   </div>
@@ -125,14 +125,14 @@ export function BusinessSidebar({ open = false, onNavigate }: Props) {
                   href={item.href}
                   onClick={onNavigate}
                   aria-current={active ? 'page' : undefined}
-                  className={`mb-0.5 flex h-10 items-center gap-3 rounded-lg px-3 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 ${
+                  className={`mb-0.5 flex h-10 items-center gap-3 rounded-lg border-l-[3px] px-3 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-indicator focus-visible:ring-offset-1 focus-visible:ring-offset-sidebar ${
                     active
-                      ? 'bg-primary-subtle font-semibold text-primary'
-                      : 'font-medium text-ink-secondary hover:bg-surface hover:text-ink'
+                      ? 'border-sidebar-indicator bg-sidebar-active font-semibold text-sidebar-indicator'
+                      : 'border-transparent font-medium text-sidebar-ink hover:bg-sidebar-active/60 hover:text-sidebar-indicator'
                   }`}
                 >
                   <Icon
-                    className={`h-[18px] w-[18px] shrink-0 ${active ? 'text-primary' : 'text-ink-muted'}`}
+                    className={`h-[18px] w-[18px] shrink-0 ${active ? 'text-sidebar-indicator' : 'text-sidebar-ink'}`}
                     strokeWidth={1.75}
                   />
                   {item.label}
@@ -144,8 +144,8 @@ export function BusinessSidebar({ open = false, onNavigate }: Props) {
         ))}
       </nav>
 
-      <div className="border-t border-line px-4 py-4">
-        <p className="text-[11px] text-ink-muted">FarmFlow Business v1.0</p>
+      <div className="border-t border-sidebar-active px-4 py-4">
+        <p className="text-[11px] text-sidebar-ink-muted">FarmFlow Business v1.0</p>
       </div>
     </aside>
   )

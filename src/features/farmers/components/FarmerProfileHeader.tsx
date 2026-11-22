@@ -73,7 +73,7 @@ export function FarmerProfileHeader({ farmer }: { farmer: FarmerDetail }) {
           className={`inline-flex shrink-0 items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
             isActive
               ? 'border-error-border bg-error-bg text-error hover:bg-error hover:text-white'
-              : 'border-primary-muted bg-primary-subtle text-primary hover:bg-primary hover:text-white'
+              : 'border-primary-muted bg-primary-subtle text-primary hover:bg-primary hover:text-on-primary'
           }`}
         >
           {isActive ? (

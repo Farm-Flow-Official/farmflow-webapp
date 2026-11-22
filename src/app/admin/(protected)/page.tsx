@@ -142,8 +142,8 @@ export default async function AdminDashboardPage() {
         <div>
           <div className="h-1.5 w-full overflow-hidden rounded-full bg-sunken">
             <div
-              className="h-full rounded-full"
-              style={{ width: `${overlapPct}%`, backgroundColor: '#F59E0B' }}
+              className="h-full rounded-full bg-warning"
+              style={{ width: `${overlapPct}%` }}
             />
           </div>
           <p className="mt-1 text-[11px] text-ink-muted">

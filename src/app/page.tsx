@@ -104,7 +104,7 @@ export default async function PortalLandingPage() {
           href="/verifier/verify/qr-check"
           className="group mt-6 flex flex-col items-start gap-4 rounded-2xl border border-primary/20 bg-primary-subtle p-6 transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 sm:flex-row sm:items-center"
         >
-          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary text-white">
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary text-on-primary">
             <QrCode className="h-6 w-6" strokeWidth={1.9} />
           </span>
 
@@ -116,7 +116,7 @@ export default async function PortalLandingPage() {
             </p>
           </div>
 
-          <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white transition-colors group-hover:bg-primary-hover">
+          <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary transition-colors group-hover:bg-primary-hover">
             ตรวจสอบเอกสาร
             <ArrowRight
               className="h-4 w-4 transition-transform group-hover:translate-x-0.5"

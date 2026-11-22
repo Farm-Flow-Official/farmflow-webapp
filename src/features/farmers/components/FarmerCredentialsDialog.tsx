@@ -107,7 +107,7 @@ export function FarmerCredentialsDialog({
         <button
           type="button"
           onClick={onClose}
-          className="mt-5 h-10 w-full rounded-lg bg-primary text-sm font-semibold text-white transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+          className="mt-5 h-10 w-full rounded-lg bg-primary text-sm font-semibold text-on-primary transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
         >
           ปิด
         </button>
@@ -187,7 +187,7 @@ export function FarmerCredentialsDialog({
           type="button"
           onClick={() => submit('set')}
           disabled={pending || (!usernameChanged && !password)}
-          className="inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-lg bg-primary px-4 text-sm font-semibold text-white transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-lg bg-primary px-4 text-sm font-semibold text-on-primary transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {pending && <Loader2 className="h-4 w-4 animate-spin" strokeWidth={2} />}
           บันทึก

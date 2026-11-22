@@ -272,7 +272,7 @@ export default async function TreeInspectPage({
                 pin={tree.captureLng != null && tree.captureLat != null
                   ? [tree.captureLng, tree.captureLat]
                   : undefined}
-                pinColor={gpsOk ? '#2563EB' : '#C8000E'}
+                pinToken={gpsOk ? 'primary' : 'gis-flagged'}
                 expandable
               />
             </div>
