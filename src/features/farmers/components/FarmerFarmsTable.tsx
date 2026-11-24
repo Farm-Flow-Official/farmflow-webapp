@@ -5,12 +5,128 @@ import { useRouter } from 'next/navigation'
 import { Sprout } from 'lucide-react'
 import { DataTable, type Column } from '@/components/ui/data-table'
 import { ListToolbar } from '@/components/ui/list-toolbar'
-import type { Farm } from '@/features/farmers/types'
+import { AreaRai } from '@/components/ui/area-rai'
+import { Carbon } from '@/components/ui/carbon'
+import { Badge } from '@/components/ui/badge'
+import { formatDate } from '@/lib/utils/format'
+import { coverPhotoUrl } from '@/lib/farm-cover'
+import { FARM_STATUS_INFO, type Farm } from '@/features/farmers/types'
 
 type Props = {
   farms: Farm[]
-  columns: Column<Farm>[]
 }
+
+/**
+ * The column definitions live here, not in the page.
+ *
+ * They were declared in the server component and handed over as a prop, which
+ * React cannot do: a `cell` is a function, and functions do not cross the
+ * server/client boundary. The page rendered fine until the table was made
+ * interactive for sorting — at which point the whole route started throwing at
+ * runtime, invisible to typecheck, lint and build alike.
+ */
+const COLUMNS: Column<Farm>[] = [
+  {
+    key: 'id',
+    header: 'Farm ID',
+    cell: (f) => (
+      <span className="rounded bg-surface px-2 py-1 font-mono text-[13px] text-ink-secondary">
+        {f.id}
+      </span>
+    ),
+  },
+  {
+    key: 'name',
+    header: 'ชื่อแปลง',
+    cell: (f) => {
+      const cover = coverPhotoUrl(f.coverPhotoFileId)
+      return (
+        <div className="flex items-center gap-2.5">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-line bg-surface">
+            {cover ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={cover}
+                alt=""
+                loading="lazy"
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <Sprout className="h-4 w-4 text-ink-disabled" strokeWidth={1.5} />
+            )}
+          </span>
+          <span className="font-medium text-ink">{f.name}</span>
+        </div>
+      )
+    },
+  },
+  {
+    key: 'province',
+    header: 'จังหวัด',
+    cell: (f) => (
+      <span className="text-[13px] text-ink-secondary">
+        {f.province ?? <span className="text-ink-disabled">—</span>}
+      </span>
+    ),
+  },
+  {
+    key: 'area',
+    header: 'พื้นที่',
+    align: 'right',
+    cell: (f) => (
+      <span className="text-ink-secondary">
+        <AreaRai rai={f.areaRai} />
+      </span>
+    ),
+  },
+  {
+    key: 'crop',
+    header: 'ชนิดพืช',
+    cell: (f) => (
+      <span className="text-[13px] text-ink-secondary">
+        {f.cropType ?? <span className="text-ink-disabled">—</span>}
+      </span>
+    ),
+  },
+  {
+    key: 'status',
+    header: 'สถานะ',
+    cell: (f) => {
+      const info = FARM_STATUS_INFO[f.farmStatus]
+      return (
+        <Badge variant={info.variant} dot>
+          {info.label}
+        </Badge>
+      )
+    },
+  },
+  {
+    key: 'project',
+    header: 'ขึ้นทะเบียนกับโครงการ',
+    cell: (f) => (
+      <span className="text-[13px] text-ink-secondary">
+        {f.projectName ?? <span className="text-ink-disabled">ยังไม่เข้าร่วม</span>}
+      </span>
+    ),
+  },
+  {
+    key: 'carbon',
+    header: 'Carbon',
+    align: 'right',
+    cell: (f) => (
+      <span className="font-semibold text-success">
+        <Carbon kgCo2e={f.carbonKgCo2e} stacked />
+      </span>
+    ),
+  },
+  {
+    key: 'registered',
+    header: 'วันที่ขึ้นทะเบียน',
+    cell: (f) => (
+      <span className="text-[13px] text-ink-secondary">{formatDate(f.registeredAt)}</span>
+    ),
+  },
+]
 
 const SORTS = [
   { value: 'registeredAt', label: 'วันที่ขึ้นทะเบียน' },
@@ -28,7 +144,7 @@ const SORTS = [
  * trip per keystroke would cost more than it saves. The control surface is
  * identical either way, which is what the convention actually asks for.
  */
-export function FarmerFarmsTable({ farms, columns }: Props) {
+export function FarmerFarmsTable({ farms }: Props) {
   const [q, setQ] = useState('')
   const [sort, setSort] = useState('registeredAt')
   const [dir, setDir] = useState<'asc' | 'desc'>('desc')
@@ -84,7 +200,7 @@ export function FarmerFarmsTable({ farms, columns }: Props) {
       />
 
       <DataTable
-        columns={columns}
+        columns={COLUMNS}
         rows={rows}
         getRowKey={(f) => f.id}
         onRowClick={(f) => router.push(`/admin/farms/${f.id}`)}

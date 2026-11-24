@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
 import { CircleCheck, CircleX, ShieldCheck, Search } from 'lucide-react'
+import { BackToPortals } from '@/components/ui/back-to-portals'
+import { SdgStrip } from '@/components/ui/sdg-strip'
 import { verifySession } from '@/features/verifier/services/verifySession'
 import { formatDate } from '@/lib/utils/format'
 
@@ -21,6 +23,11 @@ export default async function QrCheckPage({
   return (
     <main className="flex min-h-screen items-center justify-center bg-surface p-6">
       <div className="w-full max-w-[480px]">
+        {/* Reached two ways: clicked from the portal chooser, or scanned off a
+            printed certificate. The label has to make sense to the second
+            visitor, who has no account and is not going to a portal. */}
+        <BackToPortals label="หน้าแรก FarmFlow" className="mb-3 -ml-2" />
+
         {/* Brand */}
         <div className="mb-6 flex flex-col items-center gap-2">
           <div className="flex items-center gap-2.5">
@@ -92,7 +99,7 @@ export default async function QrCheckPage({
             />
             <button
               type="submit"
-              className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-lg bg-primary px-4 text-sm font-semibold text-white transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+              className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-lg bg-primary px-4 text-sm font-semibold text-on-primary transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
             >
               <Search className="h-4 w-4" strokeWidth={1.9} />
               ตรวจสอบ
@@ -106,6 +113,12 @@ export default async function QrCheckPage({
         <p className="mt-5 text-center text-xs text-ink-muted">
           ตรวจสอบเฉพาะความถูกต้องของเอกสาร · ไม่เปิดเผยข้อมูลส่วนบุคคล
         </p>
+
+        {/* Ruled off on purpose. This page answers exactly one question — is this
+            certificate real — and a row of UN goals sitting flush against that
+            answer invites the reader to think the UN had a hand in issuing it.
+            The rule makes it read as the foot of a website instead. */}
+        <SdgStrip size="sm" className="mt-6 border-t border-line pt-6" />
       </div>
     </main>
   )

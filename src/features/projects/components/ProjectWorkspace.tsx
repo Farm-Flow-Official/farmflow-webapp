@@ -11,6 +11,8 @@ import { Badge } from '@/components/ui/badge'
 import { Modal } from '@/components/ui/modal'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { Toast, useToast } from '@/components/ui/toast'
+import { SdgStrip } from '@/components/ui/sdg-strip'
+import { ProjectCoverPanel } from '@/features/projects/components/ProjectCoverPanel'
 import type { ProjectDetail, ProjectMemberFarm } from '@/features/projects/types'
 import type { ProjectLookups } from '@/features/projects/types/lookups'
 import {
@@ -182,6 +184,14 @@ export function ProjectWorkspace({ project: initial, lookups, canWrite }: Props)
 
   return (
     <div className="flex flex-col gap-6">
+      <ProjectCoverPanel
+        projectId={project.id}
+        projectCode={project.projectCode}
+        projectName={project.nameTh}
+        coverPhotoFileId={project.coverPhotoFileId}
+        canWrite={canWrite}
+      />
+
       <section className="grid gap-4 sm:grid-cols-3">
         <StatCard
           label="พื้นที่ที่ประกาศไว้"
@@ -217,7 +227,7 @@ export function ProjectWorkspace({ project: initial, lookups, canWrite }: Props)
             <button
               type="button"
               onClick={() => setAdding(true)}
-              className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+              className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-on-primary transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
             >
               <Plus className="h-4 w-4" strokeWidth={2} />
               เพิ่มฟาร์ม
@@ -276,6 +286,10 @@ export function ProjectWorkspace({ project: initial, lookups, canWrite }: Props)
           onClose={() => setRemoving(null)}
         />
       )}
+
+      {/* Last in the column so it decorates the page without ever sitting
+          between an admin and the work they came here to do. */}
+      <SdgStrip size="sm" className="pt-2" />
 
       <Toast message={message} />
     </div>
@@ -377,7 +391,7 @@ function SpeciesPanel({
               await onSave(selected)
               setSaving(false)
             }}
-            className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-60"
+            className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-on-primary transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-60"
           >
             {saving ? 'กำลังบันทึก…' : 'บันทึกชนิดพันธุ์'}
           </button>

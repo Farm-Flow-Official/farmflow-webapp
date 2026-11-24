@@ -4,8 +4,9 @@ import { BookOpen, LogOut, Menu, X } from 'lucide-react'
 import { Logo } from '@/components/ui/logo'
 import { Kbd } from '@/components/ui/kbd'
 import { useGuide } from '@/components/ui/guide-book'
-import { AnnouncementBell } from '@/components/ui/announcement-bell'
+import { NotificationBell } from '@/components/ui/notification-bell'
 import type { LiveAnnouncement } from '@/features/announcements/types/targets'
+import type { BellSnapshot } from '@/features/notifications/actions/notificationActions'
 import type { AdminProfile } from '@/features/auth/types'
 import { signOutAdmin } from '@/features/auth/actions/signOutAdmin'
 
@@ -13,8 +14,10 @@ type Props = {
   admin: AdminProfile
   menuOpen?: boolean
   onMenuClick?: () => void
-  /** Live announcements for the bell (ADMIN-ANN-02); empty hides it. */
+  /** Live announcements for the bell (ADMIN-ANN-02). */
   announcements?: LiveAnnouncement[]
+  /** First notification snapshot; the bell polls onward from it. */
+  notifications?: BellSnapshot
 }
 
 export function AdminTopbar({
@@ -22,12 +25,19 @@ export function AdminTopbar({
   menuOpen = false,
   onMenuClick,
   announcements = [],
+  notifications = { unread: 0, rows: [] },
 }: Props) {
   const initial = admin.username?.charAt(0).toUpperCase() || 'A'
   const guide = useGuide()
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 flex h-16 items-center justify-between border-b border-line bg-panel/90 px-4 backdrop-blur sm:px-6">
+      {/* Portal identity, 3px on the top edge (DESIGN.md §4.5, §9.7). Absolute
+          and overlapping the header's own top edge rather than a border, so the
+          header stays exactly 64px and pt-16 / top-16 / --topbar-height all
+          keep meaning. `fixed`/`sticky` already position the header, so no
+          `relative` (which would fight it for the `position` property). */}
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-[3px] bg-portal-accent" />
       {/* Left: hamburger (mobile) + logo */}
       <div className="flex items-center gap-2">
         <button
@@ -48,7 +58,7 @@ export function AdminTopbar({
           <Logo size={26} />
           <div className="leading-none">
             <p className="text-base font-semibold tracking-tight text-primary">FarmFlow</p>
-            <p className="mt-1 text-[10px] text-ink-muted">Admin Dashboard</p>
+            <p className="mt-1 text-[10px] text-ink-muted">Flow Control</p>
           </div>
         </div>
       </div>
@@ -59,7 +69,14 @@ export function AdminTopbar({
           Admin
         </span>
 
-        <AnnouncementBell announcements={announcements} />
+        <NotificationBell
+          announcements={announcements}
+          feed={{
+            surface: 'admin',
+            initial: notifications,
+            seeAllHref: '/admin/notifications',
+          }}
+        />
 
         {/* Help lives in the top-right, where users look for it — and stays put
             on every screen so it can be relied on mid-task. */}
@@ -75,7 +92,7 @@ export function AdminTopbar({
         </button>
 
         <div className="flex items-center gap-2">
-          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-semibold text-white">
+          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-semibold text-on-primary">
             {initial}
           </span>
           <span className="hidden text-sm font-medium text-ink sm:inline">

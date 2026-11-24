@@ -365,7 +365,7 @@ function ContactForm({
             }`}
           >
             <span
-              className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform ${
+              className={`inline-block h-5 w-5 transform rounded-full bg-panel shadow transition-transform ${
                 isPrimary ? 'translate-x-[22px]' : 'translate-x-0.5'
               }`}
             />
@@ -386,7 +386,7 @@ function ContactForm({
           type="button"
           onClick={submit}
           disabled={saving}
-          className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-60"
+          className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-on-primary transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-60"
         >
           {saving ? 'กำลังบันทึก…' : initial ? 'บันทึกการแก้ไข' : 'เพิ่มผู้ติดต่อ'}
         </button>

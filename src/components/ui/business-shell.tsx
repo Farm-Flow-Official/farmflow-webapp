@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react'
 import type { BusinessProfile } from '@/features/business/auth/types'
 import { BusinessTopbar } from '@/components/ui/business-topbar'
 import { BusinessSidebar } from '@/components/ui/business-sidebar'
+import { AnnouncementBanner } from '@/components/ui/announcement-banner'
+import type { LiveAnnouncement } from '@/features/announcements/types/targets'
 
 /**
  * Client shell for the Business Dashboard. Mirrors `AdminShell`: owns the mobile
@@ -12,9 +14,12 @@ import { BusinessSidebar } from '@/components/ui/business-sidebar'
  */
 export function BusinessShell({
   profile,
+  announcements = { banner: [], bell: [] },
   children,
 }: {
   profile: BusinessProfile
+  /** Live announcements targeted at this dashboard, split by channel. */
+  announcements?: { banner: LiveAnnouncement[]; bell: LiveAnnouncement[] }
   children: React.ReactNode
 }) {
   const [open, setOpen] = useState(false)
@@ -30,11 +35,12 @@ export function BusinessShell({
   }, [open])
 
   return (
-    <div className="min-h-screen bg-surface">
+    <div data-portal="business" className="min-h-screen bg-surface">
       <BusinessTopbar
         profile={profile}
         menuOpen={open}
         onMenuClick={() => setOpen((v) => !v)}
+        announcements={announcements.bell}
       />
 
       <BusinessSidebar open={open} onNavigate={close} />
@@ -48,7 +54,10 @@ export function BusinessShell({
         />
       )}
 
-      <main className="min-h-screen pt-16 lg:ml-60">{children}</main>
+      <main className="min-h-screen pt-16 lg:ml-60">
+        <AnnouncementBanner announcements={announcements.banner} surface="business" />
+        {children}
+      </main>
     </div>
   )
 }

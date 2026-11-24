@@ -3,6 +3,7 @@ import { getBusinessSession } from '@/features/business/auth/session'
 import { BusinessShell } from '@/components/ui/business-shell'
 import { MaintenanceScreen } from '@/components/ui/maintenance-screen'
 import { checkDashboard } from '@/features/settings/services/fetchAvailability'
+import { fetchLiveAnnouncements } from '@/features/announcements/services/fetchLiveAnnouncements'
 
 export default async function BusinessLayout({
   children,
@@ -29,5 +30,14 @@ export default async function BusinessLayout({
     redirect('/')
   }
 
-  return <BusinessShell profile={profile}>{children}</BusinessShell>
+  const [banner, bell] = await Promise.all([
+    fetchLiveAnnouncements('business', 'banner'),
+    fetchLiveAnnouncements('business', 'bell'),
+  ])
+
+  return (
+    <BusinessShell profile={profile} announcements={{ banner, bell }}>
+      {children}
+    </BusinessShell>
+  )
 }

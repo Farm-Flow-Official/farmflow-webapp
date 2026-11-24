@@ -2,8 +2,8 @@ import type { CSSProperties } from 'react'
 
 /**
  * Skeleton primitives for loading states. Built on the design tokens in
- * globals.css — the base block is `--color-sunken` (#F0F2F4) pulsing over the
- * white `--color-panel` surface. The `animate-pulse` is softened for users who
+ * globals.css — the base block is `--color-sunken` pulsing over the
+ * `--color-panel` surface. The `animate-pulse` is softened for users who
  * prefer reduced motion (see the guard in globals.css).
  *
  * The composed helpers (`SkeletonKpiCard`, `SkeletonTable`) deliberately mirror

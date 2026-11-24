@@ -10,3 +10,15 @@
 export function coverPhotoUrl(fileId: string | null | undefined): string | null {
   return fileId ? `/farm-cover/${fileId}` : null
 }
+
+/**
+ * Same-origin URL for any **public** file — announcement banners today.
+ *
+ * The proxy under `/farm-cover/[id]` is not cover-photo specific: it streams
+ * whatever public file the id names. Reusing it beats a second identical route,
+ * and this alias keeps callers from having to know it is named after its first
+ * customer.
+ */
+export function publicFileUrl(fileId: string | null | undefined): string | null {
+  return coverPhotoUrl(fileId)
+}

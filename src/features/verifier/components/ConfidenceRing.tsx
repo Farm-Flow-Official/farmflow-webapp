@@ -39,7 +39,7 @@ export function ConfidenceRing({
   const pct = hasScore ? Math.round(score * 100) : 0
   const clamped = Math.min(1, Math.max(0, score ?? 0))
   const offset = c * (1 - clamped)
-  const arcColor = hasScore ? confidenceHex(score) : '#9CA3AF'
+  const arcColor = hasScore ? confidenceHex(score) : 'var(--color-ink-muted)'
   const failed = state === 'failed'
   const waiting = state === 'waiting'
 

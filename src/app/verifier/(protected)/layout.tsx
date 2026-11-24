@@ -3,6 +3,7 @@ import { getVerifierSession } from '@/features/verifier/auth/session'
 import { fetchVerifierProjectsSafe } from '@/features/verifier/services/fetchVerifierProjects'
 import { VerifierShell } from '@/features/verifier/components/VerifierShell'
 import { fetchLiveAnnouncements } from '@/features/announcements/services/fetchLiveAnnouncements'
+import { pollBell } from '@/features/notifications/actions/notificationActions'
 import { MaintenanceScreen } from '@/components/ui/maintenance-screen'
 import { checkDashboard } from '@/features/settings/services/fetchAvailability'
 
@@ -36,14 +37,20 @@ export default async function ProtectedVerifierLayout({
   // Tolerant on purpose: a layout that throws takes down every route beneath it,
   // and `error.tsx` in this segment cannot catch its own layout. Losing the
   // names costs a label; losing the portal costs the review.
-  const [projects, banner, bell] = await Promise.all([
+  const [projects, banner, bell, notifications] = await Promise.all([
     fetchVerifierProjectsSafe(),
     fetchLiveAnnouncements('verifier', 'banner'),
     fetchLiveAnnouncements('verifier', 'bell'),
+    pollBell('verifier'),
   ])
 
   return (
-    <VerifierShell verifier={verifier} projects={projects} announcements={{ banner, bell }}>
+    <VerifierShell
+      verifier={verifier}
+      projects={projects}
+      announcements={{ banner, bell }}
+      notifications={notifications}
+    >
       {children}
     </VerifierShell>
   )

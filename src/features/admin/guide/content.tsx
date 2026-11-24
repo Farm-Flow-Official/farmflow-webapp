@@ -1,7 +1,17 @@
-import { Compass, Users, Sprout, Map, Megaphone, ShieldCheck, Keyboard } from 'lucide-react'
+import {
+  Bell,
+  Compass,
+  Users,
+  Sprout,
+  Map,
+  Megaphone,
+  ShieldCheck,
+  Keyboard,
+} from 'lucide-react'
 import { Kbd } from '@/components/ui/kbd'
 import { P, Steps, Note, Topic, Key, KeyGroup } from '@/components/ui/guide-parts'
 import type { GuideSection } from '@/components/ui/guide-book'
+import { ADMIN_DESTINATIONS } from '@/features/admin/lib/adminNav'
 
 export type AdminGuideSectionId =
   | 'overview'
@@ -9,6 +19,7 @@ export type AdminGuideSectionId =
   | 'farms'
   | 'gis'
   | 'content'
+  | 'notifications'
   | 'system'
   | 'shortcuts'
 
@@ -21,8 +32,8 @@ export const ADMIN_GUIDE_SECTIONS: GuideSection[] = [
     body: (
       <div className="flex flex-col gap-4">
         <P>
-          Admin Dashboard คือศูนย์กลางดูแล<span className="font-medium text-ink">ข้อมูลตั้งต้นของทั้งระบบ</span> —
-          บัญชีเกษตรกร ขอบเขตแปลง ประกาศ และการตั้งค่า ส่วนการตรวจรับรองคาร์บอนเป็นงานของ Verifier Portal
+          Flow Control คือศูนย์กลางดูแล<span className="font-medium text-ink">ข้อมูลตั้งต้นของทั้งระบบ</span> —
+          บัญชีเกษตรกร ขอบเขตแปลง ประกาศ และการตั้งค่า ส่วนการตรวจรับรองคาร์บอนเป็นงานของ Flow Verify
           แยกออกไปอีกระบบ
         </P>
         <Steps
@@ -31,6 +42,7 @@ export const ADMIN_GUIDE_SECTIONS: GuideSection[] = [
             ['Farmer Management', 'ค้นหาบัญชีเกษตรกร ดูฟาร์มในสังกัด ระงับหรือเปิดใช้งานบัญชี'],
             ['GIS Map', 'ดูขอบเขตแปลงทั้งหมดบนแผนที่ และหาแปลงที่ทับซ้อนกัน'],
             ['Announcements', 'เขียนประกาศที่ขึ้นในแอปของเกษตรกร'],
+            ['การแจ้งเตือน', 'งานค้าง สัญญาณเสี่ยง และคำตัดสินของทีม'],
             ['System', 'ตั้งค่าระบบ ผู้ดูแล และตรวจ Audit Log ย้อนหลัง'],
           ]}
         />
@@ -208,6 +220,46 @@ export const ADMIN_GUIDE_SECTIONS: GuideSection[] = [
     ),
   },
   {
+    id: 'notifications',
+    title: 'กระดิ่งแจ้งเตือน',
+    summary: 'ระบบบอกเองว่ามีอะไรรอคุณอยู่',
+    icon: Bell,
+    body: (
+      <div className="flex flex-col gap-4">
+        <P>
+          กระดิ่งบนหัวจอรวมสองอย่างไว้ที่เดียว —{' '}
+          <span className="font-medium text-ink">ประกาศ</span>ที่ผู้ดูแลเขียนเอง และ
+          <span className="font-medium text-ink">แจ้งเตือนที่ระบบสร้างขึ้น</span>{' '}
+          จากสิ่งที่เกิดจริงในงาน
+        </P>
+        <Topic title="สี่ประเภท">
+          <P>
+            <span className="font-medium text-warning">งานค้าง</span> = มีของรอคุณลงมือ เช่น
+            แปลงใหม่ที่ยังไม่อนุมัติ ·{' '}
+            <span className="font-medium text-error">สัญญาณเสี่ยง</span> = ข้อมูลดูไม่ปกติ
+            ควรตรวจก่อนออกเครดิต ·{' '}
+            <span className="font-medium text-success">คำตัดสิน</span> = คนอื่นในทีมตัดสินอะไรไปแล้ว ·{' '}
+            <span className="font-medium text-ink">ระบบ</span> = แดชบอร์ดปิดปรับปรุง สิทธิ์เปลี่ยน
+          </P>
+        </Topic>
+        <Topic title="ใครเห็นอะไร">
+          <P>
+            แจ้งเตือนส่งถึง<span className="font-medium text-ink">หน้าที่</span> ไม่ใช่ตัวบุคคล —
+            “แปลงรออนุมัติ” ไปถึงทุกคนที่มีสิทธิ์อนุมัติแปลง รวมถึงคนที่เพิ่งเข้าทีมวันนี้
+            และเลิกเป็นภาระของคนที่ลาออกไปแล้ว · สถานะอ่านแยกรายคน
+            คุณกดอ่านไม่ได้ทำให้ของคนอื่นหายไปด้วย
+          </P>
+        </Topic>
+        <Note>
+          กระดิ่งเก็บ 8 รายการล่าสุด · กด{' '}
+          <span className="font-medium text-ink">ดูการแจ้งเตือนทั้งหมด</span> หรือ{' '}
+          <Kbd>G</Kbd> <Kbd>N</Kbd> เพื่อดูย้อนหลังทั้งหมดพร้อมตัวกรอง ·
+          ตัวเลขบนกระดิ่งอัปเดตเองทุกนาที ไม่ต้องรีเฟรชหน้า
+        </Note>
+      </div>
+    ),
+  },
+  {
     id: 'system',
     title: 'ตั้งค่าระบบและร่องรอยการใช้งาน',
     summary: 'ราคาตลาด สิทธิ์ผู้ดูแล และ Audit Log',
@@ -287,15 +339,15 @@ export const ADMIN_GUIDE_SECTIONS: GuideSection[] = [
           (มีป้ายเล็ก ๆ ขึ้นมุมจอบอกว่ากำลังรอปุ่มที่สอง)
         </P>
 
+        {/* Generated from the menu itself. The hand-written version of this
+            list was missing Projects and ชนิดพันธุ์ไม้, and taught G N for a
+            shortcut that was never bound. */}
         <KeyGroup title="ไปยังหน้า (กด G ก่อน)">
-          <Key keys={['G', 'D']}>Dashboard</Key>
-          <Key keys={['G', 'F']}>Farmer Management</Key>
-          <Key keys={['G', 'M']}>GIS Map</Key>
-          <Key keys={['G', 'A']}>Announcements</Key>
-          <Key keys={['G', 'S']}>System Settings</Key>
-          <Key keys={['G', 'L']}>Audit Log</Key>
-          <Key keys={['G', 'U']}>Admin Users</Key>
-          <Key keys={['G', 'T']}>Support Tickets</Key>
+          {ADMIN_DESTINATIONS.map((d) => (
+            <Key key={d.href} keys={['G', d.key]}>
+              {d.label}
+            </Key>
+          ))}
         </KeyGroup>
 
         <KeyGroup title="ในหน้าที่มีตาราง">

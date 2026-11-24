@@ -40,8 +40,13 @@ export default async function PddPrintPage({ params }: { params: Promise<{ id: s
       <style>{`
         /* Top margin leaves room for the running header, bottom for the footer. */
         @page { size: A4; margin: 24mm 16mm 20mm; }
+        /* Colours come from the design tokens so this sheet tracks the one
+           source of truth. They resolve to the light values today because
+           <html data-theme> is pinned to light; when the theme toggle lands
+           (DESIGN.md §15 Phase 3) print must force light, or paper output
+           follows the screen into dark. */
         @media print {
-          html, body { background: #fff; }
+          html, body { background: var(--color-white); }
           .pdd-section { break-inside: avoid; }
           .pdd-break { break-before: page; }
           h2, h3 { break-after: avoid; }
@@ -69,16 +74,16 @@ export default async function PddPrintPage({ params }: { params: Promise<{ id: s
             align-items: center;
             justify-content: space-between;
             font-size: 8pt;
-            color: #6B7280;
+            color: var(--color-ink-muted);
           }
           .pdd-running-header {
             top: -14mm;
-            border-bottom: 0.4pt solid #D1D5DB;
+            border-bottom: 0.4pt solid var(--color-line-strong);
             padding-bottom: 2mm;
           }
           .pdd-running-footer {
             bottom: -12mm;
-            border-top: 0.4pt solid #D1D5DB;
+            border-top: 0.4pt solid var(--color-line-strong);
             padding-top: 2mm;
           }
         }
@@ -313,7 +318,7 @@ export default async function PddPrintPage({ params }: { params: Promise<{ id: s
             <Attachments pdd={pdd} slot="boundary_kmz" label="ไฟล์ขอบเขต KMZ/KML" />
             {/* The land deed and the power of attorney are deliberately absent:
                 FarmFlow does not hold them (PDPA). They go to อบก. directly. */}
-            <p style={{ fontSize: 10, color: '#555' }}>
+            <p style={{ fontSize: 10, color: 'var(--color-ink-muted)' }}>
               *หลักฐานสิทธิที่ดิน และหนังสือมอบอำนาจใช้ประโยชน์ที่ดิน ยื่นต่อ อบก. โดยตรง
               ไม่จัดเก็บในระบบ
             </p>

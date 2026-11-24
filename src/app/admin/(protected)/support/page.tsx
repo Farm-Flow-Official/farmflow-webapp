@@ -51,7 +51,7 @@ export default async function SupportPage() {
                 href={LINE_OA_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-3 inline-flex items-center gap-2 rounded-lg bg-[#06C755] px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#06C755] focus-visible:ring-offset-2"
+                className="mt-3 inline-flex items-center gap-2 rounded-lg bg-vendor-line px-4 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vendor-line focus-visible:ring-offset-2"
               >
                 <MessageCircle className="h-4 w-4" strokeWidth={2} />
                 เปิด LINE OA

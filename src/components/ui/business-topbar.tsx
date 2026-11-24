@@ -3,19 +3,34 @@
 import Link from 'next/link'
 import { LogOut, Menu, X } from 'lucide-react'
 import { Logo } from '@/components/ui/logo'
+import { NotificationBell } from '@/components/ui/notification-bell'
+import type { LiveAnnouncement } from '@/features/announcements/types/targets'
 import type { BusinessProfile } from '@/features/business/auth/types'
 
 type Props = {
   profile: BusinessProfile
   menuOpen?: boolean
   onMenuClick?: () => void
+  /** Announcements an admin targeted at this dashboard (ADMIN-ANN-02). */
+  announcements?: LiveAnnouncement[]
 }
 
-export function BusinessTopbar({ profile, menuOpen = false, onMenuClick }: Props) {
+export function BusinessTopbar({
+  profile,
+  menuOpen = false,
+  onMenuClick,
+  announcements = [],
+}: Props) {
   const initial = profile.username?.charAt(0).toUpperCase() || 'B'
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 flex h-16 items-center justify-between border-b border-line bg-panel/90 px-4 backdrop-blur sm:px-6">
+      {/* Portal identity, 3px on the top edge (DESIGN.md §4.5, §9.7). Absolute
+          and overlapping the header's own top edge rather than a border, so the
+          header stays exactly 64px and pt-16 / top-16 / --topbar-height all
+          keep meaning. `fixed`/`sticky` already position the header, so no
+          `relative` (which would fight it for the `position` property). */}
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-[3px] bg-portal-accent" />
       {/* Left: hamburger (mobile) + logo */}
       <div className="flex items-center gap-2">
         <button
@@ -41,14 +56,18 @@ export function BusinessTopbar({ profile, menuOpen = false, onMenuClick }: Props
         </div>
       </div>
 
-      {/* Right: role badge · user · logout */}
+      {/* Right: notifications · role badge · user · logout */}
       <div className="flex items-center gap-3">
+        {/* No system feed here: this dashboard owns no queue and raises no MRV
+            signals, so the bell carries announcements only. */}
+        <NotificationBell announcements={announcements} />
+
         <span className="hidden rounded-full border border-primary-muted bg-primary-subtle px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-success sm:inline">
           {profile.role}
         </span>
 
         <div className="flex items-center gap-2">
-          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-semibold text-white">
+          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-semibold text-on-primary">
             {initial}
           </span>
           <span className="hidden text-sm font-medium text-ink sm:inline">

@@ -43,7 +43,7 @@ export function PddStart({ projectId, canWrite }: { projectId: string; canWrite:
           type="button"
           onClick={start}
           disabled={busy}
-          className="mt-5 inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-60"
+          className="mt-5 inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-on-primary transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:opacity-60"
         >
           {busy && <Loader2 className="h-4 w-4 animate-spin" strokeWidth={2} />}
           {busy ? 'กำลังเริ่ม…' : 'เริ่มเขียนเอกสาร PDD'}

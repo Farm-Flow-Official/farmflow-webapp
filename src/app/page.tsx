@@ -1,8 +1,9 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
-import { LayoutDashboard, ShieldCheck, Briefcase, LayoutGrid, ArrowRight, QrCode } from 'lucide-react'
+import { LayoutDashboard, ShieldCheck, LayoutGrid, ArrowRight, QrCode } from 'lucide-react'
 import { Logo } from '@/components/ui/logo'
+import { SdgStrip } from '@/components/ui/sdg-strip'
 import { getVerifierSession } from '@/features/verifier/auth/session'
 import { getAdminSession } from '@/features/auth/services/adminSession'
 
@@ -10,11 +11,15 @@ export const metadata: Metadata = {
   title: 'FarmFlow — เข้าสู่ระบบ',
 }
 
+// Business is deliberately absent: its screens still render <ComingSoon> because
+// the packages/payouts/billing API does not exist yet, and a door on this page is
+// a promise that something is behind it. The route stays reachable by URL for
+// whoever is building it — put the card back when the endpoints land.
 const PORTALS = [
   {
     href: '/admin/login',
     icon: LayoutDashboard,
-    title: 'Admin Dashboard',
+    title: 'Flow Control',
     sub: 'สำหรับทีมภายใน',
     desc: 'จัดการเกษตรกร แปลงเพาะปลูก GIS ประกาศ และตั้งค่าระบบ',
     cta: 'เข้าสู่ระบบ',
@@ -22,26 +27,18 @@ const PORTALS = [
   {
     href: '/verifier/login',
     icon: ShieldCheck,
-    title: 'Verifier Portal',
+    title: 'Flow Verify',
     sub: 'สำหรับผู้ตรวจรับรองภายนอก',
     desc: 'ตรวจรับรองข้อมูลคาร์บอน (MRV) อนุมัติ/ปฏิเสธชุดข้อมูล',
     cta: 'เข้าสู่ระบบ',
   },
   {
-    href: '/business',
-    icon: Briefcase,
-    title: 'Business Dashboard',
-    sub: 'สำหรับทีมธุรกิจ / การเงิน',
-    desc: 'จัดการแพ็กเกจ ตรวจสลิป จ่ายเงินเกษตรกร และภาพรวมรายได้ (รอ backend API)',
-    cta: 'ดูรายละเอียด',
-  },
-  {
-    href: '/executive',
+    href: '/executive/login',
     icon: LayoutGrid,
-    title: 'Executive Dashboard',
-    sub: 'สำหรับผู้บริหาร · DEMO',
-    desc: 'ภาพรวมสุขภาพธุรกิจ — รายได้ เกษตรกร พื้นที่ และวงจรคาร์บอน · ข้อมูลตัวอย่างเพื่อรีวิว KPI',
-    cta: 'ดูตัวอย่าง',
+    title: 'Flow Decide',
+    sub: 'สำหรับผู้บริหาร (C-Level)',
+    desc: 'ภาพรวม ESG — คาร์บอน เกษตรกร พื้นที่ และธรรมาภิบาลข้อมูล แยกดูรายโครงการได้',
+    cta: 'เข้าสู่ระบบ',
   },
 ] as const
 
@@ -66,7 +63,7 @@ export default async function PortalLandingPage() {
         </div>
 
         {/* Portal cards */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {PORTALS.map((p) => {
             const Icon = p.icon
             return (
@@ -107,7 +104,7 @@ export default async function PortalLandingPage() {
           href="/verifier/verify/qr-check"
           className="group mt-6 flex flex-col items-start gap-4 rounded-2xl border border-primary/20 bg-primary-subtle p-6 transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 sm:flex-row sm:items-center"
         >
-          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary text-white">
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary text-on-primary">
             <QrCode className="h-6 w-6" strokeWidth={1.9} />
           </span>
 
@@ -119,7 +116,7 @@ export default async function PortalLandingPage() {
             </p>
           </div>
 
-          <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-white transition-colors group-hover:bg-primary-hover">
+          <span className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary transition-colors group-hover:bg-primary-hover">
             ตรวจสอบเอกสาร
             <ArrowRight
               className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
@@ -127,6 +124,8 @@ export default async function PortalLandingPage() {
             />
           </span>
         </Link>
+
+        <SdgStrip className="mt-10" />
 
         <p className="mt-6 text-center text-xs text-ink-muted">
           FarmFlow Carbon Platform

@@ -7,8 +7,9 @@ import { Kbd } from '@/components/ui/kbd'
 import type { VerifierProfile } from '@/features/verifier/auth/types'
 import { signOutVerifier } from '@/features/verifier/auth/actions'
 import { useGuide } from '@/components/ui/guide-book'
-import { AnnouncementBell } from '@/components/ui/announcement-bell'
+import { NotificationBell } from '@/components/ui/notification-bell'
 import type { LiveAnnouncement } from '@/features/announcements/types/targets'
+import type { BellSnapshot } from '@/features/notifications/actions/notificationActions'
 import type { VerifierProject } from '@/features/verifier/services/fetchVerifierProjects'
 
 type Props = {
@@ -17,8 +18,10 @@ type Props = {
   projects: VerifierProject[]
   menuOpen?: boolean
   onMenuClick?: () => void
-  /** Live announcements for the bell (ADMIN-ANN-02); empty hides it. */
+  /** Live announcements for the bell (ADMIN-ANN-02). */
   announcements?: LiveAnnouncement[]
+  /** First notification snapshot; the bell polls onward from it. */
+  notifications?: BellSnapshot
 }
 
 export function VerifierTopbar({
@@ -27,6 +30,7 @@ export function VerifierTopbar({
   menuOpen = false,
   onMenuClick,
   announcements = [],
+  notifications = { unread: 0, rows: [] },
 }: Props) {
   const initial = verifier.username?.charAt(0).toUpperCase() || 'V'
   const guide = useGuide()
@@ -39,6 +43,12 @@ export function VerifierTopbar({
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 flex h-16 items-center justify-between border-b border-line bg-panel/90 px-4 backdrop-blur sm:px-6">
+      {/* Portal identity, 3px on the top edge (DESIGN.md §4.5, §9.7). Absolute
+          and overlapping the header's own top edge rather than a border, so the
+          header stays exactly 64px and pt-16 / top-16 / --topbar-height all
+          keep meaning. `fixed`/`sticky` already position the header, so no
+          `relative` (which would fight it for the `position` property). */}
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-[3px] bg-portal-accent" />
       <div className="flex items-center gap-2">
         <button
           type="button"
@@ -54,7 +64,7 @@ export function VerifierTopbar({
           <Logo size={26} />
           <div className="leading-none">
             <p className="text-base font-semibold tracking-tight text-primary">FarmFlow</p>
-            <p className="mt-1 text-[10px] text-ink-muted">Verifier Portal</p>
+            <p className="mt-1 text-[10px] text-ink-muted">Flow Verify</p>
           </div>
         </div>
 
@@ -77,7 +87,14 @@ export function VerifierTopbar({
       </div>
 
       <div className="flex items-center gap-3">
-        <AnnouncementBell announcements={announcements} />
+        <NotificationBell
+          announcements={announcements}
+          feed={{
+            surface: 'verifier',
+            initial: notifications,
+            seeAllHref: '/verifier/notifications',
+          }}
+        />
 
         <span className="hidden rounded-full border border-primary-muted bg-primary-subtle px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-success sm:inline">
           {verifier.org}
@@ -97,7 +114,7 @@ export function VerifierTopbar({
         </button>
 
         <div className="flex items-center gap-2">
-          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-semibold text-white">
+          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-semibold text-on-primary">
             {initial}
           </span>
           <span className="hidden text-sm font-medium text-ink sm:inline">{verifier.username}</span>

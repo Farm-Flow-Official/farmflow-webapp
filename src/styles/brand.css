@@ -1,0 +1,98 @@
+/* ── Layer 1: Treva CI primitives ──────────────────────────────────────────
+   Source: "Direction for TREVA (For Website Only)" — DESIGN.md v1.0.0 §4.1–4.2.
+   Ramps generated in OKLCH from the CI anchors (marked ●).
+
+   THIS IS THE ONLY FILE IN src/ THAT MAY CONTAIN HEX. Edit here to change the
+   brand everywhere; never reference a --treva-* primitive from a component
+   (DESIGN.md §0 rules 1–3). Components read the semantic roles in theme.css.
+   ───────────────────────────────────────────────────────────────────────── */
+:root {
+  /* Dark Eggplant ● 800 — brand identity: sidebar, wordmark, Control accent */
+  --treva-eggplant-50:  #F8F5FB;  --treva-eggplant-100: #F0EDF4;
+  --treva-eggplant-200: #E1DBE5;  --treva-eggplant-300: #C8C1CF;
+  --treva-eggplant-400: #AAA0B3;  --treva-eggplant-500: #8D8098;
+  --treva-eggplant-600: #776883;  --treva-eggplant-700: #645371;
+  --treva-eggplant-800: #493657;  --treva-eggplant-900: #392845;
+  --treva-eggplant-950: #24162E;
+  --treva-eggplant-dark-300: #BCA2D0;
+  --treva-eggplant-dark-900: #352641;
+  --treva-eggplant-dark-950: #201528;
+
+  /* Sea Blue ● 700 — the single action colour: buttons, links, focus, info */
+  --treva-sea-50:  #EEF9FF;  --treva-sea-100: #E3F1FA;
+  --treva-sea-200: #CDE2EE;  --treva-sea-300: #AAC9DC;
+  --treva-sea-400: #7FACC6;  --treva-sea-500: #538EAF;
+  --treva-sea-600: #2B779D;  --treva-sea-700: #006992;
+  --treva-sea-800: #054B69;  --treva-sea-900: #01354C;
+  --treva-sea-950: #002030;
+  --treva-sea-dark-300: #82C8EF;
+  --treva-sea-dark-400: #66B5E0;
+  --treva-sea-dark-subtle: #042838;
+  --treva-sea-dark-muted:  #0F2230;
+
+  /* Mossy Leaf ● 600 — carbon / growth. 4.0:1 on white: graphics only, never
+     body text and never under white text (DESIGN.md §0 rule 5). */
+  --treva-moss-50:  #EBFFD8;  --treva-moss-100: #E2F7CD;
+  --treva-moss-200: #CFE8B7;  --treva-moss-300: #B2D094;
+  --treva-moss-400: #8FB268;  --treva-moss-500: #6D9539;
+  --treva-moss-600: #618B26;  --treva-moss-700: #466616;
+  --treva-moss-800: #344E0C;  --treva-moss-900: #233804;
+  --treva-moss-950: #132200;
+  --treva-moss-dark-400: #94C25D;
+  --treva-moss-dark-subtle: #1A2410;
+
+  /* Kelp ● 800 — the neutral family. Every gray in the product is Kelp-tinted,
+     which is what makes the canvas read warm/natural rather than cold. */
+  --treva-kelp-50:  #F6F7F5;  --treva-kelp-100: #EEEFEC;
+  --treva-kelp-200: #DDDEDB;  --treva-kelp-300: #C3C5C0;
+  --treva-kelp-400: #A3A69F;  --treva-kelp-500: #85877F;
+  --treva-kelp-600: #6D7066;  --treva-kelp-700: #595C52;
+  --treva-kelp-800: #3F4531;  --treva-kelp-900: #2F3228;
+  --treva-kelp-950: #1C1E16;
+  --treva-kelp-dark-sunken:  #090B07;
+  --treva-kelp-dark-canvas:  #0F100B;
+  --treva-kelp-dark-panel:   #171914;
+  --treva-kelp-dark-raised:  #21231C;
+  --treva-kelp-dark-line:    #32342D;
+  --treva-kelp-dark-line-2:  #4C4E46;
+  --treva-kelp-dark-input:   #676A61;
+  --treva-kelp-dark-disabled:#5C5F56;
+
+  /* Pastel Lime ● 50 — highlight SURFACE only. 1.0:1 on white, so it is never
+     text on a light background and never a border on white (§0 rule 6). */
+  --treva-lime-50:  #F5FFD7;  --treva-lime-100: #E8F7B8;
+  --treva-lime-200: #D8E6AB;
+  --treva-lime-dark-300: #DDF67C;
+  --treva-lime-dark-surface: #202410;
+
+  /* Functional status — deliberately OUTSIDE the CI palette: a brand palette
+     must not carry alarm meaning, and these hues stay reserved so they are
+     never reused as a chart series (DESIGN.md §4.3). Pending Marketing
+     sign-off (§16). */
+  --treva-amber-700: #8A5300;  --treva-amber-50:  #FFF6E0;
+  --treva-amber-600: #D08A00;  --treva-amber-dark-300: #F2B84B;
+  --treva-amber-dark-bg: #2A2210;
+  --treva-red-700: #B42318;    --treva-red-50: #FEF3F2;
+  --treva-red-600: #D92D20;    --treva-red-dark-300: #F97066;
+  --treva-red-dark-bg: #2D1514;
+
+  /* Chart-only hues. The categorical set is capped at 3 slots on purpose: with
+     the CI's Moss and Sea fixed in slots 1–2, every 4th hue tested either
+     collided under colour-blindness (purple ↔ Sea ΔE 1–4, amber ↔ Moss ΔE 1.0)
+     or read as a status. Validated all-pairs — including donut wrap-around —
+     at CVD ΔE 10.2 light / 10.6 dark (DESIGN.md §4.6). */
+  --treva-chart-orchid: #C274A9;
+  --treva-chart-dark-moss: #6E9E33;
+  --treva-chart-dark-sea:  #3A8BC9;
+  --treva-chart-dark-orchid: #A24287;
+
+  /* Third-party brand colours. NOT Treva CI and never themed — recolouring a
+     partner's mark misrepresents them. Here only so no component carries a
+     raw hex (DESIGN.md §0 rule 2). */
+  --vendor-line: #06C755;
+
+  /* Absolute. Kept as tokens so print surfaces and photo scrims can be
+     explicitly non-theming rather than accidentally so. */
+  --treva-white: #FFFFFF;
+  --treva-black: #000000;
+}

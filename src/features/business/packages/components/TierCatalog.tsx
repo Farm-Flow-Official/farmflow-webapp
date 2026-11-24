@@ -41,7 +41,7 @@ export function TierCatalog({ packages }: { packages: Package[] }) {
               }`}
             >
               {highlight && (
-                <span className="absolute -top-2.5 right-4 rounded-full bg-primary px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
+                <span className="absolute -top-2.5 right-4 rounded-full bg-primary px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-on-primary">
                   ยอดนิยม
                 </span>
               )}
