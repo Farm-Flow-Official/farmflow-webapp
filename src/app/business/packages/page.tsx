@@ -11,7 +11,7 @@ export default function PackagesPage() {
     <div className="mx-auto max-w-[1440px] px-4 py-8 sm:px-8">
       <header className="mb-6">
         <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-ink">
-          Package &amp; Subscription
+          <span className="text-lead-in">Package &amp;</span> Subscription
         </h1>
         <p className="mt-1.5 text-sm text-ink-secondary">
           จัดการแพ็กเกจและการสมัครสมาชิกของลูกค้า

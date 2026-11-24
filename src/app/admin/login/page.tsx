@@ -13,7 +13,7 @@ export default function AdminLoginPage() {
       <div className="w-full max-w-[440px]">
         <BackToPortals className="mb-3 -ml-2" />
 
-        <div className="rounded-xl border border-line bg-panel px-12 py-12 shadow-md">
+        <div className="tdg-hero-corner rounded-xl border border-line bg-panel px-12 py-12 shadow-md">
 
           {/* ── Logo ── */}
           <div className="mb-8 flex flex-col items-center gap-2">

@@ -49,7 +49,7 @@ function Header() {
   return (
     <header className="mb-6">
       <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-ink">
-        บัญชีเกษตรกร
+        <span className="text-lead-in">บัญชี</span>เกษตรกร
       </h1>
       <p className="mt-1.5 text-sm text-ink-secondary">
         แก้ชื่อผู้ใช้ ตั้งรหัสผ่านใหม่ และระงับ/ปลดระงับบัญชี — แก้ไขในบัญชีเดิมเสมอ

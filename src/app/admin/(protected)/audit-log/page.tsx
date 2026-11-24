@@ -70,7 +70,7 @@ function Header() {
   return (
     <header className="mb-6">
       <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-ink">
-        Audit Log
+        <span className="text-lead-in">Audit</span> Log
       </h1>
       <p className="mt-1.5 text-sm text-ink-secondary">
         บันทึกกิจกรรมของระบบ · เพิ่มอย่างเดียว แก้ไข/ลบไม่ได้ (append-only)

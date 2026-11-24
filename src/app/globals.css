@@ -1,6 +1,9 @@
 @import "tailwindcss";
 @import "../styles/brand.css";
 @import "../styles/theme.css";
+/* Layer 2b. MUST stay after theme.css: [data-brand] and :root have the same
+   specificity, so the brand overrides only win on source order. */
+@import "../styles/brands.css";
 
 /* The `dark:` variant follows data-theme rather than the OS media query. Per
    DESIGN.md §0 rule 4 it must never be used to fix a COLOUR — semantic tokens
@@ -47,6 +50,18 @@
   --color-on-primary: var(--on-primary);
   --color-primary-subtle: var(--primary-subtle);
   --color-primary-muted: var(--primary-muted);
+
+  /* Brand layer (src/styles/brands.css). `action` is the main action of a view,
+     which is `primary` in every brand except TDG — keeping them as separate
+     utilities is what lets one attribute repaint the CTAs without touching
+     navigation, selection or carbon. */
+  --color-action: var(--action);
+  --color-action-hover: var(--action-hover);
+  --color-on-action: var(--on-action);
+  --color-brand-red: var(--brand-red);
+  --color-eyebrow: var(--eyebrow);
+  --color-lead-in: var(--lead-in);
+  --color-link-cta: var(--link-cta);
 
   --color-carbon: var(--carbon);
   --color-carbon-ink: var(--carbon-ink);

@@ -34,7 +34,7 @@ export default async function VerifierProjectPickerPage() {
       <div className="mx-auto max-w-[1440px] px-4 py-8 sm:px-8">
         <header className="mb-6">
           <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-ink">
-            เลือกโครงการที่จะตรวจสอบ
+            <span className="text-lead-in">เลือก</span>โครงการที่จะตรวจสอบ
           </h1>
         </header>
         <ApiFailurePanel {...describeApiFailure(err, 'รายการโครงการที่ต้องตรวจ')} />
@@ -48,7 +48,7 @@ export default async function VerifierProjectPickerPage() {
     <div className="mx-auto max-w-[1440px] px-4 py-8 sm:px-8">
       <header className="mb-6">
         <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-ink">
-          เลือกโครงการที่จะตรวจสอบ
+          <span className="text-lead-in">เลือก</span>โครงการที่จะตรวจสอบ
         </h1>
         <p className="mt-1.5 text-sm text-ink-secondary">
           {projects.length > 0

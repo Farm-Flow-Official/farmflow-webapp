@@ -6,7 +6,7 @@ export default function VerifierProjectPickerLoading() {
     <div className="mx-auto max-w-[1440px] px-4 py-8 sm:px-8">
       <header className="mb-6">
         <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-ink">
-          เลือกโครงการที่จะตรวจสอบ
+          <span className="text-lead-in">เลือก</span>โครงการที่จะตรวจสอบ
         </h1>
         <Skeleton className="mt-2 h-4 w-72" />
       </header>

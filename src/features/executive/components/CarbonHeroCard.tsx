@@ -44,7 +44,7 @@ export function CarbonHeroCard({
         </p>
 
         <div className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-          <span className="text-[40px] font-bold leading-none tracking-tight text-ink sm:text-[48px]">
+          <span className="tdg-gradient-text-carbon text-[40px] font-bold leading-none tracking-tight text-ink sm:text-[48px]">
             {formatTonnes(certified.value)}
           </span>
           <span className="text-sm font-medium text-ink-secondary">tCO₂e</span>

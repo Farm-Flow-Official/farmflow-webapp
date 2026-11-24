@@ -109,7 +109,7 @@ export default async function SessionReportPage({
           </div>
         </header>
 
-        <h1 className="mt-6 text-xl font-semibold">รายงานการตรวจรับรองคาร์บอน</h1>
+        <h1 className="mt-6 text-xl font-semibold"><span className="text-lead-in">รายงาน</span>การตรวจรับรองคาร์บอน</h1>
 
         {/* Printed before a decision, this page is identical to the real thing
             in every respect that matters to someone holding it. Say plainly

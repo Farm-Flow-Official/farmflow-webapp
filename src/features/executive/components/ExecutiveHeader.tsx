@@ -43,7 +43,7 @@ export function ExecutiveHeader({ asOf, scope, cover }: Props) {
       <div className="min-w-0">
         <Eyebrow />
         <h1 className="mt-1 text-[26px] font-semibold leading-tight tracking-tight text-ink sm:text-[30px]">
-          ภาพรวมพอร์ตคาร์บอน
+          <span className="text-lead-in">ภาพรวม</span>พอร์ตคาร์บอน
         </h1>
         <p className="mt-1.5 text-[13px] leading-relaxed text-ink-secondary">
           ข้อมูล ณ {formatDateTime(asOf)}

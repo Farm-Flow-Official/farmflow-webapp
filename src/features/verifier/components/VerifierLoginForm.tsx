@@ -62,7 +62,7 @@ export function VerifierLoginForm() {
       <button
         type="submit"
         disabled={pending}
-        className="mt-6 flex h-11 w-full items-center justify-center rounded-md bg-primary px-6 text-sm font-semibold text-on-primary transition-all hover:-translate-y-px hover:bg-primary-hover focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
+        className="mt-6 flex h-11 w-full items-center justify-center rounded-md bg-action px-6 text-sm font-semibold text-on-action transition-all hover:-translate-y-px hover:bg-action-hover focus:outline-none focus:ring-2 focus:ring-action focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
       >
         {pending ? 'กำลังเข้าสู่ระบบ…' : 'เข้าสู่ระบบ'}
       </button>

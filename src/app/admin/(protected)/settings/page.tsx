@@ -25,7 +25,7 @@ export default async function SettingsPage() {
     <div className="mx-auto max-w-[1440px] px-4 py-8 sm:px-8">
       <header className="mb-6">
         <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-ink">
-          System Settings
+          <span className="text-lead-in">System</span> Settings
         </h1>
         <p className="mt-1.5 text-sm text-ink-secondary">
           ตั้งค่าตัวแปรระดับระบบ

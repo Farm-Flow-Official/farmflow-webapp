@@ -96,3 +96,75 @@
   --treva-white: #FFFFFF;
   --treva-black: #000000;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LEGACY + PARTNER RAMPS — not Treva CI.
+
+   These exist so the app can be rendered in brands other than Treva without a
+   single hex leaving this file (DESIGN.md §0 rule 2). They are consumed only by
+   src/styles/brands.css, which maps them onto the Layer-2 semantic roles.
+
+   Nothing here is themed: the alternate brands ship light-only.
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root {
+  /* ── FarmFlow v1 "Carbon Precision" ─────────────────────────────────────
+     Copied verbatim from the flat @theme block this token system replaced
+     (git show 1514e71:src/app/globals.css), so `classic` reproduces the v1
+     palette exactly rather than approximating it from the design document.
+
+     Roles Treva added that v1 never had are derived from how v1 actually drew
+     them in components, and each one says where it came from. */
+  --v1-primary:        #004C22;   --v1-primary-hover:  #003A1A;
+  --v1-primary-subtle: #F0FFF4;   --v1-primary-muted:  #D1FAE5;
+  --v1-accent:         #C8000E;   /* the retired True Red CTA */
+  --v1-accent-hover:   #A80009;
+
+  --v1-surface: #F7F8F9;   --v1-panel:  #FFFFFF;   --v1-sunken: #F0F2F4;
+  --v1-line:    #E4E7EB;   --v1-line-strong: #C9CDD3;
+
+  --v1-ink:           #111827;   --v1-ink-secondary: #4B5563;
+  --v1-ink-muted:     #9CA3AF;   --v1-ink-disabled:  #D1D5DB;
+
+  --v1-success: #166534;   --v1-success-bg: #F0FFF4;
+  --v1-warning: #92400E;   --v1-warning-bg: #FFFBEB;
+  --v1-error:   #991B1B;   --v1-error-bg:   #FEF2F2;   --v1-error-border: #FECACA;
+  --v1-info:    #1E40AF;   --v1-info-bg:    #EFF6FF;
+
+  --v1-chart-1: #008300;   --v1-chart-2: #2a78d6;   --v1-chart-3: #eda100;
+  --v1-chart-other: #9CA3AF;   --v1-chart-ghost: #D8DDE3;
+  --v1-funnel-1: #43B77A;  --v1-funnel-2: #2E9E63;  --v1-funnel-3: #1F7A46;
+
+  --v1-esg-e: #1F7A46;  --v1-esg-e-bg: #ECF7F0;
+  --v1-esg-s: #1D4ED8;  --v1-esg-s-bg: #EFF4FF;
+  --v1-esg-g: #B45309;  --v1-esg-g-bg: #FDF5E9;
+
+  --v1-gis-verified: #22C55E;  --v1-gis-pending: #F59E0B;  --v1-gis-flagged: #EF4444;
+
+  /* Derived — v1 had no token for these, so the value is taken from the class
+     v1 components actually used. */
+  --v1-warning-border: #FDE68A;  /* amber-200, the era's sibling of #FECACA   */
+  --v1-funnel-4:       #166534;  /* v1 shipped 3 steps; continues the ramp    */
+  --v1-gis-boundary:   #0EA5E9;  /* the sky blue v1 drew plot outlines in     */
+  --v1-overlay:  rgb(17 24 39 / 0.40);  /* the `bg-ink/40` mobile scrim       */
+
+  /* v1 leaned on Tailwind's default (pure black) shadows rather than a tinted
+     ramp; the medium step is the one the login card hard-coded. */
+  --v1-elev-sm: 0 1px 2px   rgb(0 0 0 / 0.06);
+  --v1-elev-md: 0 4px 12px  rgb(0 0 0 / 0.06);
+  --v1-elev-lg: 0 12px 32px rgb(0 0 0 / 0.10);
+
+  /* ── True Digital Group ─────────────────────────────────────────────────
+     DESIGN-TDG-Flavor.md §4.1/§4.3. TDG's own primary is #F11D1D, but white on
+     it is 4.26:1 — below AA for button labels — so buttons use #D7141A (5.24:1)
+     and #F11D1D is kept for gradient text, icons and display type ≥24px, where
+     the large-text rule applies. */
+  --tdg-action:       #D7141A;
+  --tdg-action-hover: #B5000B;
+  --tdg-on-action:    #FFFFFF;
+  --tdg-brand-red:    #F11D1D;   /* graphics only, never a background */
+  --tdg-lead-in:      #737373;   /* 4.74:1 — TDG's own #A3A3A3 is 2.52:1 */
+  --tdg-ink:          #262626;   /* 15.1:1, warmer than v1's #111827 */
+
+  --tdg-gradient-keyword: linear-gradient(90deg, #FF4040 0%, #F11D1D 45%, #B5000B 100%);
+  --tdg-gradient-carbon:  linear-gradient(90deg, #2E9E63 0%, #1F7A46 50%, #004C22 100%);
+}

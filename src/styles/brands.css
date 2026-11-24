@@ -1,0 +1,243 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   LAYER 2b — BRAND
+   DESIGN-TDG-Flavor.md v0.3.0, re-based onto the Treva token system (§10).
+
+   Three brands share one build. `<html data-brand>` picks one; every mode's CSS
+   ships in the same stylesheet, so switching is an attribute change, not a
+   rebuild:
+
+     (none)   Treva CI          — the real brand, docs/DESIGN.md v1.0.0
+     classic  FarmFlow v1       — "Carbon Precision", Forest Green
+     tdg      True Digital      — classic's palette + the TDG traits
+
+   `tdg` deliberately stands on `classic`, not on Treva: the flavor document's
+   reasoning (§0 rule 3, §2, §4.4, §8) is all written against the green
+   identity, and TDG red only reads as "do this" when the surrounding chrome is
+   not already carrying a second accent.
+
+   ── Two things this file has to get right ──────────────────────────────────
+
+   1. ORDER. `:root` and `[data-brand=…]` have the same specificity (0,1,0), so
+      whichever comes last wins. This file is imported AFTER theme.css; do not
+      reorder the imports in globals.css.
+
+   2. INHERITANCE, for --portal-accent only. Custom properties resolve from the
+      nearest ancestor that sets them. `--portal-accent` is declared on
+      [data-portal], a div INSIDE <html>, while data-brand sits on <html> — so
+      a rule on [data-brand] alone is simply out-ranked by the closer element
+      and silently does nothing. It has to be written as a descendant,
+      `[data-brand=…] [data-portal]`, which is the same shape theme.css already
+      uses for dark mode.
+
+   Alternate brands ship light-only. There is no [data-theme="dark"] variant
+   here, and none is needed while data-theme is pinned to light.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* ── New roles, with brand-neutral defaults ──────────────────────────────────
+   Each one resolves THROUGH an existing role, so Treva and classic render
+   exactly as they do today and only `tdg` moves. That is what makes the flavor
+   switchable rather than a fork. */
+:root {
+  /* The main action of a view. Not the same thing as `primary`: primary is
+     identity (nav, selection, carbon), action is "press this". They are the
+     same colour everywhere except TDG. */
+  --action:       var(--primary);
+  --action-hover: var(--primary-hover);
+  --on-action:    var(--on-primary);
+
+  /* Muted first half of a split title (§6.1a). Equal to --ink by default, so an
+     un-split title and a split one are indistinguishable outside tdg. */
+  --lead-in: var(--ink);
+
+  /* Red micro-label above a card title, and "ดูทั้งหมด ›" navigation links. */
+  --eyebrow:  var(--ink-secondary);
+  --link-cta: var(--primary);
+
+  /* Graphics-only brand red: gradient text, icons, display type ≥24px. Never a
+     background — see brand.css for the contrast reason. */
+  --brand-red: var(--danger-solid);
+
+  /* `none` makes .tdg-gradient-text fall back to a solid colour, so a headline
+     still reads correctly in every non-TDG brand. */
+  --gradient-keyword:        none;
+  --gradient-keyword-carbon: none;
+
+  /* One large rounded corner on a showcase hero (§6.2). The default matches the
+     rounded-2xl those blocks already carry, so nothing moves outside tdg. */
+  --radius-hero: 16px;
+}
+
+/* ── FarmFlow v1 palette — shared by `classic` and `tdg` ────────────────────
+   Every Layer-2 role is reassigned, including the ones v1 never had a token
+   for (see brand.css for where those values come from). Any role left out here
+   would quietly keep its Treva value and put an Eggplant or a Sea Blue in the
+   middle of a green screen. */
+[data-brand="classic"],
+[data-brand="tdg"] {
+  --surface:   var(--v1-surface);
+  --panel:     var(--v1-panel);
+  --raised:    var(--v1-panel);
+  --sunken:    var(--v1-sunken);
+  --highlight: var(--v1-primary-subtle);
+  --overlay:   var(--v1-overlay);
+
+  --line:        var(--v1-line);
+  --line-strong: var(--v1-line-strong);
+  --line-input:  var(--v1-line);
+  --ring:        var(--v1-primary);
+
+  --ink:           var(--v1-ink);
+  --ink-secondary: var(--v1-ink-secondary);
+  --ink-muted:     var(--v1-ink-muted);
+  --ink-disabled:  var(--v1-ink-disabled);
+
+  --brand:          var(--v1-primary);
+  --primary:        var(--v1-primary);
+  --primary-hover:  var(--v1-primary-hover);
+  --on-primary:     var(--v1-panel);
+  --primary-subtle: var(--v1-primary-subtle);
+  --primary-muted:  var(--v1-primary-muted);
+
+  /* v1 had no carbon role — the hero card drew a gradient of primary. */
+  --carbon:        var(--v1-primary);
+  --carbon-ink:    var(--v1-panel);
+  --carbon-subtle: var(--v1-primary-subtle);
+
+  /* v1's sidebar was a white panel with a green selection, not a dark rail. */
+  --sidebar:            var(--v1-panel);
+  --sidebar-ink:        var(--v1-ink-secondary);
+  --sidebar-ink-muted:  var(--v1-ink-muted);
+  --sidebar-active:     var(--v1-primary-subtle);
+  --sidebar-indicator:  var(--v1-primary);
+
+  --success: var(--v1-success);  --success-bg: var(--v1-success-bg);
+  --warning: var(--v1-warning);  --warning-bg: var(--v1-warning-bg);
+  --danger:  var(--v1-error);    --danger-bg:  var(--v1-error-bg);
+  --info:    var(--v1-info);     --info-bg:    var(--v1-info-bg);
+  --neutral: var(--v1-ink-secondary);  --neutral-bg: var(--v1-sunken);
+  --danger-solid:   var(--v1-accent);
+  --danger-border:  var(--v1-error-border);
+  --warning-border: var(--v1-warning-border);
+
+  --chart-1:     var(--v1-chart-1);
+  --chart-2:     var(--v1-chart-2);
+  --chart-3:     var(--v1-chart-3);
+  --chart-other: var(--v1-chart-other);
+  --chart-ghost: var(--v1-chart-ghost);
+  --funnel-1: var(--v1-funnel-1);  --funnel-2: var(--v1-funnel-2);
+  --funnel-3: var(--v1-funnel-3);  --funnel-4: var(--v1-funnel-4);
+
+  --esg-e: var(--v1-esg-e);  --esg-e-bg: var(--v1-esg-e-bg);
+  --esg-s: var(--v1-esg-s);  --esg-s-bg: var(--v1-esg-s-bg);
+  --esg-g: var(--v1-esg-g);  --esg-g-bg: var(--v1-esg-g-bg);
+
+  --gis-verified: var(--v1-gis-verified);
+  --gis-pending:  var(--v1-gis-pending);
+  --gis-flagged:  var(--v1-gis-flagged);
+  --gis-boundary: var(--v1-gis-boundary);
+  --on-imagery:   var(--v1-panel);
+
+  --elev-sm: var(--v1-elev-sm);
+  --elev-md: var(--v1-elev-md);
+  --elev-lg: var(--v1-elev-lg);
+}
+
+/* ── TDG traits, on top of the v1 palette ──────────────────────────────────
+   Everything NOT listed here is v1 — that is the point of the flavor. Red is
+   for calls to action and brand moments; green keeps meaning identity, carbon,
+   selection and success (§0 rule 3). */
+[data-brand="tdg"] {
+  --action:       var(--tdg-action);
+  --action-hover: var(--tdg-action-hover);
+  --on-action:    var(--tdg-on-action);
+
+  --brand-red: var(--tdg-brand-red);
+  --eyebrow:   var(--tdg-action);
+  --link-cta:  var(--tdg-action);
+  --lead-in:   var(--tdg-lead-in);
+
+  /* Slightly warmer ink, closer to TDG's neutral greys. 15.1:1 on white. */
+  --ink: var(--tdg-ink);
+
+  /* The v1 notification dot and KPI accent used the retired True Red; in TDG
+     mode they become TDG's red rather than staying FarmFlow's. */
+  --danger-solid: var(--tdg-action);
+
+  --gradient-keyword:        var(--tdg-gradient-keyword);
+  --gradient-keyword-carbon: var(--tdg-gradient-carbon);
+
+  --radius-hero: 80px;
+
+  /* §5. Satoshi is not on Google Fonts and its commercial licence is still
+     unconfirmed (flavor doc §9), so Latin and Thai both come from IBM Plex Sans
+     Thai — the Thai half of the stack TDG actually uses. Swapping Satoshi in
+     later is this one line plus a next/font/local call.
+     --font-role-numeric is deliberately untouched: §4.2 keeps Inter's tabular
+     figures for IDs and table numbers in every brand. */
+  --font-role-sans:    var(--font-plex-thai), system-ui, -apple-system, sans-serif;
+  --font-role-display: var(--font-plex-thai), system-ui, sans-serif;
+}
+
+@media (max-width: 639px) {
+  [data-brand="tdg"] { --radius-hero: 40px; }
+}
+
+/* ── Topbar edge stripe ─────────────────────────────────────────────────────
+   Treva already draws a 3px bar there to say which portal you are in, so the
+   flavor recolours that bar instead of adding a second one (two stripes at the
+   same edge would stack to 5px). Descendant selectors — see note 2 at the top.
+
+   tdg: one red line everywhere, TDG's signal, at the cost of the portal cue.
+   classic: v1 had no bar at all. */
+[data-brand="tdg"] [data-portal]     { --portal-accent: var(--tdg-brand-red); }
+[data-brand="classic"] [data-portal] { --portal-accent: transparent; }
+
+/* ── Level 2 utilities (§6.2) ───────────────────────────────────────────────
+   Opt-in per element, so a page never picks up a showcase trait by accident.
+   Each one degrades to the plain v1/Treva rendering when the brand is not tdg,
+   which is what keeps `data-brand` a true switch rather than a mode the markup
+   depends on. */
+/* No colour in the base rule on purpose. These classes are imported outside
+   @layer, so an unlayered `color` here would beat the element's own Tailwind
+   utility and repaint it in EVERY brand — a `text-primary` headline would turn
+   to ink the moment it was marked as a gradient candidate. Call sites keep
+   their colour class; it is what the gradient falls back to. */
+[data-brand="tdg"] .tdg-gradient-text,
+[data-brand="tdg"] .tdg-gradient-text-carbon {
+  background-image: var(--gradient-keyword);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+[data-brand="tdg"] .tdg-gradient-text-carbon {
+  background-image: var(--gradient-keyword-carbon);
+}
+
+/* One large corner on a showcase hero. Shape, not colour — the surface stays
+   white (§0 rule 7). */
+.tdg-hero-corner { border-bottom-right-radius: var(--radius-hero); }
+
+/* "ดูทั้งหมด ›" — the colour comes from a token in every brand; the chevron and
+   the heavier weight are TDG-only. The chevron is CSS so no JSX carries an icon
+   that would be dead weight in the other brands. */
+.tdg-link { color: var(--link-cta); }
+[data-brand="tdg"] .tdg-link { font-weight: 500; }
+[data-brand="tdg"] .tdg-link::after {
+  content: "\00a0\203A";
+  transition: margin 150ms ease;
+}
+[data-brand="tdg"] .tdg-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Gradient text is painted, so it disappears in forced-colours mode. Fall back
+   to the system text colour rather than to `transparent`. */
+@media (forced-colors: active) {
+  [data-brand="tdg"] .tdg-gradient-text,
+  [data-brand="tdg"] .tdg-gradient-text-carbon {
+    color: CanvasText;
+    background: none;
+  }
+}

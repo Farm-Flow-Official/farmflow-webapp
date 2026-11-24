@@ -237,7 +237,7 @@ export function NotificationBell({
           <Link
             href={feed.seeAllHref}
             onClick={() => setOpen(false)}
-            className="block border-t border-line px-4 py-2.5 text-center text-[12px] font-medium text-primary transition-colors hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            className="tdg-link block border-t border-line px-4 py-2.5 text-center text-[12px] font-medium transition-colors hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
           >
             ดูการแจ้งเตือนทั้งหมด
           </Link>
