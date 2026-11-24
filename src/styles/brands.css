@@ -49,8 +49,14 @@
      un-split title and a split one are indistinguishable outside tdg. */
   --lead-in: var(--ink);
 
-  /* Red micro-label above a card title, and "ดูทั้งหมด ›" navigation links. */
-  --eyebrow:  var(--ink-secondary);
+  /* Red micro-label above a card title, and "ดูทั้งหมด ›" navigation links.
+
+     The flavor document gives --color-eyebrow a default of #4B5563, i.e.
+     ink-secondary. The one card label that became an eyebrow was drawn in
+     ink-muted, so taking the document's value would darken it in Treva and
+     classic — and §0 rule 2 says every TDG trait disappears when data-brand
+     does. Matching the call site wins over matching the document. */
+  --eyebrow:  var(--ink-muted);
   --link-cta: var(--primary);
 
   /* Graphics-only brand red: gradient text, icons, display type ≥24px. Never a
