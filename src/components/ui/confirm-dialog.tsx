@@ -26,7 +26,7 @@ const TONES: Record<Tone, { chip: string; button: string }> = {
   },
   primary: {
     chip: 'bg-primary-subtle text-primary',
-    button: 'bg-primary hover:bg-primary-hover focus-visible:ring-primary',
+    button: 'bg-action hover:bg-action-hover focus-visible:ring-action',
   },
 }
 

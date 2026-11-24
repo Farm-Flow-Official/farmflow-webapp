@@ -84,7 +84,7 @@ export function GisExplorer({
       {/* Control bar */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line bg-panel px-4 py-3 sm:px-6">
         <div className="flex items-center gap-3">
-          <h1 className="text-lg font-semibold tracking-tight text-ink">GIS Farm Map</h1>
+          <h1 className="text-lg font-semibold tracking-tight text-ink"><span className="text-lead-in">GIS Farm</span> Map</h1>
           {flaggedCount > 0 && (
             <span className="inline-flex items-center gap-1.5 rounded-full border border-error-border bg-error-bg px-2.5 py-1 text-xs font-semibold text-error">
               <TriangleAlert className="h-3.5 w-3.5" strokeWidth={1.75} />

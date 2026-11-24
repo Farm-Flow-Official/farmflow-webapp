@@ -15,7 +15,7 @@ export default async function FarmersPage() {
     <div className="mx-auto max-w-[1440px] px-8 py-8">
       <header className="mb-6">
         <h1 className="text-[28px] font-semibold leading-tight tracking-tight text-ink">
-          Farmer Management
+          <span className="text-lead-in">Farmer</span> Management
         </h1>
         <p className="mt-1.5 text-sm text-ink-secondary">
           จัดการบัญชีเกษตรกรทั้งหมด ·{' '}

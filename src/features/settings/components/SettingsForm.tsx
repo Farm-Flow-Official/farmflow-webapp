@@ -128,7 +128,7 @@ export function SettingsForm({ config, currentAdminUsername }: Props) {
             type="button"
             disabled={!changed}
             onClick={() => setConfirming(true)}
-            className="h-11 shrink-0 rounded-lg bg-primary px-6 text-sm font-semibold text-on-primary transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+            className="h-11 shrink-0 rounded-lg bg-action px-6 text-sm font-semibold text-on-action transition-colors hover:bg-action-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-action focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
           >
             บันทึก
           </button>

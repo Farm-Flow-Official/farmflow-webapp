@@ -469,7 +469,7 @@ function AnnouncementForm({
         <button
           type="button"
           onClick={submit}
-          className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-on-primary transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+          className="rounded-lg bg-action px-4 py-2 text-sm font-semibold text-on-action transition-colors hover:bg-action-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-action focus-visible:ring-offset-2"
         >
           {initial ? 'บันทึกการแก้ไข' : 'สร้างประกาศ'}
         </button>

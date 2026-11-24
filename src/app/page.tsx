@@ -76,7 +76,7 @@ export default async function PortalLandingPage() {
                   <Icon className="h-5 w-5" strokeWidth={1.9} />
                 </span>
                 <h2 className="text-base font-semibold text-ink">{p.title}</h2>
-                <p className="text-[11px] font-medium uppercase tracking-wide text-ink-muted">
+                <p className="text-[11px] font-medium uppercase tracking-wide text-eyebrow">
                   {p.sub}
                 </p>
                 <p className="mt-2 flex-1 text-[13px] text-ink-secondary">{p.desc}</p>

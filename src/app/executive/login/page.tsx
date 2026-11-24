@@ -28,7 +28,7 @@ export default async function ExecutiveLoginPage() {
       <div className="w-full max-w-[440px]">
         <BackToPortals className="mb-3 -ml-2" />
 
-        <div className="rounded-xl border border-line bg-panel px-12 py-12 shadow-[0_4px_12px_rgba(0,0,0,0.06)]">
+        <div className="tdg-hero-corner rounded-xl border border-line bg-panel px-12 py-12 shadow-md">
           <div className="mb-8 flex flex-col items-center gap-2">
             <div className="flex items-center gap-2.5">
               <Logo size={32} />
